@@ -66,8 +66,8 @@ public class Engine
 		logs = new ArrayList<>();
 		
 		presentDurability = totalDurability;
-		presentProgress = 0;
-		presentQuality = 0;
+		presentProgress = 9000;
+		presentQuality = 60000;
 		presentCP = totalCP;
 		observed = false;
 		working = true;
@@ -345,14 +345,14 @@ public class Engine
 		final int lv2 = 5000;
 		final int lv3 = 6000;
 		
-		if(presentQuality < lv1) {
+		if(presentQuality/10 < lv1) {
 			return 0;
-		} else if (presentQuality < lv2) {
-			return (int)Math.floor(175 + (double)(presentQuality - lv1) * 0.1);
-		} else if (presentQuality < lv3) {
-			return (int)Math.floor(370 + (double)(presentQuality - lv2) * 0.25);
+		} else if (presentQuality/10 < lv2) {
+			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
+		} else if (presentQuality/10 < lv3) {
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.25);
 		} else {
-			return (int)Math.floor(800 + (double)(presentQuality - lv3) * 0.9);
+			return (int)Math.floor(800 + ((double)presentQuality/10 - lv3) * 0.9);
 		}
 	}
 	
