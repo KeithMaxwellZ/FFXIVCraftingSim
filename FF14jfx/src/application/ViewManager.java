@@ -53,7 +53,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 30.0;
 	
-	private static final String VERSION = "V0.5.0";
+	private static final String VERSION = "V0.5.1";
 	
 	private Stage stage;
 	private Scene mainScene;
