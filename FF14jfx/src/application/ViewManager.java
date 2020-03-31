@@ -453,7 +453,17 @@ public class ViewManager
 		engine.addToLogs("Status: " + es.toString());
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
-		al.setContentText("收藏价值:  " + engine.getPresentQuality() / 10);
+		
+		GridPane gp = new GridPane();
+		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		gp.add(val, 0, 0);
+		if(es == ExceptionStatus.Craft_Success) {		
+			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
+			gp.add(SP, 0, 1);	
+		}
+		
+		al.getDialogPane().setExpandableContent(gp);
+		al.getDialogPane().setExpanded(true);
 		
 		al.showAndWait();
 	}
