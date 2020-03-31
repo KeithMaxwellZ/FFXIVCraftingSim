@@ -9,7 +9,8 @@ public enum ExceptionStatus
 	Inner_Quiet_Exists("现在无法使用（内静已经存在）"),
 	Not_Turn_One("现在无法使用（只能在首次作业时使用）"),
 	Waste_Not_Exist("现在无法使用（无法在俭约buff存在时使用俭约加工）"),
-	No_Enough_CP("CP不足")
+	No_Enough_CP("CP不足"),
+	Maximun_Reached("现在无法使用（已达到最大使用次数）"),
 	;
 	
 	private String message;

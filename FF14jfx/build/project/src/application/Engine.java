@@ -27,6 +27,8 @@ public class Engine
 	private int baseQltyEff;
 	private int round;
 	
+	private int csCount;
+	
 	private ArrayList<String> logs;
 	
 	private CraftingStatus cs;
@@ -68,9 +70,12 @@ public class Engine
 		presentDurability = totalDurability;
 		presentProgress = 0;
 		presentQuality = 0;
+		csCount = 0;
 		presentCP = totalCP;
 		observed = false;
 		working = true;
+		progIncreased = false;
+		qltyIncreased = false;
 		
 		round = 0;
 		
@@ -130,6 +135,8 @@ public class Engine
 	
 	public void beginning() {
 		success = false;
+		progIncreased = false;
+		qltyIncreased = false;
 		addToLogs(" ");
 		addToLogs("===Round " + round + " ===");
 		addToLogs("Observed?: " + observed);
@@ -213,6 +220,16 @@ public class Engine
 	}
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
+		if(sk == SpecialSkills.Careful_Observation) {
+			if(csCount >= 3) {
+				throw new CraftingException(ExceptionStatus.Maximun_Reached);
+			}
+			csCount++;
+			beginning();
+			success = true;
+			cs = CraftingStatus.getNextStatus();
+			return;
+		}
 		beginning();
 		addToLogs("Skill name: " + (sk).toString());
 

@@ -52,6 +52,8 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 30.0;
 	
+	private static final String VERSION = "V0.4.0";
+	
 	private Stage stage;
 	private Scene mainScene;
 	private AnchorPane mainPane;
@@ -135,6 +137,7 @@ public class ViewManager
 		
 		otherSkills.add(SpecialSkills.Observe);
 		otherSkills.add(SpecialSkills.Tricks_of_the_Trade);
+		otherSkills.add(SpecialSkills.Careful_Observation);
 	}
 	
 	private void initStage() {
@@ -144,7 +147,7 @@ public class ViewManager
 		
 		mainPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, null, null)));
 		
-		stage.setTitle("FFXIV Crafting Simulator");
+		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 	}
@@ -168,6 +171,7 @@ public class ViewManager
 		
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
+		engine.setWorking(false);
 	}
 	
 	private Node initInput() {
@@ -301,7 +305,8 @@ public class ViewManager
 		HBox container = new HBox();
 		container.setAlignment(Pos.CENTER);
 		
-		Text status = new Text("  通常   ");
+		Text status = new Text("  通常     ");
+		status.setFill(Color.WHITE);
 		statusDisp = new Circle(10, Color.WHITE);
 		Text cp = new Text("CP");
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
@@ -407,6 +412,8 @@ public class ViewManager
 			b.setOnMouseClicked(e -> {
 				if(engine.isWorking()) {
 					performSkill(s);
+				} else {
+					startWarning();
 				}
 			});
 			b.setOnMouseEntered(e -> {
@@ -424,6 +431,13 @@ public class ViewManager
 		return skillLine;
 	}
 	
+	private void startWarning() {
+		Alert al = new Alert(AlertType.WARNING);
+		al.setTitle("未开始作业");
+		al.setHeaderText(null);
+		al.setContentText("请先按‘确认’键以开始作业");
+		al.showAndWait();
+	}
 	
 	private void performSkill(Skill sk) {
 		try {
@@ -436,7 +450,8 @@ public class ViewManager
 						e.es == ExceptionStatus.Inner_Quiet_Exists ||
 						e.es == ExceptionStatus.Not_Turn_One ||
 						e.es == ExceptionStatus.Waste_Not_Exist ||
-						e.es == ExceptionStatus.No_Enough_CP) {
+						e.es == ExceptionStatus.No_Enough_CP ||
+						e.es == ExceptionStatus.Maximun_Reached) {
 				postInvalidMessage(e.es);
 			} else {
 				postUnexpectedMessage();
