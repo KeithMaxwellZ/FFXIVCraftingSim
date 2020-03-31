@@ -26,6 +26,10 @@ public interface Skill
 	
 	public String getAddress();
 	
+	public String getBaseProgressRate();
+	
+	public String getBaseQualityRate();
+	
 	public double getActualProgressRate();
 	
 	public double getActualQualityRate() throws CraftingException;
