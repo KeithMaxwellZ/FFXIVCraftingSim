@@ -51,6 +51,13 @@ All notable changes to this project will be documented in this file.
 - Added start confirmation
 
 # [0.5.0] 2020-03-31
-# Added
+## Added
 - Added timer, records the complete time of crafting
 - Added last skill display
+
+# [0.5.1] 2020-03-31
+## Added
+- Exporting the crafting summary to logs
+
+## Fixed
+- Fixed the issue with last skill display after starting a new craft process
