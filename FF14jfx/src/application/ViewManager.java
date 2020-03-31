@@ -484,16 +484,24 @@ public class ViewManager
 	}
 	
 	private void postFinishMessage(ExceptionStatus es) {
-		updateAll();
-		engine.setWorking(false);
 		Alert al = new Alert(AlertType.INFORMATION);
-		engine.addToLogs("Status: " + es.toString());
-		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
-		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
-		
 		GridPane gp = new GridPane();
 		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
 		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		
+		updateAll();
+		
+		engine.setWorking(false);
+		engine.addToLogs("Status: " + es.toString());
+		engine.addToLogs("Total time: " + engine.getRuntime());
+		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
+		engine.addToLogs("Skill Points: " + engine.SPCalc());
+		engine.addToLogs("========= Summary =========");
+		engine.addToLogs("===========================");
+		
+		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
+		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
+		
 		gp.add(runTime, 0, 0);
 		gp.add(val, 0, 1);
 		if(es == ExceptionStatus.Craft_Success) {		
