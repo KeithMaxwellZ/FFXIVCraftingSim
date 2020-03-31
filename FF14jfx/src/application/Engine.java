@@ -287,8 +287,7 @@ public class Engine
 		for(int i = 0; i < activeBuffs.size(); i++)
 		{
 			if(activeBuffs.get(i).buff == Buff.manipulation) {
-				presentDurability += 5;
-				if(presentCP > totalCP) {presentCP = totalCP;}
+				presentDurability += (presentDurability <= (totalDurability - 5) ? 5 : 0);
 			}
 			activeBuffs.get(i).decrease();
 			if(activeBuffs.get(i).getRemaining() == 0) {
