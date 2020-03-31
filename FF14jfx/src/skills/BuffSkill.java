@@ -132,7 +132,7 @@ public enum BuffSkill implements Skill
 	}
 
 	public void createBuff() {
-		System.out.println("Buff: " + buff.toString() + " " + last);
+		engine.addToLogs("Buff Created: " + buff.toString() + " " + last);
 		engine.addActiveBuff(buff, last);
 		if(this == Inner_Quiet || this == Reflect) {
 			engine.setInnerQuiet(last);
