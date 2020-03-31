@@ -73,6 +73,16 @@ public enum BuffSkill implements Skill
 		return imgAddress;
 	}
 	
+	@Override 
+	public String getBaseProgressRate() {
+		return Double.toString(progressRate * 100) + "%";
+	}
+	
+	@Override 
+	public String getBaseQualityRate() {
+		return Double.toString(qualityRate * 100) + "%";
+	}
+	
 	@Override
 	public double getActualProgressRate()
 	{
