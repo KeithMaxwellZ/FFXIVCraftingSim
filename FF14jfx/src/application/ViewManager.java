@@ -52,6 +52,8 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 30.0;
 	
+	private static final String VERSION = "V0.4.0";
+	
 	private Stage stage;
 	private Scene mainScene;
 	private AnchorPane mainPane;
@@ -145,7 +147,7 @@ public class ViewManager
 		
 		mainPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, null, null)));
 		
-		stage.setTitle("FFXIV Crafting Simulator");
+		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 	}
