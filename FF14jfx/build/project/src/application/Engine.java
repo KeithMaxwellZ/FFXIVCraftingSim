@@ -27,6 +27,8 @@ public class Engine
 	private int baseQltyEff;
 	private int round;
 	
+	private ArrayList<String> logs;
+	
 	private CraftingStatus cs;
 	
 	private boolean progIncreased;
@@ -61,6 +63,7 @@ public class Engine
 		this.recControl = recControl;
 		
 		activeBuffs = new ArrayList<>();
+		logs = new ArrayList<>();
 		
 		presentDurability = totalDurability;
 		presentProgress = 0;
@@ -78,8 +81,12 @@ public class Engine
 		
 		setEnumEngine();
 		
-		System.out.println("Craftsmanship: " + craftsmanship);
-		System.out.println("Control: " + control);
+		addToLogs("Craftsmanship: " + craftsmanship);
+		addToLogs("Control: " + control);
+		addToLogs("CP: " + totalCP);
+		addToLogs("Progress: " + totalProgress);
+		addToLogs("Quality: " + totalQUality);
+		addToLogs("=========================");
 	}
 	
 	public void addActiveBuff(Buff b, int last) {
@@ -112,7 +119,7 @@ public class Engine
 		int durDec = sk.getDurCost() / (buffExist(Buff.waste_not) ? 2 : 1) / (cs == CraftingStatus.Sturdy ? 2 : 1);
 		int cpDec = sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1);
 
-		System.out.println("Duration Cost: " + durDec);
+		addToLogs("Duration Cost: " + durDec);
 
 		presentDurability -= durDec;
 		presentCP -= cpDec; 
@@ -121,13 +128,12 @@ public class Engine
 	
 	public void beginning() {
 		success = false;
-		System.out.println();
-		System.out.println("===Round " + round + " ===");
-		System.out.println("Observed?: " + observed);
+		addToLogs(" ");
+		addToLogs("===Round " + round + " ===");
+		addToLogs("Observed?: " + observed);
 	}
 	
 	public void useSkill(Skill sk) throws CraftingException { 
-		System.out.println("aaaaaaa");
 		if(presentCP < sk.getCPCost()) {
 			throw new CraftingException(ExceptionStatus.No_Enough_CP);
 		} 
@@ -141,7 +147,6 @@ public class Engine
 	}
 	
 	private void usePQSkill(PQSkill sk) throws CraftingException {
-		System.out.println("PQSkill used");
 		if(sk == PQSkill.Intensive_Synthesis || sk == PQSkill.Precise_Touch) {
 			if(cs != CraftingStatus.HQ) {
 				throw new CraftingException(ExceptionStatus.Not_HQ);
@@ -152,6 +157,8 @@ public class Engine
 		}
 		
 		beginning();
+		addToLogs("Skill name: " + (sk).toString());
+
 		if(sk.isSuccess()) {
 			success = true;
 			forwardProgress(sk);
@@ -161,24 +168,22 @@ public class Engine
 				setBuffInnerQuiet(innerQuietLvl);
 			}
 		}
-		System.out.println("Skill name: " + (sk).toString());
-		System.out.println("Success? : " + success);
+		
+		addToLogs("Success? : " + success);
 		
 		observed = false;
 		finalizeRound(sk);
 	}
 	
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
-		System.out.println("BuffSkill used");
 		if(sk == BuffSkill.Final_Appraisal) {
 			beginning();
+			success = true;
+			presentCP--;
 			sk.createBuff();
 			return;
 		}
-		System.out.println("Buff list: ");
-		for(ActiveBuff ab: activeBuffs) {
-			System.out.println(ab.buff.toString() + "   " + ab.getRemaining());
-		}
+		
 		if(sk == BuffSkill.Inner_Quiet) {
 			if(innerQuietLvl > 0) {
 				throw new CraftingException(ExceptionStatus.Inner_Quiet_Exists);
@@ -189,13 +194,14 @@ public class Engine
 				throw new CraftingException(ExceptionStatus.Not_Turn_One);
 			}
 		}
+		
 		beginning();
-				
+		addToLogs("Skill name: " + (sk).toString());
+
 		if(sk.isSuccess()) {
 			success = true;
 			forwardProgress(sk);
 		}
-		System.out.println("Skill name: " + (sk).toString());
 		
 		observed = false;
 
@@ -205,12 +211,14 @@ public class Engine
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
 		beginning();
+		addToLogs("Skill name: " + (sk).toString());
+
 		observed = false;
+
 		if(sk.isSuccess()) {
 			success = true;
 			forwardProgress(sk);
 		}
-		System.out.println("Skill name: " + (sk).toString());
 		
 		
 		sk.execute();
@@ -224,8 +232,8 @@ public class Engine
 		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
 		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * 
 								   (cs == CraftingStatus.HQ ? 1.5 : 1)) * tempQualityRate);
-		System.out.println("Progress Increase: " + tempProgressIncrease + " rate: " + tempProgressRate);
-		System.out.println("Quality Increase: " + tempQualityIncrease + " rate: " + tempQualityRate);
+		addToLogs("Progress Increase: " + tempProgressIncrease + " rate: " + tempProgressRate);
+		addToLogs("Quality Increase: " + tempQualityIncrease + " rate: " + tempQualityRate);
 		
 		progIncreased = tempProgressIncrease > 0;
 		qltyIncreased = tempQualityIncrease > 0;
@@ -249,7 +257,7 @@ public class Engine
 		} else if(tempQualityIncrease > 0 && buffExist(Buff.inner_quiet)) {
 			innerQuietLvl += 1;
 			setBuffInnerQuiet(innerQuietLvl);
-			if(sk == PQSkill.Preparatory_Touch) {
+			if(sk == PQSkill.Preparatory_Touch || sk == PQSkill.Precise_Touch) {
 				innerQuietLvl += 1;
 				setBuffInnerQuiet(innerQuietLvl);
 			}
@@ -322,6 +330,10 @@ public class Engine
 		}
 		baseQltyEff = (int)Math.floor(qualityDifference * (0.35 * (double)buffControl + 35) * 
 				(10000.0 + (double)buffControl)/(10000.0 + (double)recControl));
+	}
+	
+	public void addToLogs(String s) {
+		logs.add(s);
 	}
 	
 	public void setBuffInnerQuiet(int val) {
@@ -422,5 +434,13 @@ public class Engine
 	
 	public void setWorking(boolean b) {
 		working = b;
+	}
+	
+	public int getRound() {
+		return round + 1;
+	}
+	
+	public ArrayList<String> getLogs() {
+		return new ArrayList<String>(logs);
 	}
 }

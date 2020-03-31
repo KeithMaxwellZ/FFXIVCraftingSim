@@ -1,0 +1,24 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+# [0.2.0] 2020-03-30
+## Added
+- The display of skill name
+- The present turn display
+
+## Changed
+- improved skill area display
+- changed the margin of the input area
+
+## Fixed
+- The issue that Patient_Touch gains 2 Inner_Quiet level instead of double it
+- Prudent touch costs 10 durability, now costs 5
+
+# [0.2.0] 2020-03-31
+## Added
+- The display of skill efficiency and durability cost
+- Added the logs output
+
+## Fixed
+- Fixed the issue that the buff Great_Strides lasts for 4 turns, now only lasts for 3
+- Fixed the issue that Precise_Touch gains only 1 Inner_Quite, now gains 2

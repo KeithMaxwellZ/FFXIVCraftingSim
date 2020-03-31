@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -23,6 +24,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -41,7 +43,7 @@ public class ViewManager
 	private static final double WIDTH = 650;
 	private static final double REC_WIDTH = 580;
 	private static final double HEIGHT = 660;
-	private static final double INPUT_HEIGHT = 90;
+	private static final double EDGE_GENERAL = 8.0;
 	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
 	private static final double BAR_WIDTH = 400.0;
@@ -57,7 +59,8 @@ public class ViewManager
 	private Circle statusDisp;
 	private Text efficiencyDisp;
 	private HBox buffContainer;
-	private Text durabilityVal;
+	private Text durabilityText;
+	private Text round;
 	private Text skillDescription;
 	
 	ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
@@ -203,7 +206,7 @@ public class ViewManager
 		rControlTf.setPrefWidth(tfWidth);
 		
 		Button confirm = new Button("确认");
-		confirm.setOnAction(e -> {
+		confirm.setOnMouseClicked(e -> {
 			engine = new Engine(Integer.parseInt(craftTf.getText()), 
 								Integer.parseInt(controlTf.getText()), 
 								Integer.parseInt(CPTf.getText()), 
@@ -215,6 +218,11 @@ public class ViewManager
 			updateAll();
 		});
 		
+		Button logs = new Button("日志"); 
+		logs.setOnMouseClicked(e -> {
+			exportLogs();
+		});
+		
 		int i = 0;
 		int j = 0;
 		gp.add(craftT, i, j);
@@ -222,7 +230,8 @@ public class ViewManager
 		gp.add(confirm, i++, j + 2);
 		
 		gp.add(controlT, i, j);
-		gp.add(controlTf, i++, j + 1);
+		gp.add(controlTf, i, j + 1);
+		gp.add(logs, i++, j + 2);
 		
 		gp.add(CPT, i, j);
 		gp.add(CPTf, i++, j + 1);
@@ -246,15 +255,15 @@ public class ViewManager
 		
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
-		double edge = 12.0;
-		border.setPrefWidth(REC_WIDTH + edge);
+
+		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
 		back.add(gp, 0, 0);
 		border.setBackground(new Background(new BackgroundFill(Color.SILVER, null, null)));
 		back.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
 		
-		GridPane.setMargin(back, new Insets(edge / 2));
-		GridPane.setMargin(gp, new Insets(edge / 2));
+		GridPane.setMargin(back, new Insets(EDGE_GENERAL / 2));
+		GridPane.setMargin(gp, new Insets(EDGE_GENERAL / 2));
 		
 		return border;
 	}
@@ -263,8 +272,8 @@ public class ViewManager
 		GridPane container = new GridPane();
 		container.setAlignment(Pos.CENTER);
 		
-		Text durabilityText = new Text("  耐久          ");
-		durabilityVal = new Text("  " + engine.presentDurability + "/" + engine.totalDurability);
+		durabilityText = new Text("耐久:  " + engine.presentDurability + "/" + engine.totalDurability);
+		round = new Text("工次:  " + engine.getRound());
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		Text progressText = new Text(engine.presentProgress + "/" + engine.totalProgress);
@@ -274,7 +283,7 @@ public class ViewManager
 		progText.add(qualityText);
 		
 		container.add(durabilityText, 0, 0);
-		container.add(durabilityVal, 0, 1);
+		container.add(round, 0, 1);
 		
 		container.add(progressBar, 1, 0);
 		container.add(progressText, 2, 0);
@@ -346,10 +355,9 @@ public class ViewManager
 		skillContainer.add(createSkillList(otherSkills), i, j + 4);
 		
 		AnchorPane border = new AnchorPane();
-		double edge = 8.0;
 		
 		border.getChildren().add(skillContainer);
-		border.setPrefSize(REC_WIDTH + edge, SKILL_HEIGHT + edge);
+		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
 		skillContainer.setPrefSize(REC_WIDTH, SKILL_HEIGHT);
 		
 		border.setBackground(new Background(
@@ -357,8 +365,8 @@ public class ViewManager
 		skillContainer.setBackground(new Background(
 				new BackgroundFill(Color.AZURE, new CornerRadii(5.0), null)));
 		
-		AnchorPane.setLeftAnchor(skillContainer, edge / 2);
-		AnchorPane.setTopAnchor(skillContainer, edge / 2);
+		AnchorPane.setLeftAnchor(skillContainer, EDGE_GENERAL / 2);
+		AnchorPane.setTopAnchor(skillContainer, EDGE_GENERAL / 2);
 		
 		for(Node n: skillContainer.getChildren()) {
 			GridPane.setMargin(n, new Insets(0, 0, 0, 10));
@@ -373,7 +381,7 @@ public class ViewManager
 		skillLine.setSpacing(5);
 		
 		for(Skill s: skl) {
-			System.out.println(s.getAddress());
+			engine.addToLogs(s.toString() + ": " + s.getAddress());;
 			
 			AnchorPane skillIcon = new AnchorPane();
 			Image icon = new Image(s.getAddress(), true);
@@ -419,7 +427,6 @@ public class ViewManager
 	
 	private void performSkill(Skill sk) {
 		try {
-			System.out.println("tst");
 			engine.useSkill(sk); 
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
@@ -443,7 +450,7 @@ public class ViewManager
 		updateAll();
 		engine.setWorking(false);
 		Alert al = new Alert(AlertType.INFORMATION);
-		System.out.println(es.toString());
+		engine.addToLogs("Status: " + es.toString());
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		al.setContentText("收藏价值:  " + engine.getPresentQuality() / 10);
@@ -467,10 +474,10 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
-	private AnchorPane createBar(Color c, double width, double height, double edge) {
+	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
 
 		AnchorPane bar = new AnchorPane();
-		Rectangle edgeR = new Rectangle(width + 2 * edge, height + 2 * edge, Color.BLACK);
+		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.BLACK);
 		Rectangle fill = new Rectangle(width, height, Color.WHITE);
 		Rectangle progress = new Rectangle(0, height, c);
 		
@@ -533,8 +540,9 @@ public class ViewManager
 	}
 	
 	public void updateDur() {
-		System.out.println("Present dur: " + engine.presentDurability);
-		durabilityVal.setText("  " + engine.presentDurability+ "/" + engine.totalDurability);;
+		engine.addToLogs("Present dur: " + engine.presentDurability);
+		durabilityText.setText("耐久:  " + engine.presentDurability+ "/" + engine.totalDurability);
+		round.setText("工次:  " + engine.getRound());;
 		
 	}
 	
@@ -566,7 +574,7 @@ public class ViewManager
 		Text buffText = new Text("  Buff:");
 		buffContainer.getChildren().add(buffText);
 		for(ActiveBuff ab: engine.activeBuffs) {
-			System.out.println("refreshing buffs... " + ab.buff.toString() + " " + ab.getRemaining());
+			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = new ImageView(new Image(ab.buff.getAddress(), true));
@@ -575,7 +583,39 @@ public class ViewManager
 			ap.getChildren().add(remaining);
 
 			buffContainer.getChildren().add(ap);
+			
 		}
+	}
+	
+	public void exportLogs() {
+		Alert al = new Alert(AlertType.INFORMATION);
+		GridPane container = new GridPane();
+		Text title = new Text("日志");
+		TextArea logsOutput = new TextArea();
+		
+		logsOutput.setEditable(false);
+		logsOutput.setWrapText(false);
+		
+		for(String s: engine.getLogs()) {
+			System.out.println(s);
+			logsOutput.setText(logsOutput.getText() + "\n" + s);
+		}
+		
+		
+		GridPane.setVgrow(logsOutput, Priority.ALWAYS);
+		GridPane.setHgrow(logsOutput, Priority.ALWAYS);
+		
+		al.setTitle("以下为日志输出");
+		al.setHeaderText(null);
+		
+		container.setMaxWidth(Double.MAX_VALUE);
+		container.add(title, 0, 0);
+		container.add(logsOutput, 0, 1);
+		
+		al.getDialogPane().setExpandableContent(container);
+		al.getDialogPane().setExpanded(true);
+		
+		al.showAndWait();
 	}
 	
 	public Stage getStage() {
