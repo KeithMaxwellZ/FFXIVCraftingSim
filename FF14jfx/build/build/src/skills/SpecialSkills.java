@@ -33,6 +33,20 @@ public enum SpecialSkills implements Skill
 		return imgAddress;
 	}
 	
+	@Override 
+	public String getBaseProgressRate() {
+		return "0.0%";
+	}
+	
+	@Override 
+	public String getBaseQualityRate() {
+		if(this == Byregots_Blessing) {
+			return "100% + 20% * ÄÚ¾²²ãÊı";
+		} else {
+			return "0.0%";
+		}
+	}
+	
 	@Override
 	public double getActualProgressRate()
 	{

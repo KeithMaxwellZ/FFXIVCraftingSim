@@ -74,6 +74,16 @@ public enum PQSkill implements Skill
 		return name;
 	}
 	
+	@Override 
+	public String getBaseProgressRate() {
+		return Double.toString(progressRate * 100) + "%";
+	}
+	
+	@Override 
+	public String getBaseQualityRate() {
+		return Double.toString(qualityRate * 100) + "%";
+	}
+	
 	@Override
 	public String getAddress() {
 		return imgAddress;
