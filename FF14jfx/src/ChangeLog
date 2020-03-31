@@ -22,3 +22,11 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 - Fixed the issue that the buff Great_Strides lasts for 4 turns, now only lasts for 3
 - Fixed the issue that Precise_Touch gains only 1 Inner_Quite, now gains 2
+
+# [0.2.0] 2020-03-31
+## Added
+- The display of skill efficiency and durability cost
+- Added the logs output
+
+## Fixed
+- Fixed the issue that the half of 5 durability will become 2 
