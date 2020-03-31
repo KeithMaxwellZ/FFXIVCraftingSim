@@ -135,6 +135,7 @@ public class ViewManager
 		
 		otherSkills.add(SpecialSkills.Observe);
 		otherSkills.add(SpecialSkills.Tricks_of_the_Trade);
+		otherSkills.add(SpecialSkills.Careful_Observation);
 	}
 	
 	private void initStage() {
@@ -436,7 +437,8 @@ public class ViewManager
 						e.es == ExceptionStatus.Inner_Quiet_Exists ||
 						e.es == ExceptionStatus.Not_Turn_One ||
 						e.es == ExceptionStatus.Waste_Not_Exist ||
-						e.es == ExceptionStatus.No_Enough_CP) {
+						e.es == ExceptionStatus.No_Enough_CP ||
+						e.es == ExceptionStatus.Maximun_Reached) {
 				postInvalidMessage(e.es);
 			} else {
 				postUnexpectedMessage();

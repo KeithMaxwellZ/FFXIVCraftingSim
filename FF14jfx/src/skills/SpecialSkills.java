@@ -10,7 +10,9 @@ public enum SpecialSkills implements Skill
 	Byregots_Blessing("比尔格的祝福", 24),
 	Masters_Mend("精修", 88),
 	Observe("观察", 7),
-	Tricks_of_the_Trade("秘诀", 0);
+	Tricks_of_the_Trade("秘诀", 0),
+	Careful_Observation("设计变更", 0)
+	;
 	
 	String name; 
 	String imgAddress;
