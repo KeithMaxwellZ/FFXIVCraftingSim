@@ -172,6 +172,8 @@ public class Engine
 		System.out.println("BuffSkill used");
 		if(sk == BuffSkill.Final_Appraisal) {
 			beginning();
+			success = true;
+			presentCP--;
 			sk.createBuff();
 			return;
 		}
@@ -204,7 +206,6 @@ public class Engine
 	}
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
-		System.out.println("SpecialSkill used");
 		beginning();
 		observed = false;
 		if(sk.isSuccess()) {
@@ -423,5 +424,9 @@ public class Engine
 	
 	public void setWorking(boolean b) {
 		working = b;
+	}
+	
+	public int getRound() {
+		return round + 1;
 	}
 }

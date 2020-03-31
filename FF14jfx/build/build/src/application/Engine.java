@@ -204,7 +204,6 @@ public class Engine
 	}
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
-		System.out.println("SpecialSkill used");
 		beginning();
 		observed = false;
 		if(sk.isSuccess()) {
@@ -244,10 +243,13 @@ public class Engine
 			}
 		}
 		
-		if(tempQualityIncrease > 0 && buffExist(Buff.inner_quiet)) {
+		if(sk == PQSkill.Patient_Touch) {
+			innerQuietLvl *= 2;
+			setBuffInnerQuiet(innerQuietLvl);
+		} else if(tempQualityIncrease > 0 && buffExist(Buff.inner_quiet)) {
 			innerQuietLvl += 1;
 			setBuffInnerQuiet(innerQuietLvl);
-			if(sk == PQSkill.Preparatory_Touch || sk==PQSkill.Patient_Touch) {
+			if(sk == PQSkill.Preparatory_Touch) {
 				innerQuietLvl += 1;
 				setBuffInnerQuiet(innerQuietLvl);
 			}
