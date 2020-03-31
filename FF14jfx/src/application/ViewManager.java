@@ -41,7 +41,7 @@ public class ViewManager
 	private static final double WIDTH = 650;
 	private static final double REC_WIDTH = 580;
 	private static final double HEIGHT = 660;
-	private static final double INPUT_HEIGHT = 90;
+	private static final double EDGE_GENERAL = 8.0;
 	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
 	private static final double BAR_WIDTH = 400.0;
@@ -57,7 +57,8 @@ public class ViewManager
 	private Circle statusDisp;
 	private Text efficiencyDisp;
 	private HBox buffContainer;
-	private Text durabilityVal;
+	private Text durabilityText;
+	private Text round;
 	private Text skillDescription;
 	
 	ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
@@ -161,6 +162,7 @@ public class ViewManager
 		mainContainer.getChildren().add(initBuffDisp());
 		mainContainer.getChildren().add(initSkills());
 
+		VBox.setMargin(efficiencyDisp, new Insets(0, 0, 0 , 140.0));
 		
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
@@ -172,7 +174,6 @@ public class ViewManager
 		gp.setHgap(5);
 		gp.setVgap(3);
 		gp.setPrefWidth(REC_WIDTH);
-		gp.setPrefHeight(INPUT_HEIGHT);
 		
 		Text craftT = new Text("制作精度");
 		Text controlT = new Text("加工精度");
@@ -215,8 +216,8 @@ public class ViewManager
 			updateAll();
 		});
 		
-		int i = 3;
-		int j = 2;
+		int i = 0;
+		int j = 0;
 		gp.add(craftT, i, j);
 		gp.add(craftTf, i, j + 1);
 		gp.add(confirm, i++, j + 2);
@@ -244,26 +245,27 @@ public class ViewManager
 		
 		
 		
-		AnchorPane ap = new AnchorPane();
-		double edge = 8.0;
-		ap.setPrefWidth(REC_WIDTH + edge);
-		ap.setPrefHeight(INPUT_HEIGHT + edge);
-		ap.getChildren().add(gp);
-		ap.setBackground(new Background(new BackgroundFill(Color.SILVER, null, null)));
-		gp.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+		GridPane border = new GridPane();
+		GridPane back = new GridPane();
+
+		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
+		border.add(back, 0, 0);
+		back.add(gp, 0, 0);
+		border.setBackground(new Background(new BackgroundFill(Color.SILVER, null, null)));
+		back.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
 		
-		AnchorPane.setLeftAnchor(gp, edge / 2);
-		AnchorPane.setTopAnchor(gp, edge / 2);
+		GridPane.setMargin(back, new Insets(EDGE_GENERAL / 2));
+		GridPane.setMargin(gp, new Insets(EDGE_GENERAL / 2));
 		
-		return ap;
+		return border;
 	}
 	
 	private Node initProgressBar() {
 		GridPane container = new GridPane();
 		container.setAlignment(Pos.CENTER);
 		
-		Text durabilityText = new Text("  耐久          ");
-		durabilityVal = new Text("  " + engine.presentDurability + "/" + engine.totalDurability);
+		durabilityText = new Text("耐久:  " + engine.presentDurability + "/" + engine.totalDurability);
+		round = new Text("工次:  " + engine.getRound());
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		Text progressText = new Text(engine.presentProgress + "/" + engine.totalProgress);
@@ -273,7 +275,7 @@ public class ViewManager
 		progText.add(qualityText);
 		
 		container.add(durabilityText, 0, 0);
-		container.add(durabilityVal, 0, 1);
+		container.add(round, 0, 1);
 		
 		container.add(progressBar, 1, 0);
 		container.add(progressText, 2, 0);
@@ -345,10 +347,9 @@ public class ViewManager
 		skillContainer.add(createSkillList(otherSkills), i, j + 4);
 		
 		AnchorPane border = new AnchorPane();
-		double edge = 8.0;
 		
 		border.getChildren().add(skillContainer);
-		border.setPrefSize(REC_WIDTH + edge, SKILL_HEIGHT + edge);
+		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
 		skillContainer.setPrefSize(REC_WIDTH, SKILL_HEIGHT);
 		
 		border.setBackground(new Background(
@@ -356,8 +357,8 @@ public class ViewManager
 		skillContainer.setBackground(new Background(
 				new BackgroundFill(Color.AZURE, new CornerRadii(5.0), null)));
 		
-		AnchorPane.setLeftAnchor(skillContainer, edge / 2);
-		AnchorPane.setTopAnchor(skillContainer, edge / 2);
+		AnchorPane.setLeftAnchor(skillContainer, EDGE_GENERAL / 2);
+		AnchorPane.setTopAnchor(skillContainer, EDGE_GENERAL / 2);
 		
 		for(Node n: skillContainer.getChildren()) {
 			GridPane.setMargin(n, new Insets(0, 0, 0, 10));
@@ -401,7 +402,10 @@ public class ViewManager
 				}
 			});
 			b.setOnMouseEntered(e -> {
-				skillDescription.setText(s.getName());
+				skillDescription.setText(s.getName() + " " +
+							(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
+							(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
+							(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
 			});
 			b.setOnMouseExited(e -> {
 				skillDescription.setText("");
@@ -463,10 +467,10 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
-	private AnchorPane createBar(Color c, double width, double height, double edge) {
+	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
 
 		AnchorPane bar = new AnchorPane();
-		Rectangle edgeR = new Rectangle(width + 2 * edge, height + 2 * edge, Color.BLACK);
+		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.BLACK);
 		Rectangle fill = new Rectangle(width, height, Color.WHITE);
 		Rectangle progress = new Rectangle(0, height, c);
 		
@@ -530,7 +534,8 @@ public class ViewManager
 	
 	public void updateDur() {
 		System.out.println("Present dur: " + engine.presentDurability);
-		durabilityVal.setText("  " + engine.presentDurability+ "/" + engine.totalDurability);;
+		durabilityText.setText("耐久:  " + engine.presentDurability+ "/" + engine.totalDurability);
+		round.setText("工次:  " + engine.getRound());;
 		
 	}
 	
