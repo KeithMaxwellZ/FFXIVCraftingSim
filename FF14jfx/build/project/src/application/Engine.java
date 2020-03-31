@@ -37,6 +37,8 @@ public class Engine
 	private boolean qltyIncreased;
 	private boolean working;
 	
+	private Timer timer;
+	
 	protected ArrayList<ActiveBuff> activeBuffs;
 	
 	protected int totalDurability;
@@ -76,6 +78,9 @@ public class Engine
 		working = true;
 		progIncreased = false;
 		qltyIncreased = false;
+		
+		timer = new Timer();
+		timer.startTimer();
 		
 		round = 0;
 		
@@ -325,8 +330,10 @@ public class Engine
 	
 	private void finishCheck() throws CraftingException {
 		if(presentProgress >= totalProgress) {
+			timer.stopTimer();
 			throw new CraftingException(ExceptionStatus.Craft_Success);
 		} else if(presentDurability <= 0) {
+			timer.stopTimer();
 			throw new CraftingException(ExceptionStatus.Craft_Failed);
 		} else {
 			return; 
@@ -484,5 +491,9 @@ public class Engine
 	
 	public ArrayList<String> getLogs() {
 		return new ArrayList<String>(logs);
+	}
+	
+	public double getRuntime() {
+		return timer.getTime();
 	}
 }

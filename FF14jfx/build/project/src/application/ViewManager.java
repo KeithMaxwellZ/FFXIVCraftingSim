@@ -5,6 +5,7 @@ import java.util.List;
 
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -42,7 +43,7 @@ public class ViewManager
 {
 	private static final double WIDTH = 650;
 	private static final double REC_WIDTH = 580;
-	private static final double HEIGHT = 660;
+	private static final double HEIGHT = 690;
 	private static final double EDGE_GENERAL = 8.0;
 	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
@@ -52,15 +53,16 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 30.0;
 	
-	private static final String VERSION = "V0.4.0";
+	private static final String VERSION = "V0.5.0";
 	
 	private Stage stage;
 	private Scene mainScene;
 	private AnchorPane mainPane;
+	private AnchorPane lastSkillAp;
 	private VBox mainContainer;
+	private HBox buffContainer;
 	private Circle statusDisp;
 	private Text efficiencyDisp;
-	private HBox buffContainer;
 	private Text durabilityText;
 	private Text round;
 	private Text skillDescription;
@@ -68,14 +70,16 @@ public class ViewManager
 	ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
 	
-	private int craftsmanship = 2500;
-	private int control = 2400;
-	private int cp = 538;
+	private int craftsmanship = 2563;
+	private int control = 2620;
+	private int cp = 635;
 	private int dura = 60;
 	private int tProg = 9181;
 	private int tQlty = 64862;
 	private int rCraftsmanship = 2484;
 	private int rControl = 2206;
+
+	private Skill lastSkill = null;
 	
 	private ArrayList<Skill> progressSkills;
 	private ArrayList<Skill> qualitySkills;
@@ -162,8 +166,8 @@ public class ViewManager
 		mainContainer.getChildren().add(initInput());
 		mainContainer.getChildren().add(initProgressBar());
 		mainContainer.getChildren().add(initCPDisplay());
-		initEfficiencyDisp();
-		mainContainer.getChildren().add(efficiencyDisp);
+		
+		mainContainer.getChildren().add(initEfficiencyDisp());
 		mainContainer.getChildren().add(initBuffDisp());
 		mainContainer.getChildren().add(initSkills());
 
@@ -306,17 +310,21 @@ public class ViewManager
 		container.setAlignment(Pos.CENTER);
 		
 		Text status = new Text("  通常     ");
-		status.setFill(Color.WHITE);
-		statusDisp = new Circle(10, Color.WHITE);
-		Text cp = new Text("CP");
-		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
 		Text cpVal = new Text(engine.presentCP + "/" + engine.totalCP);
 		Text success = new Text("");
+		Text cp = new Text("CP");
+
+		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
+		
+		status.setFill(Color.WHITE);
+		statusDisp = new Circle(10, Color.WHITE);
 		
 		progText.add(cpVal);
 		progText.add(status);
 		progText.add(success);
 		bars.get(2).setWidth(CP_WIDTH);
+		
+		
 		
 		container.getChildren().addAll(status, statusDisp, cp, cpBar, cpVal, success);
 		
@@ -326,10 +334,22 @@ public class ViewManager
 		return container;
 	} 
 	
-	private void initEfficiencyDisp() {
+	private Node initEfficiencyDisp() {
+		HBox container = new HBox();
+		Text lastSkillT = new Text("上一个技能:  ");
+		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new Text(); 
+		
+		
+		lastSkillAp.setPrefSize(40.0, 40.0);
 		efficiencyDisp.setText("  100%效率下的进展: " + engine.getBaseProgEff() + 
 							" | 100%效率下的品质: " + engine.getBaseQltyEff());
+		
+		container.setAlignment(Pos.CENTER);
+		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
+		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
+		
+		return container;
 	}
 	
 	private Node initBuffDisp() {
@@ -442,6 +462,7 @@ public class ViewManager
 	private void performSkill(Skill sk) {
 		try {
 			engine.useSkill(sk); 
+			lastSkill = sk;
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				postFinishMessage(e.es);
@@ -470,11 +491,13 @@ public class ViewManager
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		
 		GridPane gp = new GridPane();
+		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
 		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
-		gp.add(val, 0, 0);
+		gp.add(runTime, 0, 0);
+		gp.add(val, 0, 1);
 		if(es == ExceptionStatus.Craft_Success) {		
 			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
-			gp.add(SP, 0, 1);	
+			gp.add(SP, 0, 2);	
 		}
 		
 		al.getDialogPane().setExpandableContent(gp);
@@ -536,6 +559,7 @@ public class ViewManager
 		updateSuccess();
 		updateBuffDIsp();
 		updateStatus();
+		updateLastSkill();
 	}
 	
 	public void updateProgress() {
@@ -610,6 +634,17 @@ public class ViewManager
 			buffContainer.getChildren().add(ap);
 			
 		}
+	}
+	
+	public void updateLastSkill() {
+		if(lastSkill == null) {
+			lastSkillAp.setBackground(Background.EMPTY);
+		} else {
+			lastSkillAp.setBackground(new Background(new BackgroundImage(
+					new Image(lastSkill.getAddress(), true), null, null, 
+					BackgroundPosition.CENTER, null)));
+		}
+		
 	}
 	
 	public void exportLogs() {
