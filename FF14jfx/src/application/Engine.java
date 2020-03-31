@@ -71,6 +71,8 @@ public class Engine
 		presentCP = totalCP;
 		observed = false;
 		working = true;
+		progIncreased = false;
+		qltyIncreased = false;
 		
 		round = 0;
 		
@@ -130,6 +132,8 @@ public class Engine
 	
 	public void beginning() {
 		success = false;
+		progIncreased = false;
+		qltyIncreased = false;
 		addToLogs(" ");
 		addToLogs("===Round " + round + " ===");
 		addToLogs("Observed?: " + observed);
