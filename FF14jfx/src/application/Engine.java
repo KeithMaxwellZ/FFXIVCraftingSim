@@ -116,7 +116,9 @@ public class Engine
 	}
 	
 	private void successfulUse(Skill sk) {
-		int durDec = sk.getDurCost() / (buffExist(Buff.waste_not) ? 2 : 1) / (cs == CraftingStatus.Sturdy ? 2 : 1);
+		int durDec = (int)Math.round((double)sk.getDurCost() / 
+									  (buffExist(Buff.waste_not) ? 2 : 1) / 
+									  (cs == CraftingStatus.Sturdy ? 2 : 1));
 		int cpDec = sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1);
 
 		addToLogs("Duration Cost: " + durDec);
@@ -241,6 +243,13 @@ public class Engine
 		presentProgress += tempProgressIncrease;
 		presentQuality += tempQualityIncrease;
 		
+		if(presentProgress > totalProgress) {
+			presentProgress = totalProgress;
+		}
+		if(presentQuality > totalQuality) {
+			presentQuality = totalQuality;
+		}
+		
 		if(presentProgress >= totalProgress && buffExist(Buff.final_appraisal)) {
 			presentProgress = totalProgress - 1;
 			for(ActiveBuff ab: activeBuffs) {
@@ -330,6 +339,22 @@ public class Engine
 		}
 		baseQltyEff = (int)Math.floor(qualityDifference * (0.35 * (double)buffControl + 35) * 
 				(10000.0 + (double)buffControl)/(10000.0 + (double)recControl));
+	}
+	
+	public int SPCalc() {
+		final int lv1 = 4500;
+		final int lv2 = 5000;
+		final int lv3 = 6000;
+		
+		if(presentQuality < lv1) {
+			return 0;
+		} else if (presentQuality < lv2) {
+			return (int)Math.floor(175 + (double)(presentQuality - lv1) * 0.1);
+		} else if (presentQuality < lv3) {
+			return (int)Math.floor(370 + (double)(presentQuality - lv2) * 0.25);
+		} else {
+			return (int)Math.floor(800 + (double)(presentQuality - lv3) * 0.9);
+		}
 	}
 	
 	public void addToLogs(String s) {
