@@ -574,7 +574,7 @@ public class ViewManager
 		Text buffText = new Text("  Buff:");
 		buffContainer.getChildren().add(buffText);
 		for(ActiveBuff ab: engine.activeBuffs) {
-			engine.addToLogs("refreshing buffs... " + ab.buff.toString() + " " + ab.getRemaining());
+			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = new ImageView(new Image(ab.buff.getAddress(), true));
