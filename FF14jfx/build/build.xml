@@ -62,7 +62,7 @@
 	
 		<mkdir dir="project" />
 		<copy todir="project">
-			<fileset dir="D:\eclipse-workspace\FF14jfx">
+			<fileset dir="D:\eclipse-workspace\Git\FFXIVCraftingSim\FF14jfx">
 				<include name="src/**" />
 			</fileset>
 		</copy>
