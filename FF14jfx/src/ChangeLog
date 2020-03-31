@@ -36,3 +36,7 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 - Inner_Quiet will become 0 after a failure of Patient_Touch and 1 Inner_Quiet
 - Fixed the issue that half cp will be rounded down
+
+# [0.3.2] 2020-03-31
+## Fixed
+- Fixed the issue that the buff will be used when skill failed
