@@ -69,11 +69,11 @@ public class ViewManager
 	private int craftsmanship = 2500;
 	private int control = 2400;
 	private int cp = 538;
-	private int dura = 70;
+	private int dura = 60;
 	private int tProg = 9181;
 	private int tQlty = 64862;
-	private int rCraftsmanship = 2480;
-	private int rControl = 2195;
+	private int rCraftsmanship = 2484;
+	private int rControl = 2206;
 	
 	private ArrayList<Skill> progressSkills;
 	private ArrayList<Skill> qualitySkills;
