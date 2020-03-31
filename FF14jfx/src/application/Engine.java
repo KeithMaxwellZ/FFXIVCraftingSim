@@ -66,8 +66,8 @@ public class Engine
 		logs = new ArrayList<>();
 		
 		presentDurability = totalDurability;
-		presentProgress = 9000;
-		presentQuality = 60000;
+		presentProgress = 0;
+		presentQuality = 0;
 		presentCP = totalCP;
 		observed = false;
 		working = true;
