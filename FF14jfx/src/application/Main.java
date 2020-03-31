@@ -19,3 +19,7 @@ public class Main extends Application {
 		launch(args);
 	}
 }
+
+//BuildPath
+//<file name="C:\Program Files\Java\jdk1.8.0_221\lib\ant-javafx.jar"/>
+//<file name="C:\Program Files\Java\jdk1.8.0_221\jre\lib\ext\jfxrt.jar"/>
