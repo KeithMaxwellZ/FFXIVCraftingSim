@@ -119,7 +119,7 @@ public class Engine
 		int durDec = (int)Math.round((double)sk.getDurCost() / 
 									  (buffExist(Buff.waste_not) ? 2 : 1) / 
 									  (cs == CraftingStatus.Sturdy ? 2 : 1));
-		int cpDec = sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1);
+		int cpDec = (int)Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1));
 
 		addToLogs("Duration Cost: " + durDec);
 
@@ -136,7 +136,7 @@ public class Engine
 	}
 	
 	public void useSkill(Skill sk) throws CraftingException { 
-		if(presentCP < sk.getCPCost()) {
+		if(presentCP < Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1))) {
 			throw new CraftingException(ExceptionStatus.No_Enough_CP);
 		} 
 		if(sk instanceof PQSkill) {
@@ -167,6 +167,7 @@ public class Engine
 		} else {
 			if(sk == PQSkill.Patient_Touch) {
 				innerQuietLvl /= 2;
+				innerQuietLvl = (innerQuietLvl == 0 ? 1 : innerQuietLvl);
 				setBuffInnerQuiet(innerQuietLvl);
 			}
 		}
