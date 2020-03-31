@@ -479,7 +479,9 @@ public class ViewManager
 				postUnexpectedMessage();
 			}
 		} finally {
-			updateAll();
+			if(engine.isWorking() == true) {
+				updateAll();
+			}
 		}
 	}
 	
@@ -492,11 +494,11 @@ public class ViewManager
 		updateAll();
 		
 		engine.setWorking(false);
+		engine.addToLogs("========= Summary =========");
 		engine.addToLogs("Status: " + es.toString());
 		engine.addToLogs("Total time: " + engine.getRuntime());
 		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
 		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("========= Summary =========");
 		engine.addToLogs("===========================");
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
