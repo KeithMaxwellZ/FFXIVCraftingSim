@@ -171,6 +171,7 @@ public class ViewManager
 		
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
+		engine.setWorking(false);
 	}
 	
 	private Node initInput() {
@@ -304,7 +305,8 @@ public class ViewManager
 		HBox container = new HBox();
 		container.setAlignment(Pos.CENTER);
 		
-		Text status = new Text("  通常   ");
+		Text status = new Text("  通常     ");
+		status.setFill(Color.WHITE);
 		statusDisp = new Circle(10, Color.WHITE);
 		Text cp = new Text("CP");
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
@@ -410,6 +412,8 @@ public class ViewManager
 			b.setOnMouseClicked(e -> {
 				if(engine.isWorking()) {
 					performSkill(s);
+				} else {
+					startWarning();
 				}
 			});
 			b.setOnMouseEntered(e -> {
@@ -427,6 +431,13 @@ public class ViewManager
 		return skillLine;
 	}
 	
+	private void startWarning() {
+		Alert al = new Alert(AlertType.WARNING);
+		al.setTitle("未开始作业");
+		al.setHeaderText(null);
+		al.setContentText("请先按‘确认’键以开始作业");
+		al.showAndWait();
+	}
 	
 	private void performSkill(Skill sk) {
 		try {
