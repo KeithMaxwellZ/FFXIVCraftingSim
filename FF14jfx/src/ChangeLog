@@ -49,3 +49,8 @@ All notable changes to this project will be documented in this file.
 ## Added
 - Added Version Mark in the title
 - Added start confirmation
+
+# [0.5.0] 2020-03-31
+# Added
+- Added timer, records the complete time of crafting
+- Added last skill display
