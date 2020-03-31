@@ -43,7 +43,7 @@ public class ViewManager
 {
 	private static final double WIDTH = 650;
 	private static final double REC_WIDTH = 580;
-	private static final double HEIGHT = 660;
+	private static final double HEIGHT = 690;
 	private static final double EDGE_GENERAL = 8.0;
 	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
