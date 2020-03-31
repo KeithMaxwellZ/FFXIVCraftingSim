@@ -69,11 +69,11 @@ public class ViewManager
 	private int craftsmanship = 2500;
 	private int control = 2400;
 	private int cp = 538;
-	private int dura = 70;
+	private int dura = 60;
 	private int tProg = 9181;
 	private int tQlty = 64862;
-	private int rCraftsmanship = 2480;
-	private int rControl = 2195;
+	private int rCraftsmanship = 2484;
+	private int rControl = 2206;
 	
 	private ArrayList<Skill> progressSkills;
 	private ArrayList<Skill> qualitySkills;
@@ -453,7 +453,17 @@ public class ViewManager
 		engine.addToLogs("Status: " + es.toString());
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
-		al.setContentText("收藏价值:  " + engine.getPresentQuality() / 10);
+		
+		GridPane gp = new GridPane();
+		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		gp.add(val, 0, 0);
+		if(es == ExceptionStatus.Craft_Success) {		
+			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
+			gp.add(SP, 0, 1);	
+		}
+		
+		al.getDialogPane().setExpandableContent(gp);
+		al.getDialogPane().setExpanded(true);
 		
 		al.showAndWait();
 	}

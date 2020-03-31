@@ -22,3 +22,17 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 - Fixed the issue that the buff Great_Strides lasts for 4 turns, now only lasts for 3
 - Fixed the issue that Precise_Touch gains only 1 Inner_Quite, now gains 2
+
+# [0.2.1] 2020-03-31
+## Fixed
+- Fixed the issue that the half of 5 durability will become 2 
+- Fixed the issue that the present durability can exceed total
+
+# [0.3.0] 2020-03-31
+## Added
+- SP display and value at the end of crafting
+
+# [0.3.1] 2020-03-31
+## Fixed
+- Inner_Quiet will become 0 after a failure of Patient_Touch and 1 Inner_Quiet
+- Fixed the issue that half cp will be rounded down

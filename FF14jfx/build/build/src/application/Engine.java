@@ -116,8 +116,10 @@ public class Engine
 	}
 	
 	private void successfulUse(Skill sk) {
-		int durDec = sk.getDurCost() / (buffExist(Buff.waste_not) ? 2 : 1) / (cs == CraftingStatus.Sturdy ? 2 : 1);
-		int cpDec = sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1);
+		int durDec = (int)Math.round((double)sk.getDurCost() / 
+									  (buffExist(Buff.waste_not) ? 2 : 1) / 
+									  (cs == CraftingStatus.Sturdy ? 2 : 1));
+		int cpDec = (int)Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1));
 
 		addToLogs("Duration Cost: " + durDec);
 
@@ -134,7 +136,7 @@ public class Engine
 	}
 	
 	public void useSkill(Skill sk) throws CraftingException { 
-		if(presentCP < sk.getCPCost()) {
+		if(presentCP < Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1))) {
 			throw new CraftingException(ExceptionStatus.No_Enough_CP);
 		} 
 		if(sk instanceof PQSkill) {
@@ -165,6 +167,7 @@ public class Engine
 		} else {
 			if(sk == PQSkill.Patient_Touch) {
 				innerQuietLvl /= 2;
+				innerQuietLvl = (innerQuietLvl == 0 ? 1 : innerQuietLvl);
 				setBuffInnerQuiet(innerQuietLvl);
 			}
 		}
@@ -241,6 +244,13 @@ public class Engine
 		presentProgress += tempProgressIncrease;
 		presentQuality += tempQualityIncrease;
 		
+		if(presentProgress > totalProgress) {
+			presentProgress = totalProgress;
+		}
+		if(presentQuality > totalQuality) {
+			presentQuality = totalQuality;
+		}
+		
 		if(presentProgress >= totalProgress && buffExist(Buff.final_appraisal)) {
 			presentProgress = totalProgress - 1;
 			for(ActiveBuff ab: activeBuffs) {
@@ -278,8 +288,7 @@ public class Engine
 		for(int i = 0; i < activeBuffs.size(); i++)
 		{
 			if(activeBuffs.get(i).buff == Buff.manipulation) {
-				presentDurability += 5;
-				if(presentCP > totalCP) {presentCP = totalCP;}
+				presentDurability += (presentDurability <= (totalDurability - 5) ? 5 : 0);
 			}
 			activeBuffs.get(i).decrease();
 			if(activeBuffs.get(i).getRemaining() == 0) {
@@ -330,6 +339,22 @@ public class Engine
 		}
 		baseQltyEff = (int)Math.floor(qualityDifference * (0.35 * (double)buffControl + 35) * 
 				(10000.0 + (double)buffControl)/(10000.0 + (double)recControl));
+	}
+	
+	public int SPCalc() {
+		final int lv1 = 4500;
+		final int lv2 = 5000;
+		final int lv3 = 6000;
+		
+		if(presentQuality/10 < lv1) {
+			return 0;
+		} else if (presentQuality/10 < lv2) {
+			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
+		} else if (presentQuality/10 < lv3) {
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.25);
+		} else {
+			return (int)Math.floor(800 + ((double)presentQuality/10 - lv3) * 0.9);
+		}
 	}
 	
 	public void addToLogs(String s) {
