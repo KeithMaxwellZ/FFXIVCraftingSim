@@ -42,7 +42,7 @@ public class ViewManager
 	private static final double REC_WIDTH = 580;
 	private static final double HEIGHT = 660;
 	private static final double INPUT_HEIGHT = 90;
-	private static final double SKILL_HEIGHT = 260;
+	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
 	private static final double BAR_WIDTH = 400.0;
 	private static final double BAR_HEIGHT = 30.0;
@@ -57,7 +57,8 @@ public class ViewManager
 	private Circle statusDisp;
 	private Text efficiencyDisp;
 	private HBox buffContainer;
-	Text durabilityVal;
+	private Text durabilityVal;
+	private Text skillDescription;
 	
 	ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
@@ -329,11 +330,13 @@ public class ViewManager
 	private Node initSkills() {
 		
 		GridPane skillContainer = new GridPane();
+		skillDescription = new Text("");
 		
 		skillContainer.setVgap(5);
 		
 		int i = 0;
 		int j = 2;
+		skillContainer.add(skillDescription, 0, 1);
 		skillContainer.add(createSkillList(progressSkills), i, j);
 		skillContainer.add(createSkillList(qualitySkills), i, j + 1);
 		skillContainer.add(createSkillList(buffSkills), i, j + 2);
@@ -356,13 +359,17 @@ public class ViewManager
 		AnchorPane.setLeftAnchor(skillContainer, edge / 2);
 		AnchorPane.setTopAnchor(skillContainer, edge / 2);
 		
+		for(Node n: skillContainer.getChildren()) {
+			GridPane.setMargin(n, new Insets(0, 0, 0, 10));
+		}
+		
 		return border;
 	}
 	
 	private Node createSkillList(List<Skill> skl) {
-		HBox SkillContainer = new HBox();
+		HBox skillLine = new HBox();
 		
-		SkillContainer.setSpacing(5);
+		skillLine.setSpacing(5);
 		
 		for(Skill s: skl) {
 			System.out.println(s.getAddress());
@@ -388,17 +395,21 @@ public class ViewManager
 			b.setBackground(new Background(new BackgroundImage(
 					icon, null, null, BackgroundPosition.CENTER, null)));
 			
-			b.setOnAction(e -> {
+			b.setOnMouseClicked(e -> {
 				if(engine.isWorking()) {
 					performSkill(s);
 				}
 			});
-			SkillContainer.getChildren().add(skillIcon);
+			b.setOnMouseEntered(e -> {
+				skillDescription.setText(s.getName());
+			});
+			b.setOnMouseExited(e -> {
+				skillDescription.setText("");
+			});
+			skillLine.getChildren().add(skillIcon);
 		}
-		
-		HBox.setMargin(SkillContainer.getChildren().get(0), new Insets(0, 0, 0, 10));
-		
-		return SkillContainer;
+
+		return skillLine;
 	}
 	
 	
