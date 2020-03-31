@@ -215,6 +215,7 @@ public class ViewManager
 		
 		Button confirm = new Button("х╥хо");
 		confirm.setOnMouseClicked(e -> {
+			lastSkill = null;
 			engine = new Engine(Integer.parseInt(craftTf.getText()), 
 								Integer.parseInt(controlTf.getText()), 
 								Integer.parseInt(CPTf.getText()), 
