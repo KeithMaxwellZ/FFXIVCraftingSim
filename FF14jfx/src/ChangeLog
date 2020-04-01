@@ -65,4 +65,8 @@ All notable changes to this project will be documented in this file.
 # [0.5.2] 2020-03-31
 ## Changed
 - Updated the logs display
-- Updated the skill description display ativation area and timing
+- Updated the skill description display activation area and timing
+
+# [0.5.3] 2020-04-01
+## Changed
+- Updated ui design (hmmmm...)
