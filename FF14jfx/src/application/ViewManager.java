@@ -80,6 +80,8 @@ public class ViewManager
 	private int tQlty = 64862;
 	private int rCraftsmanship = 2484;
 	private int rControl = 2206;
+	private double progressDifference = 0.8;
+	private double qualityDifference = 0.6;
 
 	private Skill lastSkill = null;
 	
@@ -92,7 +94,8 @@ public class ViewManager
 	private Engine engine;
 	
 	public ViewManager() {
-		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, rCraftsmanship, rControl);
+		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+				rCraftsmanship, rControl, progressDifference, qualityDifference);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 				
@@ -195,6 +198,8 @@ public class ViewManager
 		Text totalDuraT = new Text("总耐久");
 		Text rCraftT = new Text("推荐制作精度");
 		Text rControlT = new Text("推荐加工精度");
+		Text progDiffT = new Text("制作等级差");
+		Text qltyDiffT = new Text("加工等级差");
 		
 		
 		
@@ -206,6 +211,8 @@ public class ViewManager
 		TextField totalDuraTf = new TextField(Integer.toString(dura));
 		TextField rCraftTf = new TextField(Integer.toString(rCraftsmanship));
 		TextField rControlTf = new TextField(Integer.toString(rControl));
+		TextField progDiffTf = new TextField(Double.toString(progressDifference));
+		TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
 		
 		double tfWidth = 60;
 		craftTf.setPrefWidth(tfWidth);
@@ -216,6 +223,8 @@ public class ViewManager
 		totalDuraTf.setPrefWidth(tfWidth);
 		rCraftTf.setPrefWidth(tfWidth);
 		rControlTf.setPrefWidth(tfWidth);
+		progDiffTf.setPrefWidth(tfWidth);
+		qltyDiffTf.setPrefWidth(tfWidth);
 		
 		Button confirm = new Button("确认");
 		confirm.setOnMouseClicked(e -> {
@@ -227,7 +236,9 @@ public class ViewManager
 								Integer.parseInt(totalProgTf.getText()), 
 								Integer.parseInt(totalQltyTf.getText()), 
 								Integer.parseInt(rCraftTf.getText()), 
-								Integer.parseInt(rControlTf.getText()));
+								Integer.parseInt(rControlTf.getText()),
+								Double.parseDouble(progDiffTf.getText()),
+								Double.parseDouble(qltyDiffTf.getText()));
 			updateAll();
 		});
 		
@@ -239,38 +250,44 @@ public class ViewManager
 		int i = 0;
 		int j = 0;
 		gp.add(craftT, i, j);
-		gp.add(craftTf, i, j + 1);
+		gp.add(controlT, i, j + 1);
+		gp.add(CPT, i, j + 2);
 		i++;
 		
-		gp.add(controlT, i, j);
+		gp.add(craftTf, i, j);
 		gp.add(controlTf, i, j + 1);
-		i++;
-
-		gp.add(CPT, i, j);
-		gp.add(CPTf, i, j + 1);
+		gp.add(CPTf, i, j + 2);
 		i++;
 
 		gp.add(totalProgT, i, j);
-		gp.add(totalProgTf, i, j + 1);
-		gp.add(confirm, i, j + 2);
+		gp.add(totalQltyT, i, j + 1);
+		gp.add(totalDuraT, i, j + 2);
 		i++;
 
-		gp.add(totalQltyT, i, j);
+		gp.add(totalProgTf, i, j);
 		gp.add(totalQltyTf, i, j + 1);
-		gp.add(logs, i, j + 2);
-		i++;
-
-		gp.add(totalDuraT, i, j);
-		gp.add(totalDuraTf, i, j + 1);
+		gp.add(totalDuraTf, i, j + 2);
 		i++;
 
 		gp.add(rCraftT, i, j);
-		gp.add(rCraftTf, i, j + 1);
+		gp.add(rControlT, i, j + 1);
 		i++;
 
-		gp.add(rControlT, i, j);
+		gp.add(rCraftTf, i, j);
 		gp.add(rControlTf, i, j + 1);
-		i++;		
+		i++;
+		
+		gp.add(progDiffT, i, j);
+		gp.add(qltyDiffT, i, j + 1);
+		i++;	
+		
+		gp.add(progDiffTf, i, j);
+		gp.add(qltyDiffTf, i, j + 1);
+		i++;
+		
+		gp.add(confirm, i, j);
+		gp.add(logs, i, j + 1);
+		i++;
 		
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
@@ -293,6 +310,8 @@ public class ViewManager
 		t.add(totalDuraT);
 		t.add(rCraftT);
 		t.add(rControlT);
+		t.add(progDiffT);
+		t.add(qltyDiffT);
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
