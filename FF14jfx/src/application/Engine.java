@@ -141,12 +141,13 @@ public class Engine
 		round++;
 	}
 	
-	public void beginning() {
+	public void beginning(Skill sk) {
 		success = false;
 		progIncreased = false;
 		qltyIncreased = false;
 		addToLogs(" ");
 		addToLogs("===Round " + round + " ===");
+		addToLogs("Skill name: " + (sk).toString());
 		addToLogs("Observed?: " + observed);
 	}
 	
@@ -173,8 +174,7 @@ public class Engine
 			throw new CraftingException(ExceptionStatus.Waste_Not_Exist);
 		}
 		
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		if(sk.isSuccess()) {
 			success = true;
@@ -195,7 +195,7 @@ public class Engine
 	
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
 		if(sk == BuffSkill.Final_Appraisal) {
-			beginning();
+			beginning(sk);
 			success = true;
 			presentCP--;
 			sk.createBuff();
@@ -213,8 +213,7 @@ public class Engine
 			}
 		}
 		
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		if(sk.isSuccess()) {
 			success = true;
@@ -228,18 +227,20 @@ public class Engine
 	}
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
+		if(innerQuietLvl <= 1 && sk == SpecialSkills.Byregots_Blessing) {
+			throw new CraftingException(ExceptionStatus.No_Inner_Quiet); 
+		}
 		if(sk == SpecialSkills.Careful_Observation) {
 			if(csCount >= 3) {
 				throw new CraftingException(ExceptionStatus.Maximun_Reached);
 			}
 			csCount++;
-			beginning();
+			beginning(sk);
 			success = true;
 			cs = CraftingStatus.getNextStatus();
 			return;
 		}
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		observed = false;
 
@@ -253,7 +254,7 @@ public class Engine
 		finalizeRound(sk);
 	}
 	
-	private void forwardProgress(Skill sk) throws CraftingException {
+	private void forwardProgress(Skill sk) {
 		double tempProgressRate = sk.getActualProgressRate();
 		double tempQualityRate = sk.getActualQualityRate();
 		
