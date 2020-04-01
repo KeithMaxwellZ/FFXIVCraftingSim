@@ -102,3 +102,7 @@ All notable changes to this project will be documented in this file.
 # [1.1.1-S]
 ## Added
 - Added advanced settings box
+
+# [1.1.2-S]
+## Fixed
+- Fixed the issue that inner quiet is rounded down when Patient_Touch fails
