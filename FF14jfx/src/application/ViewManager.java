@@ -307,7 +307,7 @@ public class ViewManager
 		
 		gp.add(progDiffTf, i, j);
 		gp.add(qltyDiffTf, i, j + 1);
-		gp.add(GCDCb, i, j);
+		gp.add(GCDCb, i, j+2);
 		i++;
 		
 		gp.add(confirm, i, j);
