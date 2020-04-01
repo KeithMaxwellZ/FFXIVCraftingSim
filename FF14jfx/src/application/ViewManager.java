@@ -44,16 +44,18 @@ public class ViewManager
 	private static final double WIDTH = 650;
 	private static final double REC_WIDTH = 580;
 	private static final double HEIGHT = 690;
-	private static final double EDGE_GENERAL = 8.0;
+	private static final double EDGE_GENERAL = 4.0;
 	private static final double SKILL_HEIGHT = 270;
 	private static final double BAR_EDGE = 5.0;
 	private static final double BAR_WIDTH = 400.0;
 	private static final double BAR_HEIGHT = 30.0;
 	private static final double CP_EDGE = 5.0;
 	private static final double CP_WIDTH = 150.0;
-	private static final double CP_HEIGHT = 30.0;
+	private static final double CP_HEIGHT = 15.0;
 	
 	private static final String VERSION = "V0.5.2";
+	
+	private static final Color TEXT_COLOR = Color.WHITE;
 	
 	private Stage stage;
 	private Scene mainScene;
@@ -149,7 +151,8 @@ public class ViewManager
 		stage = new Stage();
 		mainScene = new Scene(mainPane, WIDTH, HEIGHT);
 		
-		mainPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGREY, null, null)));
+		mainPane.setBackground(new Background(
+				new BackgroundFill(Color.rgb(47, 50, 55, 1.0), null, null)));
 		
 		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
@@ -178,8 +181,7 @@ public class ViewManager
 		engine.setWorking(false);
 	}
 	
-	private Node initInput() {
-
+	private Node initInput() {		
 		GridPane gp = new GridPane();
 		gp.setHgap(5);
 		gp.setVgap(3);
@@ -193,6 +195,8 @@ public class ViewManager
 		Text totalDuraT = new Text("总耐久");
 		Text rCraftT = new Text("推荐制作精度");
 		Text rControlT = new Text("推荐加工精度");
+		
+		
 		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
@@ -236,31 +240,37 @@ public class ViewManager
 		int j = 0;
 		gp.add(craftT, i, j);
 		gp.add(craftTf, i, j + 1);
-		gp.add(confirm, i++, j + 2);
+		i++;
 		
 		gp.add(controlT, i, j);
 		gp.add(controlTf, i, j + 1);
-		gp.add(logs, i++, j + 2);
-		
+		i++;
+
 		gp.add(CPT, i, j);
-		gp.add(CPTf, i++, j + 1);
-		
+		gp.add(CPTf, i, j + 1);
+		i++;
+
 		gp.add(totalProgT, i, j);
-		gp.add(totalProgTf, i++, j + 1);
-		
+		gp.add(totalProgTf, i, j + 1);
+		gp.add(confirm, i, j + 2);
+		i++;
+
 		gp.add(totalQltyT, i, j);
-		gp.add(totalQltyTf, i++, j + 1);
-		
+		gp.add(totalQltyTf, i, j + 1);
+		gp.add(logs, i, j + 2);
+		i++;
+
 		gp.add(totalDuraT, i, j);
-		gp.add(totalDuraTf, i++, j + 1);
-		
+		gp.add(totalDuraTf, i, j + 1);
+		i++;
+
 		gp.add(rCraftT, i, j);
-		gp.add(rCraftTf, i++, j + 1);
-		
+		gp.add(rCraftTf, i, j + 1);
+		i++;
+
 		gp.add(rControlT, i, j);
-		gp.add(rControlTf, i++, j + 1);
-		
-		
+		gp.add(rControlTf, i, j + 1);
+		i++;		
 		
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
@@ -268,11 +278,24 @@ public class ViewManager
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
 		back.add(gp, 0, 0);
-		border.setBackground(new Background(new BackgroundFill(Color.SILVER, null, null)));
-		back.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+		border.setBackground(new Background(new BackgroundFill(Color.SILVER, new CornerRadii(10.0), null)));
+		back.setBackground(new Background(new BackgroundFill(Color.rgb(25,30,37,1.0), new CornerRadii(10.0), null)));
 		
 		GridPane.setMargin(back, new Insets(EDGE_GENERAL / 2));
-		GridPane.setMargin(gp, new Insets(EDGE_GENERAL / 2));
+		GridPane.setMargin(gp, new Insets(10));
+		
+		ArrayList<Text> t = new ArrayList<Text>();
+		t.add(craftT);
+		t.add(controlT);
+		t.add(CPT);
+		t.add(totalProgT);
+		t.add(totalQltyT);
+		t.add(totalDuraT);
+		t.add(rCraftT);
+		t.add(rControlT);
+		for(Text tx: t) {
+			tx.setFill(TEXT_COLOR);
+		}
 		
 		return border;
 	}
@@ -303,6 +326,15 @@ public class ViewManager
 		container.setVgap(20);
 		container.setHgap(20);
 		
+		ArrayList<Text> t = new ArrayList<Text>();
+		t.add(durabilityText);
+		t.add(round);
+		t.add(progressText);
+		t.add(qualityText);
+		for(Text tx: t) {
+			tx.setFill(TEXT_COLOR);
+		}
+		
 		return container;
 	}
 	
@@ -332,6 +364,14 @@ public class ViewManager
 		container.setSpacing(30);
 		container.setLayoutX(10);
 		
+		ArrayList<Text> t = new ArrayList<Text>();
+		t.add(cpVal);
+		t.add(success);
+		t.add(cp);
+		for(Text tx: t) {
+			tx.setFill(TEXT_COLOR);
+		}
+		
 		return container;
 	} 
 	
@@ -350,6 +390,13 @@ public class ViewManager
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
 		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
 		
+		ArrayList<Text> t = new ArrayList<Text>();
+		t.add(lastSkillT);
+		t.add(efficiencyDisp);
+		for(Text tx: t) {
+			tx.setFill(TEXT_COLOR);
+		}
+		
 		return container;
 	}
 	
@@ -359,6 +406,8 @@ public class ViewManager
 		Text buffText = new Text("  Buff:");
 		
 		buffContainer.getChildren().add(buffText);
+		
+		buffText.setFill(TEXT_COLOR);
 		
 		return buffContainer;
 	}
@@ -633,6 +682,7 @@ public class ViewManager
 	public void updateBuffDIsp() {
 		buffContainer.getChildren().clear();
 		Text buffText = new Text("  Buff:");
+		buffText.setFill(TEXT_COLOR);
 		buffContainer.getChildren().add(buffText);
 		for(ActiveBuff ab: engine.activeBuffs) {
 			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());

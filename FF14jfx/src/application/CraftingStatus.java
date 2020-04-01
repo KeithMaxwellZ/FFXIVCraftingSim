@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 public enum CraftingStatus
 {
 	Sturdy(  "顽丈   ", Color.BLUE),
-	Centered("安定   ", Color.YELLOW),
+	Centered("安定   ", Color.YELLOWGREEN),
 	Pliant(  "高性能", Color.GREEN),
 	HQ(      "高品质", Color.RED),
 	Normal(  "通常   ", Color.WHITE);
@@ -20,6 +20,7 @@ public enum CraftingStatus
 		private Node(CraftingStatus cs, double probability) {
 			this.cs = cs;
 			this.probability = probability;
+
 		}
 	}
 	
