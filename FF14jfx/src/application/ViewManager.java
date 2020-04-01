@@ -156,7 +156,7 @@ public class ViewManager
 		
 		mainPane.setBackground(new Background(
 				new BackgroundFill(Color.LIGHTGRAY, null, null)));
-//		Color.rgb(47, 50, 55, 1.0)
+
 		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
@@ -164,15 +164,16 @@ public class ViewManager
 	
 	private void initDisplay() {
 		mainContainer = new VBox(20);
+		
 		mainContainer.setSpacing(10);
 		mainContainer.setFillWidth(false);
 		mainContainer.setAlignment(Pos.CENTER_LEFT);
+		
 		mainPane.getChildren().add(mainContainer);
 
 		mainContainer.getChildren().add(initInput());
 		mainContainer.getChildren().add(initProgressBar());
 		mainContainer.getChildren().add(initCPDisplay());
-		
 		mainContainer.getChildren().add(initEfficiencyDisp());
 		mainContainer.getChildren().add(initBuffDisp());
 		mainContainer.getChildren().add(initSkills());
@@ -181,11 +182,20 @@ public class ViewManager
 		
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
+		
 		engine.setWorking(false);
 	}
 	
 	private Node initInput() {		
+		double tfWidth = 40;
 		GridPane gp = new GridPane();
+		GridPane border = new GridPane();
+		GridPane back = new GridPane();
+		Button confirm = new Button("确认");
+		Button logs = new Button("日志"); 
+		
+		ArrayList<Text> t = new ArrayList<Text>();
+		
 		gp.setHgap(5);
 		gp.setVgap(3);
 		gp.setPrefWidth(REC_WIDTH);
@@ -201,8 +211,6 @@ public class ViewManager
 		Text progDiffT = new Text("制作等级差");
 		Text qltyDiffT = new Text("加工等级差");
 		
-		
-		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
 		TextField CPTf = new TextField(Integer.toString(cp));
@@ -214,7 +222,6 @@ public class ViewManager
 		TextField progDiffTf = new TextField(Double.toString(progressDifference));
 		TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
 		
-		double tfWidth = 40;
 		craftTf.setPrefWidth(tfWidth);
 		controlTf.setPrefWidth(tfWidth);
 		CPTf.setPrefWidth(tfWidth);
@@ -226,7 +233,6 @@ public class ViewManager
 		progDiffTf.setPrefWidth(tfWidth);
 		qltyDiffTf.setPrefWidth(tfWidth);
 		
-		Button confirm = new Button("确认");
 		confirm.setOnMouseClicked(e -> {
 			lastSkill = null;
 			engine = new Engine(Integer.parseInt(craftTf.getText()), 
@@ -242,7 +248,6 @@ public class ViewManager
 			updateAll();
 		});
 		
-		Button logs = new Button("日志"); 
 		logs.setOnMouseClicked(e -> {
 			exportLogs();
 		});
@@ -288,20 +293,17 @@ public class ViewManager
 		gp.add(confirm, i, j);
 		gp.add(logs, i, j + 1);
 		i++;
-		
-		GridPane border = new GridPane();
-		GridPane back = new GridPane();
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
-		back.add(gp, 0, 0);
 		border.setBackground(new Background(new BackgroundFill(Color.SILVER, new CornerRadii(10.0), null)));
+		
+		back.add(gp, 0, 0);
 		back.setBackground(new Background(new BackgroundFill(Color.rgb(25,30,37,1.0), new CornerRadii(10.0), null)));
 		
 		GridPane.setMargin(back, new Insets(EDGE_GENERAL / 2));
 		GridPane.setMargin(gp, new Insets(10));
 		
-		ArrayList<Text> t = new ArrayList<Text>();
 		t.add(craftT);
 		t.add(controlT);
 		t.add(CPT);
@@ -312,6 +314,7 @@ public class ViewManager
 		t.add(rControlT);
 		t.add(progDiffT);
 		t.add(qltyDiffT);
+		
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
@@ -321,17 +324,19 @@ public class ViewManager
 	
 	private Node initProgressBar() {
 		GridPane container = new GridPane();
-		container.setAlignment(Pos.CENTER);
-		
-		durabilityText = new Text("耐久:  " + engine.presentDurability + "/" + engine.totalDurability);
-		round = new Text("工次:  " + engine.getRound());
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		Text progressText = new Text(engine.presentProgress + "/" + engine.totalProgress);
 		Text qualityText = new Text(engine.presentQuality + "/" + engine.totalQuality);
+		ArrayList<Text> t = new ArrayList<Text>();
+		
+		durabilityText = new Text("耐久:  " + engine.presentDurability + "/" + engine.totalDurability);
+		round = new Text("工次:  " + engine.getRound());
 		
 		progText.add(progressText);
 		progText.add(qualityText);
+		
+		container.setAlignment(Pos.CENTER);
 		
 		container.add(durabilityText, 0, 0);
 		container.add(round, 0, 1);
@@ -345,11 +350,11 @@ public class ViewManager
 		container.setVgap(20);
 		container.setHgap(20);
 		
-		ArrayList<Text> t = new ArrayList<Text>();
 		t.add(durabilityText);
 		t.add(round);
 		t.add(progressText);
 		t.add(qualityText);
+		
 		for(Text tx: t) {
 			tx.setFill(TEXT_COLOR);
 		}
@@ -359,34 +364,33 @@ public class ViewManager
 	
 	private Node initCPDisplay() {
 		HBox container = new HBox();
-		container.setAlignment(Pos.CENTER);
-		
+		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
 		Text status = new Text("  通常     ");
 		Text cpVal = new Text(engine.presentCP + "/" + engine.totalCP);
 		Text success = new Text("");
 		Text cp = new Text("CP");
+		ArrayList<Text> t = new ArrayList<Text>();
 
-		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
+		statusDisp = new Circle(10, Color.WHITE);
+		
+		container.setAlignment(Pos.CENTER);
 		
 		status.setFill(Color.WHITE);
-		statusDisp = new Circle(10, Color.WHITE);
 		
 		progText.add(cpVal);
 		progText.add(status);
 		progText.add(success);
 		bars.get(2).setWidth(CP_WIDTH);
 		
-		
-		
 		container.getChildren().addAll(status, statusDisp, cp, cpBar, cpVal, success);
 		
 		container.setSpacing(30);
 		container.setLayoutX(10);
 		
-		ArrayList<Text> t = new ArrayList<Text>();
 		t.add(cpVal);
 		t.add(success);
 		t.add(cp);
+		
 		for(Text tx: t) {
 			tx.setFill(TEXT_COLOR);
 		}
@@ -399,19 +403,20 @@ public class ViewManager
 		Text lastSkillT = new Text("上一个技能:  ");
 		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new Text(); 
-		
+		ArrayList<Text> t = new ArrayList<Text>();
 		
 		lastSkillAp.setPrefSize(40.0, 40.0);
+		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
+
 		efficiencyDisp.setText("  100%效率下的进展: " + engine.getBaseProgEff() + 
 							" | 100%效率下的品质: " + engine.getBaseQltyEff());
 		
 		container.setAlignment(Pos.CENTER);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
-		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
 		
-		ArrayList<Text> t = new ArrayList<Text>();
 		t.add(lastSkillT);
 		t.add(efficiencyDisp);
+		
 		for(Text tx: t) {
 			tx.setFill(TEXT_COLOR);
 		}
@@ -420,9 +425,9 @@ public class ViewManager
 	}
 	
 	private Node initBuffDisp() {
+		Text buffText = new Text("  Buff:");
 		buffContainer = new HBox(10);
 		buffContainer.setPrefHeight(32.0);
-		Text buffText = new Text("  Buff:");
 		
 		buffContainer.getChildren().add(buffText);
 		
@@ -432,23 +437,21 @@ public class ViewManager
 	}
 	
 	private Node initSkills() {
-		
 		GridPane skillContainer = new GridPane();
 		skillDescription = new Text("");
+		AnchorPane border = new AnchorPane();		
 		
 		skillContainer.setVgap(5);
 		
 		int i = 0;
 		int j = 2;
+		
 		skillContainer.add(skillDescription, 0, 1);
 		skillContainer.add(createSkillList(progressSkills), i, j);
 		skillContainer.add(createSkillList(qualitySkills), i, j + 1);
 		skillContainer.add(createSkillList(buffSkills), i, j + 2);
-		
 		skillContainer.add(createSkillList(recoverySkills), i, j + 3);
 		skillContainer.add(createSkillList(otherSkills), i, j + 4);
-		
-		AnchorPane border = new AnchorPane();
 		
 		border.getChildren().add(skillContainer);
 		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
@@ -481,6 +484,7 @@ public class ViewManager
 			Image icon = new Image(s.getAddress(), true);
 			Button b = new Button();
 			Text costText = new Text(s.getCPCost() != 0 ? Integer.toString(s.getCPCost()) : "");
+			
 			costText.setFill(Color.WHITE);
 			skillIcon.getChildren().add(b);
 			skillIcon.getChildren().add(costText);
@@ -512,9 +516,11 @@ public class ViewManager
 							(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
 							(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
 			});
+			
 			skillIcon.setOnMouseExited(e -> {
 				skillDescription.setText("");
 			});
+			
 			skillLine.getChildren().add(skillIcon);
 		}
 
@@ -523,9 +529,11 @@ public class ViewManager
 	
 	private void startWarning() {
 		Alert al = new Alert(AlertType.WARNING);
+		
 		al.setTitle("未开始作业");
 		al.setHeaderText(null);
 		al.setContentText("请先按‘确认’键以开始作业");
+		
 		al.showAndWait();
 	}
 	
@@ -536,7 +544,7 @@ public class ViewManager
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				postFinishMessage(e.es);
-			} else if ( e.es == ExceptionStatus.Not_HQ ||
+			} else if (	e.es == ExceptionStatus.Not_HQ ||
 						e.es == ExceptionStatus.No_Inner_Quiet ||
 						e.es == ExceptionStatus.Inner_Quiet_Exists ||
 						e.es == ExceptionStatus.Not_Turn_One ||
@@ -575,6 +583,7 @@ public class ViewManager
 		
 		gp.add(runTime, 0, 0);
 		gp.add(val, 0, 1);
+		
 		if(es == ExceptionStatus.Craft_Success) {		
 			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
 			gp.add(SP, 0, 2);	
@@ -588,6 +597,7 @@ public class ViewManager
 	
 	private void postInvalidMessage(ExceptionStatus es) {
 		Alert al = new Alert(AlertType.WARNING);
+		
 		al.setTitle("无法使用");
 		al.setContentText(es.getMessage());
 		
@@ -596,6 +606,7 @@ public class ViewManager
 	
 	private void postUnexpectedMessage() {
 		Alert al = new Alert(AlertType.WARNING);
+		
 		al.setTitle("未知错误");
 		al.setContentText("你是怎么触发的...");
 		
@@ -603,7 +614,6 @@ public class ViewManager
 	}
 	
 	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
-
 		AnchorPane bar = new AnchorPane();
 		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.BLACK);
 		Rectangle fill = new Rectangle(width, height, Color.WHITE);
@@ -682,6 +692,7 @@ public class ViewManager
 	
 	public void updateSuccess() {
 		Text t = progText.get(4);
+		
 		if(engine.success) {
 			t.setText("Success!");
 			t.setFill(Color.GREEN);
@@ -689,6 +700,7 @@ public class ViewManager
 			t.setText("Fail...");
 			t.setFill(Color.RED);
 		}
+		
 		t.setFont(Font.font(20));
 	}
 	
@@ -699,16 +711,19 @@ public class ViewManager
 	}
 	
 	public void updateBuffDIsp() {
-		buffContainer.getChildren().clear();
 		Text buffText = new Text("  Buff:");
+		
+		buffContainer.getChildren().clear();
 		buffText.setFill(TEXT_COLOR);
 		buffContainer.getChildren().add(buffText);
+		
 		for(ActiveBuff ab: engine.activeBuffs) {
 			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = new ImageView(new Image(ab.buff.getAddress(), true));
 			Text remaining = new Text(Integer.toString(ab.getRemaining()));
+			
 			ap.getChildren().add(iv);
 			ap.getChildren().add(remaining);
 
