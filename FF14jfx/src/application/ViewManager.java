@@ -5,7 +5,9 @@ import java.util.List;
 
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
-
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -34,6 +36,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import skills.ActiveBuff;
 import skills.BuffSkill;
 import skills.PQSkill;
@@ -69,6 +72,7 @@ public class ViewManager
 	private Text durabilityText;
 	private Text round;
 	private Text skillDescription;
+	private Timeline t = new Timeline();
 	
 	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	private ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
@@ -494,6 +498,7 @@ public class ViewManager
 	private Node createSkillList(List<Skill> skl) {
 		HBox skillLine = new HBox();
 		
+		
 		skillLine.setSpacing(5);
 		
 		for(Skill s: skl) {
@@ -503,10 +508,23 @@ public class ViewManager
 			Image icon = new Image(s.getAddress(), true);
 			Button b = new Button();
 			Text costText = new Text(s.getCPCost() != 0 ? Integer.toString(s.getCPCost()) : "");
+			ImageView iv = new ImageView(icon);
+			Rectangle rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
+			KeyValue kv1 = new KeyValue(iv.opacityProperty(), 1.0);
+			KeyValue kv2 = new KeyValue(iv.opacityProperty(), 0.1);
+			
+			KeyFrame kf1 = new KeyFrame(Duration.millis(1900), kv1);
+			KeyFrame kf2 = new KeyFrame(Duration.millis(1), kv2);
+			
+			t.getKeyFrames().addAll(kf1, kf2);
+			
 			
 			costText.setFill(Color.WHITE);
-			skillIcon.getChildren().add(b);
+			
+			skillIcon.getChildren().add(rec);
+			skillIcon.getChildren().add(iv);
 			skillIcon.getChildren().add(costText);
+			skillIcon.getChildren().add(b);
 			
 			costText.setLayoutX(0);
 			costText.setLayoutY(40.0);
@@ -518,13 +536,15 @@ public class ViewManager
 			b.setPrefHeight(40);
 			b.setPrefWidth(40);
 			
-			b.setBackground(new Background(new BackgroundImage(
-					icon, null, null, BackgroundPosition.CENTER, null)));
+			b.setOpacity(0.0);
+			
+//			b.setBackground(new Background(new BackgroundImage(
+//					icon, null, null, BackgroundPosition.CENTER, null)));
 			
 			b.setOnMouseClicked(e -> {
 				if(engine.isWorking()) {
 					if(tm.getTime() >= (hasGCD ? 2.00 : 0)) {
-						performSkill(s);
+						performSkill(s, iv);
 					}
 				} else {
 					startWarning();
@@ -558,11 +578,15 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
-	private void performSkill(Skill sk) {
+	private void performSkill(Skill sk, ImageView iv) {
 		try {
 			engine.useSkill(sk); 
-			lastSkill = sk;
+			
 			tm.startTimer();
+			lastSkill = sk;
+			if(hasGCD) {
+				t.play();
+			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				postFinishMessage(e.es);
