@@ -66,7 +66,7 @@ public class Engine
 		this.totalQuality = totalQUality;
 		this.recCraftsmanship = recCraftsmanship;
 		this.recControl = recControl;
-		this.progressDifference = progressDifference;
+		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
 		
 		activeBuffs = new ArrayList<>();

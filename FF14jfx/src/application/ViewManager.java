@@ -214,7 +214,7 @@ public class ViewManager
 		TextField progDiffTf = new TextField(Double.toString(progressDifference));
 		TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
 		
-		double tfWidth = 60;
+		double tfWidth = 40;
 		craftTf.setPrefWidth(tfWidth);
 		controlTf.setPrefWidth(tfWidth);
 		CPTf.setPrefWidth(tfWidth);
