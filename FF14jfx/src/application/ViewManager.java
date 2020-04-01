@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -82,6 +83,8 @@ public class ViewManager
 	private int rControl = 2206;
 	private double progressDifference = 0.8;
 	private double qualityDifference = 0.6;
+	
+	private boolean hasGCD = true;
 
 	private Skill lastSkill = null;
 	
@@ -93,11 +96,16 @@ public class ViewManager
 	
 	private Engine engine;
 	
+	private Timer tm;
+	
 	public ViewManager() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 				rCraftsmanship, rControl, progressDifference, qualityDifference);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
+		tm = new Timer();
+		
+		tm.startTimer();
 				
 		initSkillsList();
 		initStage();
@@ -210,6 +218,7 @@ public class ViewManager
 		Text rControlT = new Text("推荐加工精度");
 		Text progDiffT = new Text("制作等级差");
 		Text qltyDiffT = new Text("加工等级差");
+		Text GCDT = new Text("GCD");
 		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
@@ -221,6 +230,12 @@ public class ViewManager
 		TextField rControlTf = new TextField(Integer.toString(rControl));
 		TextField progDiffTf = new TextField(Double.toString(progressDifference));
 		TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
+		
+		CheckBox GCDCb = new CheckBox("GCD");
+		
+		GCDCb.setIndeterminate(false);
+		GCDCb.setSelected(true);
+		GCDCb.setTextFill(Color.WHITE);
 		
 		craftTf.setPrefWidth(tfWidth);
 		controlTf.setPrefWidth(tfWidth);
@@ -245,6 +260,7 @@ public class ViewManager
 								Integer.parseInt(rControlTf.getText()),
 								Double.parseDouble(progDiffTf.getText()),
 								Double.parseDouble(qltyDiffTf.getText()));
+			hasGCD = GCDCb.isSelected();
 			updateAll();
 		});
 		
@@ -293,6 +309,9 @@ public class ViewManager
 		gp.add(confirm, i, j);
 		gp.add(logs, i, j + 1);
 		i++;
+		
+		i++;
+		gp.add(GCDCb, i, j);
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
@@ -504,7 +523,9 @@ public class ViewManager
 			
 			b.setOnMouseClicked(e -> {
 				if(engine.isWorking()) {
-					performSkill(s);
+					if(tm.getTime() >= (hasGCD ? 2.00 : 0)) {
+						performSkill(s);
+					}
 				} else {
 					startWarning();
 				}
@@ -541,6 +562,7 @@ public class ViewManager
 		try {
 			engine.useSkill(sk); 
 			lastSkill = sk;
+			tm.startTimer();
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				postFinishMessage(e.es);
@@ -777,4 +799,6 @@ public class ViewManager
 	public Stage getStage() {
 		return stage;
 	}
+	
+	 
 }
