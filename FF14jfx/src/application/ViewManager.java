@@ -69,8 +69,8 @@ public class ViewManager
 	private Text round;
 	private Text skillDescription;
 	
-	ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
-	ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
+	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
+	private ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
 	
 	private int craftsmanship = 2563;
 	private int control = 2620;
