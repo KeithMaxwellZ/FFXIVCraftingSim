@@ -57,7 +57,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 15.0;
 	
-	private static final String VERSION = "V1.1.0-S";
+	private static final String VERSION = "V1.1.1-S";
 	
 	private static final Color TEXT_COLOR = Color.BLACK;
 	
@@ -199,7 +199,7 @@ public class ViewManager
 	}
 	
 	private Node initInput() {		
-		double tfWidth = 50;
+		double tfWidth = 70.0;
 		GridPane gp = new GridPane();
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
@@ -801,8 +801,8 @@ public class ViewManager
 	}
 	
 	class AdvancedSettingsBox {
-		public static final double BOX_WIDTH = 250.0;
-		public static final double BOX_HEIGHT = 200.0;
+		public static final double BOX_WIDTH = 300.0;
+		public static final double BOX_HEIGHT = 250.0;
 		
 		private Stage boxStage;
 		private Scene scene;
@@ -817,7 +817,7 @@ public class ViewManager
 			GridPane gp = new GridPane();
 			Button b = new Button("确认");
 			
-			double tfWidth = 50.0;
+			double tfWidth = 70.0;
 			
 			
 			boxStage.setTitle("高级设置");
