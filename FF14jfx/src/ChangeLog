@@ -79,3 +79,6 @@ All notable changes to this project will be documented in this file.
 # [1.0.0-S] 2020-04-01
 ## Added
 - added lvl difference input
+
+## Fixed
+- minor typo and data error
