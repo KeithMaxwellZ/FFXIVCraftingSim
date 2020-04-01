@@ -53,7 +53,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 30.0;
 	
-	private static final String VERSION = "V0.5.1";
+	private static final String VERSION = "V0.5.2";
 	
 	private Stage stage;
 	private Scene mainScene;
@@ -437,13 +437,14 @@ public class ViewManager
 					startWarning();
 				}
 			});
-			b.setOnMouseEntered(e -> {
+			
+			skillIcon.setOnMouseEntered(e -> {
 				skillDescription.setText(s.getName() + " " +
 							(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
 							(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
 							(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
 			});
-			b.setOnMouseExited(e -> {
+			skillIcon.setOnMouseExited(e -> {
 				skillDescription.setText("");
 			});
 			skillLine.getChildren().add(skillIcon);
@@ -479,7 +480,9 @@ public class ViewManager
 				postUnexpectedMessage();
 			}
 		} finally {
-			updateAll();
+			if(engine.isWorking() == true) {
+				updateAll();
+			}
 		}
 	}
 	
@@ -492,11 +495,11 @@ public class ViewManager
 		updateAll();
 		
 		engine.setWorking(false);
+		engine.addToLogs("========= Summary =========");
 		engine.addToLogs("Status: " + es.toString());
 		engine.addToLogs("Total time: " + engine.getRuntime());
 		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
 		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("========= Summary =========");
 		engine.addToLogs("===========================");
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
