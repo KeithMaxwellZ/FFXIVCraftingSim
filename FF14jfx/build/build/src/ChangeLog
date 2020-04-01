@@ -79,3 +79,14 @@ All notable changes to this project will be documented in this file.
 # [1.0.0-S] 2020-04-01
 ## Added
 - added lvl difference input
+
+## Fixed
+- minor typo and data error
+
+# [1.0.1] 2020-04-01
+## Changed
+- Changed the display color of CraftingStatus Centered back to Yellow
+
+## Fixed
+- fixed the issue where manipulation buff doesn't work properly when the difference
+	between present dura and total dura is 5
