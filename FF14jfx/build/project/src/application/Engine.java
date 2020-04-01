@@ -56,7 +56,8 @@ public class Engine
 	
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
-				int totalProgress, int totalQUality, int recCraftsmanship, int recControl) {
+				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
+				double porgressDifference, double qualityDifference) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -65,6 +66,8 @@ public class Engine
 		this.totalQuality = totalQUality;
 		this.recCraftsmanship = recCraftsmanship;
 		this.recControl = recControl;
+		this.progressDifference = porgressDifference;
+		this.qualityDifference = qualityDifference;
 		
 		activeBuffs = new ArrayList<>();
 		logs = new ArrayList<>();
