@@ -95,3 +95,6 @@ All notable changes to this project will be documented in this file.
 ## Added
 - Added gcd mode
 - Added gcd animation
+
+## Fixed
+- Fixed the issue when click on the text the button won't work
