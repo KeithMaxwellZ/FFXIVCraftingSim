@@ -222,7 +222,6 @@ public class ViewManager
 		Text rControlT = new Text("推荐加工精度");
 		Text progDiffT = new Text("制作等级差");
 		Text qltyDiffT = new Text("加工等级差");
-		Text GCDT = new Text("GCD");
 		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
@@ -308,6 +307,7 @@ public class ViewManager
 		
 		gp.add(progDiffTf, i, j);
 		gp.add(qltyDiffTf, i, j + 1);
+		gp.add(GCDCb, i, j);
 		i++;
 		
 		gp.add(confirm, i, j);
@@ -315,7 +315,7 @@ public class ViewManager
 		i++;
 		
 		i++;
-		gp.add(GCDCb, i, j);
+		
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
