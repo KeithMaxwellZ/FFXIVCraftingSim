@@ -72,7 +72,7 @@ public class ViewManager
 	private Text durabilityText;
 	private Text round;
 	private Text skillDescription;
-	private Timeline t = new Timeline();
+	private Timeline tml = new Timeline();
 	
 	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	private ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
@@ -199,18 +199,15 @@ public class ViewManager
 	}
 	
 	private Node initInput() {		
-		double tfWidth = 40;
+		double tfWidth = 50;
 		GridPane gp = new GridPane();
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
 		Button confirm = new Button("确认");
 		Button logs = new Button("日志"); 
+		Button b = new Button("高级");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
-		
-		gp.setHgap(5);
-		gp.setVgap(3);
-		gp.setPrefWidth(REC_WIDTH);
 		
 		Text craftT = new Text("制作精度");
 		Text controlT = new Text("加工精度");
@@ -218,10 +215,7 @@ public class ViewManager
 		Text totalProgT = new Text("总进度");
 		Text totalQltyT = new Text("总品质");
 		Text totalDuraT = new Text("总耐久");
-		Text rCraftT = new Text("推荐制作精度");
-		Text rControlT = new Text("推荐加工精度");
-		Text progDiffT = new Text("制作等级差");
-		Text qltyDiffT = new Text("加工等级差");
+
 		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
@@ -229,12 +223,13 @@ public class ViewManager
 		TextField totalProgTf = new TextField(Integer.toString(tProg));
 		TextField totalQltyTf = new TextField(Integer.toString(tQlty));
 		TextField totalDuraTf = new TextField(Integer.toString(dura));
-		TextField rCraftTf = new TextField(Integer.toString(rCraftsmanship));
-		TextField rControlTf = new TextField(Integer.toString(rControl));
-		TextField progDiffTf = new TextField(Double.toString(progressDifference));
-		TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
+
 		
 		CheckBox GCDCb = new CheckBox("GCD");
+		
+		gp.setHgap(5);
+		gp.setVgap(3);
+		gp.setPrefWidth(REC_WIDTH);
 		
 		GCDCb.setIndeterminate(false);
 		GCDCb.setSelected(true);
@@ -246,23 +241,19 @@ public class ViewManager
 		totalProgTf.setPrefWidth(tfWidth);
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
-		rCraftTf.setPrefWidth(tfWidth);
-		rControlTf.setPrefWidth(tfWidth);
-		progDiffTf.setPrefWidth(tfWidth);
-		qltyDiffTf.setPrefWidth(tfWidth);
+
 		
 		confirm.setOnMouseClicked(e -> {
 			lastSkill = null;
-			engine = new Engine(Integer.parseInt(craftTf.getText()), 
-								Integer.parseInt(controlTf.getText()), 
-								Integer.parseInt(CPTf.getText()), 
-								Integer.parseInt(totalDuraTf.getText()),
-								Integer.parseInt(totalProgTf.getText()), 
-								Integer.parseInt(totalQltyTf.getText()), 
-								Integer.parseInt(rCraftTf.getText()), 
-								Integer.parseInt(rControlTf.getText()),
-								Double.parseDouble(progDiffTf.getText()),
-								Double.parseDouble(qltyDiffTf.getText()));
+			craftsmanship = Integer.parseInt(craftTf.getText()); 
+			control = Integer.parseInt(controlTf.getText()); 
+			cp = Integer.parseInt(CPTf.getText());
+			dura = Integer.parseInt(totalDuraTf.getText());
+			tProg = Integer.parseInt(totalProgTf.getText()); 
+			tQlty = Integer.parseInt(totalQltyTf.getText());
+
+			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+					rCraftsmanship, rControl, progressDifference,qualityDifference);
 			hasGCD = GCDCb.isSelected();
 			updateAll();
 		});
@@ -293,29 +284,17 @@ public class ViewManager
 		gp.add(totalDuraTf, i, j + 2);
 		i++;
 
-		gp.add(rCraftT, i, j);
-		gp.add(rControlT, i, j + 1);
-		i++;
-
-		gp.add(rCraftTf, i, j);
-		gp.add(rControlTf, i, j + 1);
+		gp.add(GCDCb, i, j);
 		i++;
 		
-		gp.add(progDiffT, i, j);
-		gp.add(qltyDiffT, i, j + 1);
-		i++;	
-		
-		gp.add(progDiffTf, i, j);
-		gp.add(qltyDiffTf, i, j + 1);
-		gp.add(GCDCb, i, j+2);
-		i++;
+		b.setOnMouseClicked(e -> {
+			AdvancedSettingsBox asb = new AdvancedSettingsBox(t);
+		});
 		
 		gp.add(confirm, i, j);
 		gp.add(logs, i, j + 1);
+		gp.add(b, i, j + 2);
 		i++;
-		
-		i++;
-		
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
@@ -333,14 +312,11 @@ public class ViewManager
 		t.add(totalProgT);
 		t.add(totalQltyT);
 		t.add(totalDuraT);
-		t.add(rCraftT);
-		t.add(rControlT);
-		t.add(progDiffT);
-		t.add(qltyDiffT);
 		
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
+		
 		
 		return border;
 	}
@@ -516,7 +492,7 @@ public class ViewManager
 			KeyFrame kf1 = new KeyFrame(Duration.millis(1900), kv1);
 			KeyFrame kf2 = new KeyFrame(Duration.millis(1), kv2);
 			
-			t.getKeyFrames().addAll(kf1, kf2);
+			tml.getKeyFrames().addAll(kf1, kf2);
 			
 			
 			costText.setFill(Color.WHITE);
@@ -585,7 +561,7 @@ public class ViewManager
 			tm.startTimer();
 			lastSkill = sk;
 			if(hasGCD) {
-				t.play();
+				tml.play();
 			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
@@ -824,5 +800,95 @@ public class ViewManager
 		return stage;
 	}
 	
-	 
+	class AdvancedSettingsBox {
+		public static final double BOX_WIDTH = 250.0;
+		public static final double BOX_HEIGHT = 200.0;
+		
+		private Stage boxStage;
+		private Scene scene;
+		private GridPane mainBoxPane;
+
+		public AdvancedSettingsBox(ArrayList<Text> t)
+		{
+			mainBoxPane = new GridPane();
+			boxStage = new Stage();
+			scene = new Scene(mainBoxPane, BOX_WIDTH, BOX_HEIGHT);
+			
+			GridPane gp = new GridPane();
+			Button b = new Button("确认");
+			
+			double tfWidth = 50.0;
+			
+			
+			boxStage.setTitle("高级设置");
+			boxStage.setScene(scene);
+			
+			Text rCraftT = new Text("推荐制作");
+			Text rControlT = new Text("推荐加工");
+			Text progDiffT = new Text("制作等级差");
+			Text qltyDiffT = new Text("加工等级差");
+
+			TextField rCraftTf = new TextField(Integer.toString(rCraftsmanship));
+			TextField rControlTf = new TextField(Integer.toString(rControl));
+			TextField progDiffTf = new TextField(Double.toString(progressDifference));
+			TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
+
+			rCraftTf.setPrefWidth(tfWidth);
+			rControlTf.setPrefWidth(tfWidth);
+			progDiffTf.setPrefWidth(tfWidth);
+			qltyDiffTf.setPrefWidth(tfWidth);
+
+			rCraftsmanship = Integer.parseInt(rCraftTf.getText()); 
+			rControl = Integer.parseInt(rControlTf.getText());
+			progressDifference = Double.parseDouble(progDiffTf.getText());
+			qualityDifference = Double.parseDouble(qltyDiffTf.getText());
+
+			gp.setVgap(5.0);
+			gp.setHgap(5.0);
+			
+			int i = 0;
+			int j = 0;
+			gp.add(rCraftT, i, j);
+			gp.add(rCraftTf, i + 1, j);
+			j++;
+			
+			gp.add(rControlT, i, j);
+			gp.add(rControlTf, i + 1, j);
+			j++;
+			
+			gp.add(progDiffT, i, j);
+			gp.add(progDiffTf, i + 1, j);
+			j++;	
+			
+			gp.add(qltyDiffT, i, j);
+			gp.add(qltyDiffTf, i + 1, j);
+			j++;
+			
+			gp.add(b, i, j);
+			
+			t.add(rCraftT);
+			t.add(rControlT);
+			t.add(progDiffT);
+			t.add(qltyDiffT);
+			
+			b.setOnMouseClicked(e -> {
+				rCraftsmanship = Integer.parseInt(rCraftTf.getText());
+				rControl = Integer.parseInt(rControlTf.getText());
+				progressDifference = Double.parseDouble(progDiffTf.getText());
+				qualityDifference = Double.parseDouble(qltyDiffTf.getText());
+				boxStage.close();
+			});
+			
+			mainBoxPane.add(gp, 0, 0);
+			
+			GridPane.setMargin(gp, new Insets(20.0));
+			
+			boxStage.showAndWait();
+		}
+			
+	}
+	
 }
+
+
+
