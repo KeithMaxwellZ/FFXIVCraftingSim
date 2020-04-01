@@ -53,9 +53,9 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 15.0;
 	
-	private static final String VERSION = "V0.5.2";
+	private static final String VERSION = "V1.0.0";
 	
-	private static final Color TEXT_COLOR = Color.WHITE;
+	private static final Color TEXT_COLOR = Color.BLACK;
 	
 	private Stage stage;
 	private Scene mainScene;
@@ -152,8 +152,8 @@ public class ViewManager
 		mainScene = new Scene(mainPane, WIDTH, HEIGHT);
 		
 		mainPane.setBackground(new Background(
-				new BackgroundFill(Color.rgb(47, 50, 55, 1.0), null, null)));
-		
+				new BackgroundFill(Color.LIGHTGRAY, null, null)));
+//		Color.rgb(47, 50, 55, 1.0)
 		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
@@ -294,7 +294,7 @@ public class ViewManager
 		t.add(rCraftT);
 		t.add(rControlT);
 		for(Text tx: t) {
-			tx.setFill(TEXT_COLOR);
+			tx.setFill(Color.WHITE);
 		}
 		
 		return border;
