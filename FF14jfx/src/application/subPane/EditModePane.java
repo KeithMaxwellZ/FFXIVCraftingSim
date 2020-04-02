@@ -131,7 +131,7 @@ public class EditModePane
 		Alert al = new Alert(AlertType.CONFIRMATION);
 		al.setTitle("提示");
 		al.setHeaderText("关于编辑模式");
-		TextArea  hintTf = new TextArea("点击一个空格后它会变暗，此时点击另一个空格即可交换他们的位置。" + '\n'
+		TextArea  hintTf = new TextArea("点击选中一个空格/技能后，点击另一个即可交换他们的位置。" + '\n'
 				+ "下次是否继续显示此提示？");
 		hintTf.setEditable(false);
 		hintTf.setWrapText(true);
