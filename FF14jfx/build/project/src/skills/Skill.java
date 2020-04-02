@@ -1,6 +1,5 @@
 package skills;
 
-import exceptions.CraftingException;
 import application.Engine;
 
 public interface Skill
@@ -32,7 +31,7 @@ public interface Skill
 	
 	public double getActualProgressRate();
 	
-	public double getActualQualityRate() throws CraftingException;
+	public double getActualQualityRate();
 	
 	public boolean isSuccess();
 	

@@ -38,6 +38,7 @@ public class Engine
 	private boolean working;
 	
 	private Timer timer;
+	private CraftingHistory ch;
 	
 	protected ArrayList<ActiveBuff> activeBuffs;
 	
@@ -57,7 +58,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference) {
+				double porgressDifference, double qualityDifference, CraftingHistory ch) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -68,6 +69,7 @@ public class Engine
 		this.recControl = recControl;
 		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
+		this.ch = ch;
 		
 		activeBuffs = new ArrayList<>();
 		logs = new ArrayList<>();
@@ -141,12 +143,14 @@ public class Engine
 		round++;
 	}
 	
-	public void beginning() {
+	public void beginning(Skill sk) {
 		success = false;
 		progIncreased = false;
 		qltyIncreased = false;
 		addToLogs(" ");
 		addToLogs("===Round " + round + " ===");
+		addToLogs("Crafting Status: " + cs.toString());
+		addToLogs("Skill name: " + (sk).toString());
 		addToLogs("Observed?: " + observed);
 	}
 	
@@ -173,8 +177,7 @@ public class Engine
 			throw new CraftingException(ExceptionStatus.Waste_Not_Exist);
 		}
 		
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		if(sk.isSuccess()) {
 			success = true;
@@ -195,10 +198,11 @@ public class Engine
 	
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
 		if(sk == BuffSkill.Final_Appraisal) {
-			beginning();
+			beginning(sk);
 			success = true;
 			presentCP--;
 			sk.createBuff();
+			ch.addToQueue(sk, cs, success);
 			return;
 		}
 		
@@ -213,8 +217,7 @@ public class Engine
 			}
 		}
 		
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		if(sk.isSuccess()) {
 			success = true;
@@ -222,24 +225,33 @@ public class Engine
 		}
 		
 		observed = false;
+		
+		for(ActiveBuff ab: activeBuffs) {
+			if(ab.buff == sk.getBuff()) {
+				activeBuffs.remove(ab);
+				return;
+			}
+		}
 
 		finalizeRound(sk);
 		sk.createBuff();
 	}
 	
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
+		if(innerQuietLvl <= 1 && sk == SpecialSkills.Byregots_Blessing) {
+			throw new CraftingException(ExceptionStatus.No_Inner_Quiet); 
+		}
 		if(sk == SpecialSkills.Careful_Observation) {
 			if(csCount >= 3) {
 				throw new CraftingException(ExceptionStatus.Maximun_Reached);
 			}
 			csCount++;
-			beginning();
+			beginning(sk);
 			success = true;
 			cs = CraftingStatus.getNextStatus();
 			return;
 		}
-		beginning();
-		addToLogs("Skill name: " + (sk).toString());
+		beginning(sk);
 
 		observed = false;
 
@@ -248,12 +260,11 @@ public class Engine
 			forwardProgress(sk);
 		}
 		
-		
 		sk.execute();
 		finalizeRound(sk);
 	}
 	
-	private void forwardProgress(Skill sk) throws CraftingException {
+	private void forwardProgress(Skill sk) {
 		double tempProgressRate = sk.getActualProgressRate();
 		double tempQualityRate = sk.getActualQualityRate();
 		
@@ -301,6 +312,8 @@ public class Engine
 	}
 	
 	private void finalizeRound(Skill sk) throws CraftingException {
+		ch.addToQueue(sk, cs, success);
+		
 		successfulUse(sk);
 				
 		finishCheck();

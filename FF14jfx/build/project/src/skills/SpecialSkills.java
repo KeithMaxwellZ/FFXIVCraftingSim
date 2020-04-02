@@ -56,12 +56,10 @@ public enum SpecialSkills implements Skill
 	}
 
 	@Override
-	public double getActualQualityRate() throws CraftingException
+	public double getActualQualityRate()
 	{
 		if(this == Byregots_Blessing) {
-			if(engine.getInnerQuiet() <= 1) {
-				throw new CraftingException(ExceptionStatus.No_Inner_Quiet); 
-			}
+
 			double temp = 1.0;
 			for(ActiveBuff ab: engine.getActiveBuffs()) {
 				temp += ab.buff.getQualityBuff();

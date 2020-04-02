@@ -103,6 +103,22 @@ All notable changes to this project will be documented in this file.
 ## Added
 - Added advanced settings box
 
-# [1.1.2-S]
+# [1.1.2-S] (merged)
 ## Fixed
 - Fixed the issue that inner quiet is rounded down when Patient_Touch fails
+
+# [1.2.0]
+## Added
+- Added crafting status to logs
+
+## Fixed
+- Fixed the issue that manipulation will take effect on 
+	the turn the skill manipulation is used
+
+# [1.2.1-S]
+## Changed
+- Updated Inner Quiet Buff icon
+
+# [1.3.0-S]
+## Added
+- Added crafting history display

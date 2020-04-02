@@ -38,6 +38,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import skills.ActiveBuff;
+import skills.Buff;
 import skills.BuffSkill;
 import skills.PQSkill;
 import skills.Skill;
@@ -57,7 +58,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 15.0;
 	
-	private static final String VERSION = "V1.1.2-S";
+	private static final String VERSION = "V1.2.0";
 	
 	private static final Color TEXT_COLOR = Color.BLACK;
 	
@@ -99,12 +100,14 @@ public class ViewManager
 	private ArrayList<Skill> otherSkills;
 	
 	private Engine engine;
+	private CraftingHistory ch;
 	
 	private Timer tm;
 	
 	public ViewManager() {
+		ch = new CraftingHistory();
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-				rCraftsmanship, rControl, progressDifference, qualityDifference);
+				rCraftsmanship, rControl, progressDifference, qualityDifference, ch);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -244,6 +247,7 @@ public class ViewManager
 
 		
 		confirm.setOnMouseClicked(e -> {
+			ch.destory();
 			lastSkill = null;
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
@@ -251,11 +255,12 @@ public class ViewManager
 			dura = Integer.parseInt(totalDuraTf.getText());
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
-
+			ch = new CraftingHistory();
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-					rCraftsmanship, rControl, progressDifference,qualityDifference);
+					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
 			hasGCD = GCDCb.isSelected();
 			updateAll();
+			ch.display();
 		});
 		
 		logs.setOnMouseClicked(e -> {
@@ -289,6 +294,7 @@ public class ViewManager
 		
 		b.setOnMouseClicked(e -> {
 			AdvancedSettingsBox asb = new AdvancedSettingsBox(t);
+			asb.display();
 		});
 		
 		gp.add(confirm, i, j);
@@ -587,6 +593,7 @@ public class ViewManager
 	private void postFinishMessage(ExceptionStatus es) {
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane gp = new GridPane();
+		Text GCDMode = new Text("GCD: " + (hasGCD ? "开启" : "关闭"));
 		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
 		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
 		
@@ -603,12 +610,14 @@ public class ViewManager
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		
-		gp.add(runTime, 0, 0);
-		gp.add(val, 0, 1);
+		int i = 0;
+		gp.add(GCDMode, 0, i++);
+		gp.add(runTime, 0, i++);
+		gp.add(val, 0, i++);
 		
 		if(es == ExceptionStatus.Craft_Success) {		
 			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
-			gp.add(SP, 0, 2);	
+			gp.add(SP, 0, i++);	
 		}
 		
 		al.getDialogPane().setExpandableContent(gp);
@@ -743,7 +752,13 @@ public class ViewManager
 			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
-			ImageView iv = new ImageView(new Image(ab.buff.getAddress(), true));
+			ImageView iv = null;
+			if(ab.buff == Buff.inner_quiet) {
+				String add = "/icons/Inner_Quiet_Icon/Inner_Quiet_" + ab.getRemaining() + ".png";
+				iv = new ImageView(new Image(add, true));
+			} else {
+				iv = new ImageView(new Image(ab.buff.getAddress(), true));
+			}
 			Text remaining = new Text(Integer.toString(ab.getRemaining()));
 			
 			ap.getChildren().add(iv);
@@ -819,7 +834,6 @@ public class ViewManager
 			
 			double tfWidth = 70.0;
 			
-			
 			boxStage.setTitle("高级设置");
 			boxStage.setScene(scene);
 			
@@ -882,7 +896,9 @@ public class ViewManager
 			mainBoxPane.add(gp, 0, 0);
 			
 			GridPane.setMargin(gp, new Insets(20.0));
-			
+		}
+		
+		public void display() {
 			boxStage.showAndWait();
 		}
 			
