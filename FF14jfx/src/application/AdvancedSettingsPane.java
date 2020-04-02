@@ -117,8 +117,11 @@ public class AdvancedSettingsPane
 	}
 	
 	public void display() {
+		boxStage.setAlwaysOnTop(true);
 		boxStage.showAndWait();
 	}
 	
-
+	public void close() {
+		boxStage.close();
+	}
 }

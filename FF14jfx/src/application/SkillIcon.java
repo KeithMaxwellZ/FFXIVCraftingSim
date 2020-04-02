@@ -91,7 +91,7 @@ public class SkillIcon extends AnchorPane
 		});
 		
 		this.setOnMouseEntered(e -> {
-			vm.skillDescription.setText(s.getName() + " " +
+			vm.skillDescription.setText("  " + s.getName() + " " +
 						(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
 						(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
 						(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));

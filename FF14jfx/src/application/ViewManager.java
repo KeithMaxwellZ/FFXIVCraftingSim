@@ -95,6 +95,7 @@ public class ViewManager
 	
 	private Engine engine;
 	private CraftingHistoryPane ch;
+	private AdvancedSettingsPane asp;
 	
 	private Timer tm;
 	
@@ -170,6 +171,9 @@ public class ViewManager
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {
+			if(asp != null) {
+				asp.close();
+			}
 			ch.close();
 		});
 	}
@@ -293,7 +297,7 @@ public class ViewManager
 		i++;
 		
 		b.setOnMouseClicked(e -> {
-			AdvancedSettingsPane asp = new AdvancedSettingsPane(t, this);
+			asp = new AdvancedSettingsPane(t, this);
 			asp.display();
 		});
 		
@@ -443,20 +447,27 @@ public class ViewManager
 	
 	private Node initSkills() {
 		GridPane skillContainer = new GridPane();
-		skillDescription = new Text("");
+		GridPane iconContainer = new GridPane();
 		AnchorPane border = new AnchorPane();		
 		
-		skillContainer.setVgap(5);
+		skillDescription = new Text("  ");
 		
-		int i = 0;
+		
+		skillContainer.setVgap(5);
+		iconContainer.setHgap(5);
+		
 		int j = 2;
 		
 		skillContainer.add(skillDescription, 0, 1);
-		skillContainer.add(createSkillList(progressSkills), i, j);
-		skillContainer.add(createSkillList(qualitySkills), i, j + 1);
-		skillContainer.add(createSkillList(buffSkills), i, j + 2);
-		skillContainer.add(createSkillList(recoverySkills), i, j + 3);
-		skillContainer.add(createSkillList(otherSkills), i, j + 4);
+		skillContainer.add(iconContainer, 0, 2);
+		
+		GridPane.setMargin(skillDescription, new Insets(10.0));
+		
+		createSkillList(progressSkills, iconContainer, j++);
+		createSkillList(qualitySkills, iconContainer, j++);
+		createSkillList(buffSkills, iconContainer, j++);
+		createSkillList(recoverySkills, iconContainer, j++);
+		createSkillList(otherSkills, iconContainer, j++);
 		
 		border.getChildren().add(skillContainer);
 		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
@@ -477,23 +488,23 @@ public class ViewManager
 		return border;
 	}
 	
-	private Node createSkillList(List<Skill> skl) {
-		HBox skillLine = new HBox();
+	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
 		
+		//pqbro
 		
-		skillLine.setSpacing(5);
-		
+		int j = 1;
 		for(Skill s: skl) {
 			engine.addToLogs(s.toString() + ": " + s.getAddress());;
 			
 			SkillIcon si = new SkillIcon(s, tml, this);
 			
-			skillLine.getChildren().add(si);
+			gp.add(si, j, i);
+			j++;
 		}
 		
 		SkillIcon.setVm(engine, tml, this);
 
-		return skillLine;
+		return;
 	}
 	
 	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
