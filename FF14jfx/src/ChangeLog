@@ -122,3 +122,10 @@ All notable changes to this project will be documented in this file.
 # [1.3.0-S]
 ## Added
 - Added crafting history display
+
+# [1.3.1-S]
+## Fixed
+- Fixed the bug of no scroll bar
+
+## TODO
+- unknown issue of negative dura
