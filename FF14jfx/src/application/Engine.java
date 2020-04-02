@@ -221,6 +221,13 @@ public class Engine
 		}
 		
 		observed = false;
+		
+		for(ActiveBuff ab: activeBuffs) {
+			if(ab.buff == sk.getBuff()) {
+				activeBuffs.remove(ab);
+				return;
+			}
+		}
 
 		finalizeRound(sk);
 		sk.createBuff();
@@ -248,7 +255,6 @@ public class Engine
 			success = true;
 			forwardProgress(sk);
 		}
-		
 		
 		sk.execute();
 		finalizeRound(sk);
