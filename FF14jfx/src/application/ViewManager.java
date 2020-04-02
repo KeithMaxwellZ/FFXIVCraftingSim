@@ -57,7 +57,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 15.0;
 	
-	private static final String VERSION = "V1.1.2-S";
+	private static final String VERSION = "V1.1.3-S";
 	
 	private static final Color TEXT_COLOR = Color.BLACK;
 	
