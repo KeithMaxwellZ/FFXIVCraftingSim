@@ -181,7 +181,7 @@ public class Engine
 			forwardProgress(sk);
 		} else {
 			if(sk == PQSkill.Patient_Touch) {
-				innerQuietLvl /= 2;
+				innerQuietLvl =  (innerQuietLvl + 1) / 2;
 				innerQuietLvl = (innerQuietLvl == 0 ? 1 : innerQuietLvl);
 				setBuffInnerQuiet(innerQuietLvl);
 			}

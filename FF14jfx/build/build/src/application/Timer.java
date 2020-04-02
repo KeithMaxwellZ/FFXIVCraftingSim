@@ -23,11 +23,7 @@ public class Timer
 	}
 	
 	public double getTime() {
-		if(st == Status.stopped) {
-			return (double)(endTime - startTime) / 1000.0;
-		} else {
-			return 0;
-		}
+		return (double)(System.currentTimeMillis() - startTime) / 1000.0;
 	}
 }
 
