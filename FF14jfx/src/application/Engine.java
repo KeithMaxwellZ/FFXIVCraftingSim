@@ -38,6 +38,7 @@ public class Engine
 	private boolean working;
 	
 	private Timer timer;
+	private CraftingHistory ch;
 	
 	protected ArrayList<ActiveBuff> activeBuffs;
 	
@@ -57,7 +58,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference) {
+				double porgressDifference, double qualityDifference, CraftingHistory ch) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -68,6 +69,7 @@ public class Engine
 		this.recControl = recControl;
 		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
+		this.ch = ch;
 		
 		activeBuffs = new ArrayList<>();
 		logs = new ArrayList<>();
@@ -200,6 +202,7 @@ public class Engine
 			success = true;
 			presentCP--;
 			sk.createBuff();
+			ch.addToQueue(sk, cs, success);
 			return;
 		}
 		
@@ -309,6 +312,8 @@ public class Engine
 	}
 	
 	private void finalizeRound(Skill sk) throws CraftingException {
+		ch.addToQueue(sk, cs, success);
+		
 		successfulUse(sk);
 				
 		finishCheck();

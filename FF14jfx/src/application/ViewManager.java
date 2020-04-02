@@ -100,12 +100,14 @@ public class ViewManager
 	private ArrayList<Skill> otherSkills;
 	
 	private Engine engine;
+	private CraftingHistory ch;
 	
 	private Timer tm;
 	
 	public ViewManager() {
+		ch = new CraftingHistory();
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-				rCraftsmanship, rControl, progressDifference, qualityDifference);
+				rCraftsmanship, rControl, progressDifference, qualityDifference, ch);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -245,6 +247,7 @@ public class ViewManager
 
 		
 		confirm.setOnMouseClicked(e -> {
+			ch.destory();
 			lastSkill = null;
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
@@ -252,11 +255,12 @@ public class ViewManager
 			dura = Integer.parseInt(totalDuraTf.getText());
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
-
+			ch = new CraftingHistory();
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-					rCraftsmanship, rControl, progressDifference,qualityDifference);
+					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
 			hasGCD = GCDCb.isSelected();
 			updateAll();
+			ch.display();
 		});
 		
 		logs.setOnMouseClicked(e -> {
@@ -589,6 +593,7 @@ public class ViewManager
 	private void postFinishMessage(ExceptionStatus es) {
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane gp = new GridPane();
+		Text GCDMode = new Text("GCD: " + (hasGCD ? "开启" : "关闭"));
 		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
 		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
 		
@@ -605,8 +610,9 @@ public class ViewManager
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		
-		gp.add(runTime, 0, 0);
-		gp.add(val, 0, 1);
+		gp.add(GCDMode, 0, 0);
+		gp.add(runTime, 0, 1);
+		gp.add(val, 0, 2);
 		
 		if(es == ExceptionStatus.Craft_Success) {		
 			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
@@ -826,7 +832,6 @@ public class ViewManager
 			Button b = new Button("确认");
 			
 			double tfWidth = 70.0;
-			
 			
 			boxStage.setTitle("高级设置");
 			boxStage.setScene(scene);
