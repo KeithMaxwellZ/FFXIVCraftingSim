@@ -42,9 +42,13 @@ public enum BuffSkill implements Skill
 	boolean once;
 	boolean firstTurn;
 
-	Random r;
+	static Random r;
 	Buff buff;
 	Engine engine;
+	
+	static {
+		r = new Random();
+	}
 	
 	private BuffSkill(String name,  int cpCost, int durabilityCost,
 					   double progressRate, double qualityRate, double successRate,
@@ -60,7 +64,6 @@ public enum BuffSkill implements Skill
 		this.once = once;
 		this.firstTurn = firstTurn;
 		this.buff = buff;
-		r = new Random();
 	}
 	
 	@Override
@@ -110,7 +113,7 @@ public enum BuffSkill implements Skill
 	@Override
 	public boolean isSuccess()
 	{
-		return r.nextDouble() <= (successRate + (engine.getCraftingStatus() == CraftingStatus.Centered ? 0.25 : 0));
+		return true;
 	}
 
 	@Override
@@ -133,6 +136,11 @@ public enum BuffSkill implements Skill
 
 	public Buff getBuff() {
 		return buff;
+	}
+	
+	@Override
+	public double getSuccessRate() {
+		return 1.0;
 	}
 	
 	public void createBuff() {
