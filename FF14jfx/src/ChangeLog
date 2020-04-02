@@ -135,5 +135,12 @@ All notable changes to this project will be documented in this file.
 - Changed the background color of history pane
 
 ## Fixed
-- Fixed the issue that refresh buff doesn't work properl
+- Fixed the issue that refresh buff doesn't work properly
+
+# [1.4.0]
+## Added
+- Added success rate display in the history bar
+
+## Fixed
+- Fixed issue with manipulation buff calculation
 
