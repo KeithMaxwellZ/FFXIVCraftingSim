@@ -1,6 +1,8 @@
 package application;
 
+
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -21,13 +23,13 @@ public class CraftingHistory
 
 	private Stage historyStage;
 	private Scene scene;
-	private FlowPane mainHistoryPane;
+	private ScrollPane mainHistoryPane;
 	private GridPane queue;
 	private int presentLoc;
 	
 	public CraftingHistory()
 	{
-		mainHistoryPane = new FlowPane();
+		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
 		
@@ -35,7 +37,8 @@ public class CraftingHistory
 		historyStage.setTitle("ÀúÊ·¼ÇÂ¼");
 		
 		queue = new GridPane();
-		mainHistoryPane.getChildren().add(queue);
+		mainHistoryPane.setPrefHeight(BOX_HEIGHT);
+		mainHistoryPane.setContent(queue);;
 		mainHistoryPane.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
 		
