@@ -13,7 +13,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -27,6 +26,9 @@ public class SkillIcon extends AnchorPane
 	private static ViewManager vm;
 	private static Timeline tml;
 
+	private static SkillIcon icon1;
+	private static SkillIcon icon2;
+	
 	private Image icon;
 	private Button b = new Button();
 	private Text costText;
@@ -45,19 +47,30 @@ public class SkillIcon extends AnchorPane
 	public SkillIcon(Skill s, Timeline tml, ViewManager vm) {
 		this.s = s;
 		
-		icon = new Image(s.getAddress(), true);
 		b = new Button();
-		costText = new Text(s.getCPCost() != 0 ? Integer.toString(s.getCPCost()) : "");
-		iv = new ImageView(icon);
-		rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
 		
-		kv1 = new KeyValue(iv.opacityProperty(), 1.0);
-		kv2 = new KeyValue(iv.opacityProperty(), 0.1);
+		if(s == null) {
+			icon = new Image("/icons/Blank.png");
+			costText = new Text(" ");
+			iv = new ImageView(icon);
+			rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
+			
+			getIv().setOpacity(0.0);
+			rec.setOpacity(0.0);
+		} else {
+			icon = new Image(s.getAddress(), true);
+			costText = new Text(s.getCPCost() != 0 ? Integer.toString(s.getCPCost()) : "");
+			iv = new ImageView(icon);
+			rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
+		}
+		
+		kv1 = new KeyValue(getIv().opacityProperty(), 1.0);
+		kv2 = new KeyValue(getIv().opacityProperty(), 0.1);
 		
 		kf1 = new KeyFrame(Duration.millis(1900), kv1);
 		kf2 = new KeyFrame(Duration.millis(1), kv2);
 		
-		iv.setSmooth(true);
+		getIv().setSmooth(true);
 		rec.setSmooth(true);
 		
 		tml.getKeyFrames().addAll(kf1, kf2);
@@ -69,7 +82,7 @@ public class SkillIcon extends AnchorPane
 		costText.setFill(Color.WHITE);
 		
 		getChildren().add(rec);
-		getChildren().add(iv);
+		getChildren().add(getIv());
 		getChildren().add(costText);
 		getChildren().add(b);
 		
@@ -86,20 +99,39 @@ public class SkillIcon extends AnchorPane
 		b.setOpacity(0.0);
 		
 		b.setOnMouseClicked(e -> {
-			if(engine.isWorking()) {
-				if(vm.getTimer().getTime() >= (vm.getHasGCD() ? 2.00 : 0)) {
-					performSkill(getSkill(), iv);
+			if(engine.getEngineStatus() == EngineStatus.Editing) {
+				if(getIcon1() == null) {
+					setIcon1(this);
+					if(s == null) {
+						rec.setOpacity(0.5);
+					} else {
+						iv.setOpacity(0.3);
+					}
+				} else {
+					getIcon1().getIv().setOpacity(1.0);
+					icon2 = this;
+					SkillIcon.switchPos(getIcon1(), icon2);
+					setIcon1(null);
+					icon2 = null;
 				}
+			} else if(engine.getEngineStatus() == EngineStatus.Crafting) {
+				if(s != null && vm.getTimer().getTime() >= (vm.getHasGCD() ? 2.00 : 0)) {
+					performSkill(getSkill(), getIv());
+				}
+			} else if(s == null) {
+				// Do nothing
 			} else {
 				startWarning();
 			}
 		});
 		
 		this.setOnMouseEntered(e -> {
-			vm.getSkillDescription().setText("  " + s.getName() + " " +
-						(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
-						(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
-						(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
+			if(s != null) {
+				vm.getSkillDescription().setText("  " + s.getName() + " " +
+							(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
+							(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
+							(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
+			}
 		});
 		
 		this.setOnMouseExited(e -> {
@@ -128,7 +160,7 @@ public class SkillIcon extends AnchorPane
 			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
-				postFinishMessage(e.es);
+				vm.postFinishMessage(e.es);
 			} else if (	e.es == ExceptionStatus.Not_HQ ||
 						e.es == ExceptionStatus.No_Inner_Quiet ||
 						e.es == ExceptionStatus.Inner_Quiet_Exists ||
@@ -136,74 +168,30 @@ public class SkillIcon extends AnchorPane
 						e.es == ExceptionStatus.Waste_Not_Exist ||
 						e.es == ExceptionStatus.No_Enough_CP ||
 						e.es == ExceptionStatus.Maximun_Reached) {
-				postInvalidMessage(e.es);
+				vm.postInvalidMessage(e.es);
 			} else {
-				postUnexpectedMessage();
+				vm.postUnexpectedMessage();
 			}
 		} finally {
-			if(engine.isWorking() == true) {
+			if(engine.getEngineStatus() == EngineStatus.Crafting) {
 				vm.updateAll();
 			}
 		}
 	}
 	
-	private void postFinishMessage(ExceptionStatus es) {
-		Alert al = new Alert(AlertType.INFORMATION);
-		GridPane gp = new GridPane();
-		Text GCDMode = new Text("GCD: " + (vm.getHasGCD() ? "开启" : "关闭"));
-		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
-		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
-		
-		vm.updateAll();
-		
-		engine.setWorking(false);
-		engine.addToLogs("========= Summary =========");
-		engine.addToLogs("Status: " + es.toString());
-		engine.addToLogs("Total time: " + engine.getRuntime());
-		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
-		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("===========================");
-		
-		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
-		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
-		
-		int i = 0;
-		gp.add(GCDMode, 0, i++);
-		gp.add(runTime, 0, i++);
-		gp.add(val, 0, i++);
-		
-		if(es == ExceptionStatus.Craft_Success) {		
-			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
-			gp.add(SP, 0, i++);	
+	public void refreshDisplay(Skill sk) {
+		this.s = sk;
+		if(this.s == null) {
+			getIv().setImage(new Image("/icons/Blank.png", true));
+			rec.setOpacity(0.0);
+			costText.setText("");
+		} else {
+			getIv().setImage(new Image(s.getAddress(), true));
+			getIv().setOpacity(1.0);
+			rec.setOpacity(1.0);
+			costText.setText(Integer.toString(s.getCPCost()));
 		}
 		
-		al.getDialogPane().setExpandableContent(gp);
-		al.getDialogPane().setExpanded(true);
-		
-		al.showAndWait();
-	}
-	
-	private void postInvalidMessage(ExceptionStatus es) {
-		Alert al = new Alert(AlertType.WARNING);
-		
-		al.setTitle("无法使用");
-		al.setContentText(es.getMessage());
-		
-		al.showAndWait();
-	}
-	
-	private void postUnexpectedMessage() {
-		Alert al = new Alert(AlertType.WARNING);
-		
-		al.setTitle("未知错误");
-		al.setContentText("你是怎么触发的...");
-		
-		al.showAndWait();
-	}
-	
-	public void refreshDisplay(Skill s) {
-		this.s = s;
-		iv.setImage(new Image(s.getAddress(), true));
 	}
 	
 	public static void setVm(Engine e, Timeline timeLine, ViewManager viewManager) {
@@ -240,4 +228,20 @@ public class SkillIcon extends AnchorPane
 		si1.refreshDisplay(si1.getSkill());
 		si2.refreshDisplay(si2.getSkill());
 	}
+
+	public static SkillIcon getIcon1()
+	{
+		return icon1;
+	}
+
+	public static void setIcon1(SkillIcon icon1)
+	{
+		SkillIcon.icon1 = icon1;
+	}
+
+	public ImageView getIv()
+	{
+		return iv;
+	}
+
 }

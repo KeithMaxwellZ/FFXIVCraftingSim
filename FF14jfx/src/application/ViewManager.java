@@ -3,10 +3,13 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.components.EngineStatus;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
 import application.subPane.CraftingHistoryPane;
+import application.subPane.EditModePane;
+import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -65,6 +68,7 @@ public class ViewManager
 	private Scene mainScene;
 	private AnchorPane mainPane;
 	private AnchorPane lastSkillAp;
+	private GridPane iconContainer;
 	private VBox mainContainer;
 	private HBox buffContainer;
 	private Circle statusDisp;
@@ -99,13 +103,14 @@ public class ViewManager
 	private ArrayList<Skill> otherSkills;
 	
 	private Engine engine;
+	
 	private CraftingHistoryPane ch;
 	private AdvancedSettingsPane asp;
+	private EditModePane emp;
 	
 	private Timer tm;
 	
 	public ViewManager() {
-		ch = new CraftingHistoryPane();
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 				rCraftsmanship, rControl, progressDifference, qualityDifference, ch);
 		progText = new ArrayList<>();
@@ -117,6 +122,8 @@ public class ViewManager
 		initSkillsList();
 		initStage();
 		initMainDisplay();
+		
+		ch = new CraftingHistoryPane(this);
 	}
 	
 	private void initSkillsList() {
@@ -204,7 +211,7 @@ public class ViewManager
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
-		engine.setWorking(false);
+		engine.setEngineStatus(EngineStatus.Pending);;
 		
 		
 	}
@@ -216,7 +223,9 @@ public class ViewManager
 		GridPane back = new GridPane();
 		Button confirm = new Button("确认");
 		Button logs = new Button("日志"); 
-		Button b = new Button("高级");
+		Button advanced = new Button("高级");
+		Button finish = new Button("结束制作");
+		Button iconRearr = new Button("编辑图标");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
 		
@@ -235,7 +244,6 @@ public class ViewManager
 		TextField totalQltyTf = new TextField(Integer.toString(tQlty));
 		TextField totalDuraTf = new TextField(Integer.toString(dura));
 
-		
 		CheckBox GCDCb = new CheckBox("GCD");
 		
 		gp.setHgap(5);
@@ -253,6 +261,16 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
+		finish.setOnMouseClicked(e -> {
+			if(engine.getEngineStatus() == EngineStatus.Crafting) {
+				postFinishMessage(ExceptionStatus.Craft_Failed);
+			}
+		});
+		
+		iconRearr.setOnMouseClicked(e -> {
+			emp = new EditModePane(this, engine);
+			emp.display();
+		});
 		
 		confirm.setOnMouseClicked(e -> {
 			ch.destory();
@@ -263,7 +281,7 @@ public class ViewManager
 			dura = Integer.parseInt(totalDuraTf.getText());
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
-			ch = new CraftingHistoryPane();
+			ch = new CraftingHistoryPane(this);
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
 			hasGCD = GCDCb.isSelected();
@@ -274,6 +292,11 @@ public class ViewManager
 		
 		logs.setOnMouseClicked(e -> {
 			exportLogs();
+		});
+		
+		advanced.setOnMouseClicked(e -> {
+			asp = new AdvancedSettingsPane(t, this);
+			asp.display();
 		});
 		
 		int i = 0;
@@ -301,14 +324,15 @@ public class ViewManager
 		gp.add(GCDCb, i, j);
 		i++;
 		
-		b.setOnMouseClicked(e -> {
-			asp = new AdvancedSettingsPane(t, this);
-			asp.display();
-		});
-		
 		gp.add(confirm, i, j);
 		gp.add(logs, i, j + 1);
-		gp.add(b, i, j + 2);
+		gp.add(advanced, i, j + 2);
+		i++;
+		
+		i++;
+		i++;
+		gp.add(finish, i, j);
+		gp.add(iconRearr, i, j + 1);
 		i++;
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
@@ -452,27 +476,28 @@ public class ViewManager
 	
 	private Node initSkills() {
 		GridPane skillContainer = new GridPane();
-		GridPane iconContainer = new GridPane();
-		AnchorPane border = new AnchorPane();		
+		AnchorPane border = new AnchorPane();	
+		
+		setIconContainer(new GridPane());
 		
 		setSkillDescription(new Text("  "));
 		
 		
 		skillContainer.setVgap(5);
-		iconContainer.setHgap(5);
+		getIconContainer().setHgap(5);
 		
-		int j = 2;
+		int i = 2;
 		
 		skillContainer.add(getSkillDescription(), 0, 1);
-		skillContainer.add(iconContainer, 0, 2);
+		skillContainer.add(getIconContainer(), 0, 2);
 		
 		GridPane.setMargin(getSkillDescription(), new Insets(10.0));
 		
-		createSkillList(progressSkills, iconContainer, j++);
-		createSkillList(qualitySkills, iconContainer, j++);
-		createSkillList(buffSkills, iconContainer, j++);
-		createSkillList(recoverySkills, iconContainer, j++);
-		createSkillList(otherSkills, iconContainer, j++);
+		createSkillList(progressSkills, getIconContainer(), i++);
+		createSkillList(qualitySkills, getIconContainer(), i++);
+		createSkillList(buffSkills, getIconContainer(), i++);
+		createSkillList(recoverySkills, getIconContainer(), i++);
+		createSkillList(otherSkills, getIconContainer(), i++);
 		
 		border.getChildren().add(skillContainer);
 		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
@@ -505,6 +530,10 @@ public class ViewManager
 			
 			gp.add(si, j, i);
 			j++;
+		}
+		for(; j <= 12; j++) {
+			SkillIcon si = new SkillIcon(null, tml, this);
+			gp.add(si, j, i);
 		}
 		
 		SkillIcon.setVm(engine, tml, this);
@@ -648,6 +677,60 @@ public class ViewManager
 		
 	}
 	
+	public void postFinishMessage(ExceptionStatus es) {
+		Alert al = new Alert(AlertType.INFORMATION);
+		GridPane gp = new GridPane();
+		Text GCDMode = new Text("GCD: " + (getHasGCD() ? "开启" : "关闭"));
+		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
+		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		
+		updateAll();
+		
+		engine.setEngineStatus(EngineStatus.Pending);;
+		engine.addToLogs("========= Summary =========");
+		engine.addToLogs("Status: " + es.toString());
+		engine.addToLogs("Total time: " + engine.getRuntime());
+		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
+		engine.addToLogs("Skill Points: " + engine.SPCalc());
+		engine.addToLogs("===========================");
+		
+		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
+		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
+		
+		int i = 0;
+		gp.add(GCDMode, 0, i++);
+		gp.add(runTime, 0, i++);
+		gp.add(val, 0, i++);
+		
+		if(es == ExceptionStatus.Craft_Success) {		
+			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
+			gp.add(SP, 0, i++);	
+		}
+		
+		al.getDialogPane().setExpandableContent(gp);
+		al.getDialogPane().setExpanded(true);
+		
+		al.showAndWait();
+	}
+	
+	public void postInvalidMessage(ExceptionStatus es) {
+		Alert al = new Alert(AlertType.WARNING);
+		
+		al.setTitle("无法使用");
+		al.setContentText(es.getMessage());
+		
+		al.showAndWait();
+	}
+	
+	public void postUnexpectedMessage() {
+		Alert al = new Alert(AlertType.WARNING);
+		
+		al.setTitle("未知错误");
+		al.setContentText("你是怎么触发的...");
+		
+		al.showAndWait();
+	}
+	
 	public void exportLogs() {
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane container = new GridPane();
@@ -748,6 +831,16 @@ public class ViewManager
 	public void setLastSkill(Skill lastSkill)
 	{
 		this.lastSkill = lastSkill;
+	}
+
+	public GridPane getIconContainer()
+	{
+		return iconContainer;
+	}
+
+	public void setIconContainer(GridPane iconContainer)
+	{
+		this.iconContainer = iconContainer;
 	}
 }
 
