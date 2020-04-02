@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import skills.Skill;
 
-public class CraftingHistory
+public class CraftingHistoryPane
 {
 	public static final double BOX_WIDTH = 300.0;
 	public static final double BOX_HEIGHT = 690.0;
@@ -28,7 +28,7 @@ public class CraftingHistory
 	private GridPane queue;
 	private int presentLoc;
 	
-	public CraftingHistory()
+	public CraftingHistoryPane()
 	{
 		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
@@ -82,6 +82,10 @@ public class CraftingHistory
 	}
 	
 	public void destory() {
+		historyStage.close();
+	}
+	
+	public void close() {
 		historyStage.close();
 	}
 }
