@@ -2,8 +2,8 @@ package skills;
 
 import java.util.Random;
 
-import application.CraftingStatus;
 import application.Engine;
+import application.components.CraftingStatus;
 
 public enum PQSkill implements Skill
 {

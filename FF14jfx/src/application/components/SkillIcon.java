@@ -1,5 +1,7 @@
-package application;
+package application.components;
 
+import application.Engine;
+import application.ViewManager;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import javafx.animation.KeyFrame;
@@ -55,6 +57,9 @@ public class SkillIcon extends AnchorPane
 		kf1 = new KeyFrame(Duration.millis(1900), kv1);
 		kf2 = new KeyFrame(Duration.millis(1), kv2);
 		
+		iv.setSmooth(true);
+		rec.setSmooth(true);
+		
 		tml.getKeyFrames().addAll(kf1, kf2);
 		
 		init();
@@ -91,14 +96,14 @@ public class SkillIcon extends AnchorPane
 		});
 		
 		this.setOnMouseEntered(e -> {
-			vm.skillDescription.setText("  " + s.getName() + " " +
+			vm.getSkillDescription().setText("  " + s.getName() + " " +
 						(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
 						(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
 						(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
 		});
 		
 		this.setOnMouseExited(e -> {
-			vm.skillDescription.setText("");
+			vm.getSkillDescription().setText("");
 		});
 	}
 	
@@ -117,7 +122,7 @@ public class SkillIcon extends AnchorPane
 			engine.useSkill(sk); 
 			
 			vm.getTimer().startTimer();
-			vm.lastSkill = sk;
+			vm.setLastSkill(sk);
 			if(vm.getHasGCD()) {
 				tml.play();
 			}

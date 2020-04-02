@@ -1,6 +1,7 @@
-package application;
+package application.subPane;
 
 
+import application.components.CraftingStatus;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -56,10 +57,10 @@ public class CraftingHistoryPane
 	public void addToQueue(Skill sk, CraftingStatus cs, boolean success) {
 		GridPane gp = new GridPane();
 		ImageView iv = new ImageView(new Image(sk.getAddress(), true));
-		Text csT = new Text(cs.name);
+		Text csT = new Text(cs.getName());
 		Text successT = new Text(success ? "Success" : "Failed");
 		Text srT = new Text(Double.toString(sk.getSuccessRate()));
-		Circle statusDisp = new Circle(10.0, cs.color);
+		Circle statusDisp = new Circle(10.0, cs.getColor());
 		
 		gp.add(iv, 0, 0);
 		gp.add(csT, 1, 0);
@@ -69,7 +70,7 @@ public class CraftingHistoryPane
 		
 		gp.setHgap(10.0);
 		
-		csT.setFill(cs.color);
+		csT.setFill(cs.getColor());
 		successT.setFill(success ? Color.GREEN : Color.RED);
 		
 		queue.add(gp, 0, presentLoc);

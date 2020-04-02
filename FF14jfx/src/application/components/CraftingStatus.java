@@ -1,4 +1,4 @@
-package application;
+package application.components;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -26,8 +26,8 @@ public enum CraftingStatus
 	
 	
 	static ArrayList<Node> probList;
-	String name;
-	Color color;
+	private String name;
+	private Color color;
 	static Random r;
 	
 	static {
@@ -37,8 +37,8 @@ public enum CraftingStatus
 	}
 	
 	private CraftingStatus(String name, Color color) {
-		this.name = name;
-		this.color = color;
+		this.setName(name);
+		this.setColor(color);
 	}
 	
 	private static void initProb() {
@@ -62,6 +62,26 @@ public enum CraftingStatus
 	
 	public static void setRandom(Random ra) {
 		r = ra;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	public Color getColor()
+	{
+		return color;
+	}
+
+	public void setColor(Color color)
+	{
+		this.color = color;
 	}
 }
 

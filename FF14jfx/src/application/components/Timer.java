@@ -1,4 +1,4 @@
-package application;
+package application.components;
 
 public class Timer
 {

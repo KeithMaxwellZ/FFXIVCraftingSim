@@ -1,7 +1,8 @@
-package application;
+package application.subPane;
 
 import java.util.ArrayList;
 
+import application.ViewManager;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;

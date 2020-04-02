@@ -3,6 +3,9 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.components.CraftingStatus;
+import application.components.Timer;
+import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import skills.ActiveBuff;

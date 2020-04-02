@@ -2,6 +2,11 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import application.components.SkillIcon;
+import application.components.Timer;
+import application.subPane.AdvancedSettingsPane;
+import application.subPane.CraftingHistoryPane;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -66,7 +71,7 @@ public class ViewManager
 	private Text efficiencyDisp;
 	private Text durabilityText;
 	private Text round;
-	protected Text skillDescription;
+	private Text skillDescription;
 	private Timeline tml = new Timeline();
 	
 	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
@@ -85,7 +90,7 @@ public class ViewManager
 	
 	private boolean hasGCD = true;
 
-	protected Skill lastSkill = null;
+	private Skill lastSkill = null;
 	
 	private ArrayList<Skill> progressSkills;
 	private ArrayList<Skill> qualitySkills;
@@ -251,7 +256,7 @@ public class ViewManager
 		
 		confirm.setOnMouseClicked(e -> {
 			ch.destory();
-			lastSkill = null;
+			setLastSkill(null);
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
@@ -450,7 +455,7 @@ public class ViewManager
 		GridPane iconContainer = new GridPane();
 		AnchorPane border = new AnchorPane();		
 		
-		skillDescription = new Text("  ");
+		setSkillDescription(new Text("  "));
 		
 		
 		skillContainer.setVgap(5);
@@ -458,10 +463,10 @@ public class ViewManager
 		
 		int j = 2;
 		
-		skillContainer.add(skillDescription, 0, 1);
+		skillContainer.add(getSkillDescription(), 0, 1);
 		skillContainer.add(iconContainer, 0, 2);
 		
-		GridPane.setMargin(skillDescription, new Insets(10.0));
+		GridPane.setMargin(getSkillDescription(), new Insets(10.0));
 		
 		createSkillList(progressSkills, iconContainer, j++);
 		createSkillList(qualitySkills, iconContainer, j++);
@@ -599,9 +604,9 @@ public class ViewManager
 	}
 	
 	public void updateStatus() {
-		progText.get(3).setText("  " + engine.getCraftingStatus().name);
-		progText.get(3).setFill(engine.getCraftingStatus().color);
-		statusDisp.setFill(engine.getCraftingStatus().color);
+		progText.get(3).setText("  " + engine.getCraftingStatus().getName());
+		progText.get(3).setFill(engine.getCraftingStatus().getColor());
+		statusDisp.setFill(engine.getCraftingStatus().getColor());
 	}
 	
 	public void updateBuffDIsp() {
@@ -633,11 +638,11 @@ public class ViewManager
 	}
 	
 	public void updateLastSkill() {
-		if(lastSkill == null) {
+		if(getLastSkill() == null) {
 			lastSkillAp.setBackground(Background.EMPTY);
 		} else {
 			lastSkillAp.setBackground(new Background(new BackgroundImage(
-					new Image(lastSkill.getAddress(), true), null, null, 
+					new Image(getLastSkill().getAddress(), true), null, null, 
 					BackgroundPosition.CENTER, null)));
 		}
 		
@@ -724,6 +729,26 @@ public class ViewManager
 	public void setQualityDifference(double qualityDifference)
 	{
 		this.qualityDifference = qualityDifference;
+	}
+
+	public Text getSkillDescription()
+	{
+		return skillDescription;
+	}
+
+	public void setSkillDescription(Text skillDescription)
+	{
+		this.skillDescription = skillDescription;
+	}
+
+	public Skill getLastSkill()
+	{
+		return lastSkill;
+	}
+
+	public void setLastSkill(Skill lastSkill)
+	{
+		this.lastSkill = lastSkill;
 	}
 }
 
