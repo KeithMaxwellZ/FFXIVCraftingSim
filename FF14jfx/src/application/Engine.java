@@ -147,6 +147,7 @@ public class Engine
 		qltyIncreased = false;
 		addToLogs(" ");
 		addToLogs("===Round " + round + " ===");
+		addToLogs("Crafting Status: " + cs.toString());
 		addToLogs("Skill name: " + (sk).toString());
 		addToLogs("Observed?: " + observed);
 	}

@@ -38,6 +38,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import skills.ActiveBuff;
+import skills.Buff;
 import skills.BuffSkill;
 import skills.PQSkill;
 import skills.Skill;
@@ -744,7 +745,13 @@ public class ViewManager
 			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
-			ImageView iv = new ImageView(new Image(ab.buff.getAddress(), true));
+			ImageView iv = null;
+			if(ab.buff == Buff.inner_quiet) {
+				String add = "/icons/Inner_Quiet_Icon/Inner_Quiet_" + ab.getRemaining() + ".png";
+				iv = new ImageView(new Image(add, true));
+			} else {
+				iv = new ImageView(new Image(ab.buff.getAddress(), true));
+			}
 			Text remaining = new Text(Integer.toString(ab.getRemaining()));
 			
 			ap.getChildren().add(iv);

@@ -108,6 +108,9 @@ All notable changes to this project will be documented in this file.
 - Fixed the issue that inner quiet is rounded down when Patient_Touch fails
 
 # [1.2.0]
+## Added
+- Added crafting status to logs
+
 ## Fixed
 - Fixed the issue that manipulation will take effect on 
 	the turn the skill manipulation is used
