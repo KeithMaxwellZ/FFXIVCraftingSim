@@ -131,6 +131,10 @@ public enum BuffSkill implements Skill
 		engine = e;
 	}
 
+	public Buff getBuff() {
+		return buff;
+	}
+	
 	public void createBuff() {
 		engine.addToLogs("Buff Created: " + buff.toString() + " " + last);
 		engine.addActiveBuff(buff, last);
