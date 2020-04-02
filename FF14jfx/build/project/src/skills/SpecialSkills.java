@@ -99,6 +99,11 @@ public enum SpecialSkills implements Skill
 		this.engine = e;
 	}
 	
+	@Override
+	public double getSuccessRate() {
+		return 1.0;
+	}
+	
 	public void execute() throws CraftingException {
 		if(this == Byregots_Blessing) {
 			engine.setInnerQuiet(0);

@@ -1,5 +1,7 @@
 package skills;
 
+import java.util.Random;
+
 import application.Engine;
 
 public interface Skill
@@ -38,6 +40,8 @@ public interface Skill
 	public int getCPCost();
 	
 	public int getDurCost();
+	
+	public double getSuccessRate();
 	
 	public void setEngine(Engine e);
 }

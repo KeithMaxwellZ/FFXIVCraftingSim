@@ -59,5 +59,9 @@ public enum CraftingStatus
 		}
 		return probList.get(probList.size() - 1).cs;
 	}
+	
+	public static void setRandom(Random ra) {
+		r = ra;
+	}
 }
 

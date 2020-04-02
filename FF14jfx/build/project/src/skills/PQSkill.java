@@ -51,9 +51,13 @@ public enum PQSkill implements Skill
 	double qualityRate;
 	double successRate;
 
-	Random r;
+	static Random r;
 	
 	Engine engine;
+	
+	static {
+		r = new Random();
+	}
 	
 	private PQSkill(String name,  int cpCost, int durabilityCost,
 			double progressRate, double qualityRate, double successRate) {
@@ -63,10 +67,7 @@ public enum PQSkill implements Skill
 		this.durabilityCost = durabilityCost;
 		this.progressRate = progressRate;
 		this.qualityRate = qualityRate;
-		this.successRate = successRate;
-		
-		r = new Random();
-		
+		this.successRate = successRate;		
 	}
 	
 	@Override
@@ -143,5 +144,18 @@ public enum PQSkill implements Skill
 	{
 		engine = e;
 	}
-
+	
+	@Override
+	public double getSuccessRate() {
+		if(successRate == 1.0) {
+			return 1.0;
+		}
+		double d = successRate + (engine.getCraftingStatus() == CraftingStatus.Centered ? 0.3 : 0);
+		d = (double)Math.round(d * 10)/10;
+		return d;
+	}
+ 
+	public static void setRandom(Random ra) {
+		r = ra;
+	}
 }
