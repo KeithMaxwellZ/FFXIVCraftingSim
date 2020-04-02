@@ -1,7 +1,5 @@
 package skills;
 
-import java.util.Random;
-
 import application.Engine;
 
 public interface Skill

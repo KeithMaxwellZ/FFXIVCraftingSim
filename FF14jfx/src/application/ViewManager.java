@@ -662,7 +662,6 @@ public class ViewManager
 			logsOutput.setText(logsOutput.getText() + "\n" + s);
 		}
 		
-		
 		GridPane.setVgrow(logsOutput, Priority.ALWAYS);
 		GridPane.setHgrow(logsOutput, Priority.ALWAYS);
 		

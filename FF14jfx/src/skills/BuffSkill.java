@@ -3,7 +3,6 @@ package skills;
 import java.util.Random;
 import skills.Buff;
 import application.Engine;
-import application.components.CraftingStatus;
 
 public enum BuffSkill implements Skill
 {
