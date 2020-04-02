@@ -289,6 +289,7 @@ public class ViewManager
 		
 		b.setOnMouseClicked(e -> {
 			AdvancedSettingsBox asb = new AdvancedSettingsBox(t);
+			asb.display();
 		});
 		
 		gp.add(confirm, i, j);
@@ -882,7 +883,9 @@ public class ViewManager
 			mainBoxPane.add(gp, 0, 0);
 			
 			GridPane.setMargin(gp, new Insets(20.0));
-			
+		}
+		
+		public void display() {
 			boxStage.showAndWait();
 		}
 			
