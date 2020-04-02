@@ -3,6 +3,9 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.components.CraftingStatus;
+import application.components.Timer;
+import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import skills.ActiveBuff;
@@ -38,7 +41,7 @@ public class Engine
 	private boolean working;
 	
 	private Timer timer;
-	private CraftingHistory ch;
+	private CraftingHistoryPane ch;
 	
 	protected ArrayList<ActiveBuff> activeBuffs;
 	
@@ -58,7 +61,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference, CraftingHistory ch) {
+				double porgressDifference, double qualityDifference, CraftingHistoryPane ch) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;

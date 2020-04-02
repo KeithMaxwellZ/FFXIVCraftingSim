@@ -2,7 +2,6 @@ package skills;
 
 import java.util.Random;
 import skills.Buff;
-import application.CraftingStatus;
 import application.Engine;
 
 public enum BuffSkill implements Skill
