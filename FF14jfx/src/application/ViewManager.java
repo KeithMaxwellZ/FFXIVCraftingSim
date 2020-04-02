@@ -610,13 +610,14 @@ public class ViewManager
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		
-		gp.add(GCDMode, 0, 0);
-		gp.add(runTime, 0, 1);
-		gp.add(val, 0, 2);
+		int i = 0;
+		gp.add(GCDMode, 0, i++);
+		gp.add(runTime, 0, i++);
+		gp.add(val, 0, i++);
 		
 		if(es == ExceptionStatus.Craft_Success) {		
 			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
-			gp.add(SP, 0, 2);	
+			gp.add(SP, 0, i++);	
 		}
 		
 		al.getDialogPane().setExpandableContent(gp);
