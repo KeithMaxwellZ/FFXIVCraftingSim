@@ -37,6 +37,8 @@ public class SkillIcon extends AnchorPane
 	
 	private Skill s;
 	
+	private int[] pos;
+	
 	
 	public SkillIcon(Skill s, Timeline tml, ViewManager vm) {
 		this.s = s;
@@ -207,5 +209,30 @@ public class SkillIcon extends AnchorPane
 	
 	public Skill getSkill() {
 		return s;
+	}
+	
+	public void setSkill(Skill s) {
+		this.s = s;
+	}
+	
+	public int[] getPos() {
+		return pos;
+	}
+	
+	public void setPos(int[] pos) {
+		this.pos = pos;
+	}
+	
+	public static void switchPos(SkillIcon si1, SkillIcon si2) {
+		Skill st = si1.getSkill();
+		si1.setSkill(si2.getSkill());
+		si2.setSkill(st);
+		
+		int[] pt = si1.getPos();
+		si1.setPos(si2.getPos());
+		si2.setPos(pt);
+		
+		si1.refreshDisplay(si1.getSkill());
+		si2.refreshDisplay(si2.getSkill());
 	}
 }
