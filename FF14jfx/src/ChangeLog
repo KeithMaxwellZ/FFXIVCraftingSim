@@ -115,3 +115,10 @@ All notable changes to this project will be documented in this file.
 - Fixed the issue that manipulation will take effect on 
 	the turn the skill manipulation is used
 
+# [1.2.1-S]
+## Changed
+- Updated Inner Quiet Buff icon
+
+# [1.3.0-S]
+## Added
+- Added crafting history display
