@@ -32,16 +32,16 @@ public class CraftingHistoryPane
 		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
+		queue = new GridPane();
 		
 		historyStage.setScene(scene);
 		historyStage.setTitle("ÀúÊ·¼ÇÂ¼");
 		
-		queue = new GridPane();
 		mainHistoryPane.setPrefHeight(BOX_HEIGHT);
-		mainHistoryPane.setContent(queue);;
+		mainHistoryPane.setContent(queue);
+		
 		queue.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
-		
 		
 		historyStage.setX(100.0);
 		historyStage.setY(100.0);
