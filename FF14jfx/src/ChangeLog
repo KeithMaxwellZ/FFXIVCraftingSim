@@ -149,7 +149,7 @@ All notable changes to this project will be documented in this file.
 - Optimized codes a little bit
 - The history window now will close with the main window
 
-# [1.5.0]
+# [1.5.0-S]
 ## Added
 - Added skill rearrange function
 - Added skill mapping import and export function
