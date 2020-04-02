@@ -11,6 +11,8 @@ public enum ExceptionStatus
 	Waste_Not_Exist("现在无法使用（无法在俭约buff存在时使用俭约加工）"),
 	No_Enough_CP("CP不足"),
 	Maximun_Reached("现在无法使用（已达到最大使用次数）"),
+	Now_Crafting("正在制作中，无法编辑技能位置"),
+	Code_Error("代码错误，无法导入"),
 	;
 	
 	private String message;

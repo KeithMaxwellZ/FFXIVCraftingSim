@@ -1,6 +1,8 @@
-package application;
+package application.subPane;
 
 
+import application.ViewManager;
+import application.components.CraftingStatus;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -8,8 +10,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -17,7 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import skills.Skill;
 
-public class CraftingHistory
+public class CraftingHistoryPane
 {
 	public static final double BOX_WIDTH = 300.0;
 	public static final double BOX_HEIGHT = 690.0;
@@ -28,24 +28,29 @@ public class CraftingHistory
 	private GridPane queue;
 	private int presentLoc;
 	
-	public CraftingHistory()
+	@SuppressWarnings("unused")
+	private ViewManager vm;
+	
+	public CraftingHistoryPane(ViewManager vm)
 	{
+		this.vm = vm;
+		
 		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
+		queue = new GridPane();
 		
 		historyStage.setScene(scene);
 		historyStage.setTitle("ÀúÊ·¼ÇÂ¼");
 		
-		queue = new GridPane();
 		mainHistoryPane.setPrefHeight(BOX_HEIGHT);
-		mainHistoryPane.setContent(queue);;
+		mainHistoryPane.setContent(queue);
+		
 		queue.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
 		
-		
-		historyStage.setX(100.0);
-		historyStage.setY(100.0);
+		historyStage.setX(vm.getStage().getX() - BOX_WIDTH - 10.0);
+		historyStage.setY(vm.getStage().getY());
 		
 		queue.setPrefWidth(BOX_WIDTH);
 		queue.setPrefHeight(BOX_HEIGHT);
@@ -56,10 +61,10 @@ public class CraftingHistory
 	public void addToQueue(Skill sk, CraftingStatus cs, boolean success) {
 		GridPane gp = new GridPane();
 		ImageView iv = new ImageView(new Image(sk.getAddress(), true));
-		Text csT = new Text(cs.name);
+		Text csT = new Text(cs.getName());
 		Text successT = new Text(success ? "Success" : "Failed");
 		Text srT = new Text(Double.toString(sk.getSuccessRate()));
-		Circle statusDisp = new Circle(10.0, cs.color);
+		Circle statusDisp = new Circle(10.0, cs.getColor());
 		
 		gp.add(iv, 0, 0);
 		gp.add(csT, 1, 0);
@@ -69,7 +74,7 @@ public class CraftingHistory
 		
 		gp.setHgap(10.0);
 		
-		csT.setFill(cs.color);
+		csT.setFill(cs.getColor());
 		successT.setFill(success ? Color.GREEN : Color.RED);
 		
 		queue.add(gp, 0, presentLoc);
@@ -82,6 +87,10 @@ public class CraftingHistory
 	}
 	
 	public void destory() {
+		historyStage.close();
+	}
+	
+	public void close() {
 		historyStage.close();
 	}
 }

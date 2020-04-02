@@ -3,6 +3,10 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
+import application.components.CraftingStatus;
+import application.components.EngineStatus;
+import application.components.Timer;
+import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import skills.ActiveBuff;
@@ -35,10 +39,10 @@ public class Engine
 	
 	private boolean progIncreased;
 	private boolean qltyIncreased;
-	private boolean working;
+	private EngineStatus es;
 	
 	private Timer timer;
-	private CraftingHistory ch;
+	private CraftingHistoryPane ch;
 	
 	protected ArrayList<ActiveBuff> activeBuffs;
 	
@@ -58,7 +62,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference, CraftingHistory ch) {
+				double porgressDifference, double qualityDifference, CraftingHistoryPane ch) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -80,7 +84,7 @@ public class Engine
 		csCount = 0;
 		presentCP = totalCP;
 		observed = false;
-		working = true;
+		es = EngineStatus.Crafting;
 		progIncreased = false;
 		qltyIncreased = false;
 		
@@ -497,12 +501,12 @@ public class Engine
 		return cs;
 	}
 	
-	public boolean isWorking() {
-		return working;
+	public EngineStatus getEngineStatus() {
+		return es;
 	}
 	
-	public void setWorking(boolean b) {
-		working = b;
+	public void setEngineStatus(EngineStatus es) {
+		this.es = es;
 	}
 	
 	public int getRound() {
