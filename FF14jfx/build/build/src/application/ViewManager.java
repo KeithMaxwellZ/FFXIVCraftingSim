@@ -58,7 +58,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;
 	private static final double CP_HEIGHT = 15.0;
 	
-	private static final String VERSION = "V1.2.0";
+	private static final String VERSION = "V1.4.0";
 	
 	private static final Color TEXT_COLOR = Color.BLACK;
 	
@@ -116,7 +116,7 @@ public class ViewManager
 				
 		initSkillsList();
 		initStage();
-		initDisplay();
+		initMainDisplay();
 	}
 	
 	private void initSkillsList() {
@@ -177,7 +177,7 @@ public class ViewManager
 		stage.setResizable(false);
 	}
 	
-	private void initDisplay() {
+	private void initMainDisplay() {
 		mainContainer = new VBox(20);
 		
 		mainContainer.setSpacing(10);
@@ -199,6 +199,8 @@ public class ViewManager
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
 		engine.setWorking(false);
+		
+		
 	}
 	
 	private Node initInput() {		

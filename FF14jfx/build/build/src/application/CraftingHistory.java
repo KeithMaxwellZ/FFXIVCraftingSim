@@ -1,6 +1,9 @@
 package application;
 
+
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -21,13 +24,13 @@ public class CraftingHistory
 
 	private Stage historyStage;
 	private Scene scene;
-	private FlowPane mainHistoryPane;
+	private ScrollPane mainHistoryPane;
 	private GridPane queue;
 	private int presentLoc;
 	
 	public CraftingHistory()
 	{
-		mainHistoryPane = new FlowPane();
+		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
 		
@@ -35,9 +38,11 @@ public class CraftingHistory
 		historyStage.setTitle("ÀúÊ·¼ÇÂ¼");
 		
 		queue = new GridPane();
-		mainHistoryPane.getChildren().add(queue);
-		mainHistoryPane.setBackground(new Background(
+		mainHistoryPane.setPrefHeight(BOX_HEIGHT);
+		mainHistoryPane.setContent(queue);;
+		queue.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
+		
 		
 		historyStage.setX(100.0);
 		historyStage.setY(100.0);
@@ -45,21 +50,22 @@ public class CraftingHistory
 		queue.setPrefWidth(BOX_WIDTH);
 		queue.setPrefHeight(BOX_HEIGHT);
 		queue.setHgap(10);
-		queue.setVgap(10);
+		queue.setVgap(3);
 	}
 	
 	public void addToQueue(Skill sk, CraftingStatus cs, boolean success) {
-		System.out.println("asdasd");
 		GridPane gp = new GridPane();
 		ImageView iv = new ImageView(new Image(sk.getAddress(), true));
 		Text csT = new Text(cs.name);
 		Text successT = new Text(success ? "Success" : "Failed");
+		Text srT = new Text(Double.toString(sk.getSuccessRate()));
 		Circle statusDisp = new Circle(10.0, cs.color);
 		
 		gp.add(iv, 0, 0);
 		gp.add(csT, 1, 0);
 		gp.add(statusDisp, 2, 0);
 		gp.add(successT, 3, 0);
+		gp.add(srT, 4, 0);
 		
 		gp.setHgap(10.0);
 		
@@ -67,6 +73,7 @@ public class CraftingHistory
 		successT.setFill(success ? Color.GREEN : Color.RED);
 		
 		queue.add(gp, 0, presentLoc);
+		GridPane.setMargin(gp, new Insets(15.0, 0, 0, 15.0));
 		presentLoc++;
 	}
 	

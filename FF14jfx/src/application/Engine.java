@@ -136,7 +136,8 @@ public class Engine
 									  (cs == CraftingStatus.Sturdy ? 2 : 1));
 		int cpDec = (int)Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1));
 
-		addToLogs("Duration Cost: " + durDec);
+		addToLogs("Duration Cost: " + durDec)
+		;
 
 		presentDurability -= durDec;
 		presentCP -= cpDec; 
@@ -326,7 +327,10 @@ public class Engine
 		for(int i = 0; i < activeBuffs.size(); i++)
 		{
 			if(activeBuffs.get(i).buff == Buff.manipulation) {
-				presentDurability += (presentDurability <= (totalDurability - 5) ? 5 : 0);
+				presentDurability += 5;
+				if(presentDurability > totalDurability) {
+					presentDurability = totalDurability;
+				}
 			}
 			activeBuffs.get(i).decrease();
 			if(activeBuffs.get(i).getRemaining() == 0) {
