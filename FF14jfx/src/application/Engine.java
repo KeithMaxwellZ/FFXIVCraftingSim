@@ -229,7 +229,7 @@ public class Engine
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff == sk.getBuff()) {
 				activeBuffs.remove(ab);
-				return;
+				break;
 			}
 		}
 

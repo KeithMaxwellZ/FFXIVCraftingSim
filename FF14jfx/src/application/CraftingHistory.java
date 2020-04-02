@@ -39,8 +39,9 @@ public class CraftingHistory
 		queue = new GridPane();
 		mainHistoryPane.setPrefHeight(BOX_HEIGHT);
 		mainHistoryPane.setContent(queue);;
-		mainHistoryPane.setBackground(new Background(
+		queue.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
+		
 		
 		historyStage.setX(100.0);
 		historyStage.setY(100.0);
