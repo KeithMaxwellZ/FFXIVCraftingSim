@@ -3,10 +3,13 @@ package application;
 import java.util.ArrayList;
 import java.util.List;
 
-import exceptions.CraftingException;
+import application.components.EngineStatus;
+import application.components.SkillIcon;
+import application.components.Timer;
+import application.subPane.AdvancedSettingsPane;
+import application.subPane.CraftingHistoryPane;
+import application.subPane.EditModePane;
 import exceptions.ExceptionStatus;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,7 +39,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import skills.ActiveBuff;
 import skills.Buff;
 import skills.BuffSkill;
@@ -66,6 +68,7 @@ public class ViewManager
 	private Scene mainScene;
 	private AnchorPane mainPane;
 	private AnchorPane lastSkillAp;
+	private GridPane iconContainer;
 	private VBox mainContainer;
 	private HBox buffContainer;
 	private Circle statusDisp;
@@ -100,12 +103,14 @@ public class ViewManager
 	private ArrayList<Skill> otherSkills;
 	
 	private Engine engine;
-	private CraftingHistory ch;
+	
+	private CraftingHistoryPane ch;
+	private AdvancedSettingsPane asp;
+	private EditModePane emp;
 	
 	private Timer tm;
 	
 	public ViewManager() {
-		ch = new CraftingHistory();
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 				rCraftsmanship, rControl, progressDifference, qualityDifference, ch);
 		progText = new ArrayList<>();
@@ -117,6 +122,8 @@ public class ViewManager
 		initSkillsList();
 		initStage();
 		initMainDisplay();
+		
+		ch = new CraftingHistoryPane(this);
 	}
 	
 	private void initSkillsList() {
@@ -175,6 +182,12 @@ public class ViewManager
 		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
+		stage.setOnCloseRequest(e -> {
+			if(asp != null) {
+				asp.close();
+			}
+			ch.close();
+		});
 	}
 	
 	private void initMainDisplay() {
@@ -198,7 +211,7 @@ public class ViewManager
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
-		engine.setWorking(false);
+		engine.setEngineStatus(EngineStatus.Pending);;
 		
 		
 	}
@@ -210,7 +223,9 @@ public class ViewManager
 		GridPane back = new GridPane();
 		Button confirm = new Button("确认");
 		Button logs = new Button("日志"); 
-		Button b = new Button("高级");
+		Button advanced = new Button("高级");
+		Button finish = new Button("结束制作");
+		Button iconRearr = new Button("编辑图标");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
 		
@@ -229,7 +244,6 @@ public class ViewManager
 		TextField totalQltyTf = new TextField(Integer.toString(tQlty));
 		TextField totalDuraTf = new TextField(Integer.toString(dura));
 
-		
 		CheckBox GCDCb = new CheckBox("GCD");
 		
 		gp.setHgap(5);
@@ -247,26 +261,42 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
+		finish.setOnMouseClicked(e -> {
+			if(engine.getEngineStatus() == EngineStatus.Crafting) {
+				postFinishMessage(ExceptionStatus.Craft_Failed);
+			}
+		});
+		
+		iconRearr.setOnMouseClicked(e -> {
+			emp = new EditModePane(this, engine);
+			emp.display();
+		});
 		
 		confirm.setOnMouseClicked(e -> {
 			ch.destory();
-			lastSkill = null;
+			setLastSkill(null);
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
 			dura = Integer.parseInt(totalDuraTf.getText());
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
-			ch = new CraftingHistory();
+			ch = new CraftingHistoryPane(this);
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
 			hasGCD = GCDCb.isSelected();
+			SkillIcon.setVm(engine, tml, this);
 			updateAll();
 			ch.display();
 		});
 		
 		logs.setOnMouseClicked(e -> {
 			exportLogs();
+		});
+		
+		advanced.setOnMouseClicked(e -> {
+			asp = new AdvancedSettingsPane(t, this);
+			asp.display();
 		});
 		
 		int i = 0;
@@ -294,14 +324,15 @@ public class ViewManager
 		gp.add(GCDCb, i, j);
 		i++;
 		
-		b.setOnMouseClicked(e -> {
-			AdvancedSettingsBox asb = new AdvancedSettingsBox(t);
-			asb.display();
-		});
-		
 		gp.add(confirm, i, j);
 		gp.add(logs, i, j + 1);
-		gp.add(b, i, j + 2);
+		gp.add(advanced, i, j + 2);
+		i++;
+		
+		i++;
+		i++;
+		gp.add(finish, i, j);
+		gp.add(iconRearr, i, j + 1);
 		i++;
 
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
@@ -445,20 +476,28 @@ public class ViewManager
 	
 	private Node initSkills() {
 		GridPane skillContainer = new GridPane();
-		skillDescription = new Text("");
-		AnchorPane border = new AnchorPane();		
+		AnchorPane border = new AnchorPane();	
+		
+		setIconContainer(new GridPane());
+		
+		setSkillDescription(new Text("  "));
+		
 		
 		skillContainer.setVgap(5);
+		getIconContainer().setHgap(5);
 		
-		int i = 0;
-		int j = 2;
+		int i = 2;
 		
-		skillContainer.add(skillDescription, 0, 1);
-		skillContainer.add(createSkillList(progressSkills), i, j);
-		skillContainer.add(createSkillList(qualitySkills), i, j + 1);
-		skillContainer.add(createSkillList(buffSkills), i, j + 2);
-		skillContainer.add(createSkillList(recoverySkills), i, j + 3);
-		skillContainer.add(createSkillList(otherSkills), i, j + 4);
+		skillContainer.add(getSkillDescription(), 0, 1);
+		skillContainer.add(getIconContainer(), 0, 2);
+		
+		GridPane.setMargin(getSkillDescription(), new Insets(10.0));
+		
+		createSkillList(progressSkills, getIconContainer(), i++);
+		createSkillList(qualitySkills, getIconContainer(), i++);
+		createSkillList(buffSkills, getIconContainer(), i++);
+		createSkillList(recoverySkills, getIconContainer(), i++);
+		createSkillList(otherSkills, getIconContainer(), i++);
 		
 		border.getChildren().add(skillContainer);
 		border.setPrefSize(REC_WIDTH + EDGE_GENERAL, SKILL_HEIGHT + EDGE_GENERAL);
@@ -479,171 +518,27 @@ public class ViewManager
 		return border;
 	}
 	
-	private Node createSkillList(List<Skill> skl) {
-		HBox skillLine = new HBox();
+	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
 		
+		//pqbro
 		
-		skillLine.setSpacing(5);
-		
+		int j = 1;
 		for(Skill s: skl) {
 			engine.addToLogs(s.toString() + ": " + s.getAddress());;
 			
-			AnchorPane skillIcon = new AnchorPane();
-			Image icon = new Image(s.getAddress(), true);
-			Button b = new Button();
-			Text costText = new Text(s.getCPCost() != 0 ? Integer.toString(s.getCPCost()) : "");
-			ImageView iv = new ImageView(icon);
-			Rectangle rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
-			KeyValue kv1 = new KeyValue(iv.opacityProperty(), 1.0);
-			KeyValue kv2 = new KeyValue(iv.opacityProperty(), 0.1);
+			SkillIcon si = new SkillIcon(s, tml, this);
 			
-			KeyFrame kf1 = new KeyFrame(Duration.millis(1900), kv1);
-			KeyFrame kf2 = new KeyFrame(Duration.millis(1), kv2);
-			
-			tml.getKeyFrames().addAll(kf1, kf2);
-			
-			
-			costText.setFill(Color.WHITE);
-			
-			skillIcon.getChildren().add(rec);
-			skillIcon.getChildren().add(iv);
-			skillIcon.getChildren().add(costText);
-			skillIcon.getChildren().add(b);
-			
-			costText.setLayoutX(0);
-			costText.setLayoutY(40.0);
-			costText.setFont(Font.font(15));
-			
-			b.setLayoutX(0);
-			b.setLayoutY(0);
-			
-			b.setPrefHeight(40);
-			b.setPrefWidth(40);
-			
-			b.setOpacity(0.0);
-			
-//			b.setBackground(new Background(new BackgroundImage(
-//					icon, null, null, BackgroundPosition.CENTER, null)));
-			
-			b.setOnMouseClicked(e -> {
-				if(engine.isWorking()) {
-					if(tm.getTime() >= (hasGCD ? 2.00 : 0)) {
-						performSkill(s, iv);
-					}
-				} else {
-					startWarning();
-				}
-			});
-			
-			skillIcon.setOnMouseEntered(e -> {
-				skillDescription.setText(s.getName() + " " +
-							(!s.getBaseProgressRate().equals("0.0%") ? "进度效率： " + s.getBaseProgressRate() : "") + " " +
-							(!s.getBaseQualityRate().equals("0.0%") ? "品质效率： " + s.getBaseQualityRate() : "") + " " + 
-							(s.getDurCost() != 0 ? "耐久消耗: " + s.getDurCost() : ""));
-			});
-			
-			skillIcon.setOnMouseExited(e -> {
-				skillDescription.setText("");
-			});
-			
-			skillLine.getChildren().add(skillIcon);
+			gp.add(si, j, i);
+			j++;
 		}
+		for(; j <= 12; j++) {
+			SkillIcon si = new SkillIcon(null, tml, this);
+			gp.add(si, j, i);
+		}
+		
+		SkillIcon.setVm(engine, tml, this);
 
-		return skillLine;
-	}
-	
-	private void startWarning() {
-		Alert al = new Alert(AlertType.WARNING);
-		
-		al.setTitle("未开始作业");
-		al.setHeaderText(null);
-		al.setContentText("请先按‘确认’键以开始作业");
-		
-		al.showAndWait();
-	}
-	
-	private void performSkill(Skill sk, ImageView iv) {
-		try {
-			engine.useSkill(sk); 
-			
-			tm.startTimer();
-			lastSkill = sk;
-			if(hasGCD) {
-				tml.play();
-			}
-		} catch (CraftingException e) {
-			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
-				postFinishMessage(e.es);
-			} else if (	e.es == ExceptionStatus.Not_HQ ||
-						e.es == ExceptionStatus.No_Inner_Quiet ||
-						e.es == ExceptionStatus.Inner_Quiet_Exists ||
-						e.es == ExceptionStatus.Not_Turn_One ||
-						e.es == ExceptionStatus.Waste_Not_Exist ||
-						e.es == ExceptionStatus.No_Enough_CP ||
-						e.es == ExceptionStatus.Maximun_Reached) {
-				postInvalidMessage(e.es);
-			} else {
-				postUnexpectedMessage();
-			}
-		} finally {
-			if(engine.isWorking() == true) {
-				updateAll();
-			}
-		}
-	}
-	
-	private void postFinishMessage(ExceptionStatus es) {
-		Alert al = new Alert(AlertType.INFORMATION);
-		GridPane gp = new GridPane();
-		Text GCDMode = new Text("GCD: " + (hasGCD ? "开启" : "关闭"));
-		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
-		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
-		
-		updateAll();
-		
-		engine.setWorking(false);
-		engine.addToLogs("========= Summary =========");
-		engine.addToLogs("Status: " + es.toString());
-		engine.addToLogs("Total time: " + engine.getRuntime());
-		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
-		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("===========================");
-		
-		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
-		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
-		
-		int i = 0;
-		gp.add(GCDMode, 0, i++);
-		gp.add(runTime, 0, i++);
-		gp.add(val, 0, i++);
-		
-		if(es == ExceptionStatus.Craft_Success) {		
-			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
-			gp.add(SP, 0, i++);	
-		}
-		
-		al.getDialogPane().setExpandableContent(gp);
-		al.getDialogPane().setExpanded(true);
-		
-		al.showAndWait();
-	}
-	
-	private void postInvalidMessage(ExceptionStatus es) {
-		Alert al = new Alert(AlertType.WARNING);
-		
-		al.setTitle("无法使用");
-		al.setContentText(es.getMessage());
-		
-		al.showAndWait();
-	}
-	
-	private void postUnexpectedMessage() {
-		Alert al = new Alert(AlertType.WARNING);
-		
-		al.setTitle("未知错误");
-		al.setContentText("你是怎么触发的...");
-		
-		al.showAndWait();
+		return;
 	}
 	
 	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
@@ -738,9 +633,9 @@ public class ViewManager
 	}
 	
 	public void updateStatus() {
-		progText.get(3).setText("  " + engine.getCraftingStatus().name);
-		progText.get(3).setFill(engine.getCraftingStatus().color);
-		statusDisp.setFill(engine.getCraftingStatus().color);
+		progText.get(3).setText("  " + engine.getCraftingStatus().getName());
+		progText.get(3).setFill(engine.getCraftingStatus().getColor());
+		statusDisp.setFill(engine.getCraftingStatus().getColor());
 	}
 	
 	public void updateBuffDIsp() {
@@ -772,14 +667,68 @@ public class ViewManager
 	}
 	
 	public void updateLastSkill() {
-		if(lastSkill == null) {
+		if(getLastSkill() == null) {
 			lastSkillAp.setBackground(Background.EMPTY);
 		} else {
 			lastSkillAp.setBackground(new Background(new BackgroundImage(
-					new Image(lastSkill.getAddress(), true), null, null, 
+					new Image(getLastSkill().getAddress(), true), null, null, 
 					BackgroundPosition.CENTER, null)));
 		}
 		
+	}
+	
+	public void postFinishMessage(ExceptionStatus es) {
+		Alert al = new Alert(AlertType.INFORMATION);
+		GridPane gp = new GridPane();
+		Text GCDMode = new Text("GCD: " + (getHasGCD() ? "开启" : "关闭"));
+		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
+		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		
+		updateAll();
+		
+		engine.setEngineStatus(EngineStatus.Pending);;
+		engine.addToLogs("========= Summary =========");
+		engine.addToLogs("Status: " + es.toString());
+		engine.addToLogs("Total time: " + engine.getRuntime());
+		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
+		engine.addToLogs("Skill Points: " + engine.SPCalc());
+		engine.addToLogs("===========================");
+		
+		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
+		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
+		
+		int i = 0;
+		gp.add(GCDMode, 0, i++);
+		gp.add(runTime, 0, i++);
+		gp.add(val, 0, i++);
+		
+		if(es == ExceptionStatus.Craft_Success) {		
+			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
+			gp.add(SP, 0, i++);	
+		}
+		
+		al.getDialogPane().setExpandableContent(gp);
+		al.getDialogPane().setExpanded(true);
+		
+		al.showAndWait();
+	}
+	
+	public void postInvalidMessage(ExceptionStatus es) {
+		Alert al = new Alert(AlertType.WARNING);
+		
+		al.setTitle("无法使用");
+		al.setContentText(es.getMessage());
+		
+		al.showAndWait();
+	}
+	
+	public void postUnexpectedMessage() {
+		Alert al = new Alert(AlertType.WARNING);
+		
+		al.setTitle("未知错误");
+		al.setContentText("你是怎么触发的...");
+		
+		al.showAndWait();
 	}
 	
 	public void exportLogs() {
@@ -795,7 +744,6 @@ public class ViewManager
 			System.out.println(s);
 			logsOutput.setText(logsOutput.getText() + "\n" + s);
 		}
-		
 		
 		GridPane.setVgrow(logsOutput, Priority.ALWAYS);
 		GridPane.setHgrow(logsOutput, Priority.ALWAYS);
@@ -817,95 +765,83 @@ public class ViewManager
 		return stage;
 	}
 	
-	class AdvancedSettingsBox {
-		public static final double BOX_WIDTH = 300.0;
-		public static final double BOX_HEIGHT = 250.0;
-		
-		private Stage boxStage;
-		private Scene scene;
-		private GridPane mainBoxPane;
-
-		public AdvancedSettingsBox(ArrayList<Text> t)
-		{
-			mainBoxPane = new GridPane();
-			boxStage = new Stage();
-			scene = new Scene(mainBoxPane, BOX_WIDTH, BOX_HEIGHT);
-			
-			GridPane gp = new GridPane();
-			Button b = new Button("确认");
-			
-			double tfWidth = 70.0;
-			
-			boxStage.setTitle("高级设置");
-			boxStage.setScene(scene);
-			
-			Text rCraftT = new Text("推荐制作");
-			Text rControlT = new Text("推荐加工");
-			Text progDiffT = new Text("制作等级差");
-			Text qltyDiffT = new Text("加工等级差");
-
-			TextField rCraftTf = new TextField(Integer.toString(rCraftsmanship));
-			TextField rControlTf = new TextField(Integer.toString(rControl));
-			TextField progDiffTf = new TextField(Double.toString(progressDifference));
-			TextField qltyDiffTf = new TextField(Double.toString(qualityDifference));
-
-			rCraftTf.setPrefWidth(tfWidth);
-			rControlTf.setPrefWidth(tfWidth);
-			progDiffTf.setPrefWidth(tfWidth);
-			qltyDiffTf.setPrefWidth(tfWidth);
-
-			rCraftsmanship = Integer.parseInt(rCraftTf.getText()); 
-			rControl = Integer.parseInt(rControlTf.getText());
-			progressDifference = Double.parseDouble(progDiffTf.getText());
-			qualityDifference = Double.parseDouble(qltyDiffTf.getText());
-
-			gp.setVgap(5.0);
-			gp.setHgap(5.0);
-			
-			int i = 0;
-			int j = 0;
-			gp.add(rCraftT, i, j);
-			gp.add(rCraftTf, i + 1, j);
-			j++;
-			
-			gp.add(rControlT, i, j);
-			gp.add(rControlTf, i + 1, j);
-			j++;
-			
-			gp.add(progDiffT, i, j);
-			gp.add(progDiffTf, i + 1, j);
-			j++;	
-			
-			gp.add(qltyDiffT, i, j);
-			gp.add(qltyDiffTf, i + 1, j);
-			j++;
-			
-			gp.add(b, i, j);
-			
-			t.add(rCraftT);
-			t.add(rControlT);
-			t.add(progDiffT);
-			t.add(qltyDiffT);
-			
-			b.setOnMouseClicked(e -> {
-				rCraftsmanship = Integer.parseInt(rCraftTf.getText());
-				rControl = Integer.parseInt(rControlTf.getText());
-				progressDifference = Double.parseDouble(progDiffTf.getText());
-				qualityDifference = Double.parseDouble(qltyDiffTf.getText());
-				boxStage.close();
-			});
-			
-			mainBoxPane.add(gp, 0, 0);
-			
-			GridPane.setMargin(gp, new Insets(20.0));
-		}
-		
-		public void display() {
-			boxStage.showAndWait();
-		}
-			
+	public Timer getTimer() {
+		return tm;
 	}
 	
+	public boolean getHasGCD() {
+		return hasGCD;
+	}
+
+	public int getrCraftsmanship()
+	{
+		return rCraftsmanship;
+	}
+
+	public void setrCraftsmanship(int rCraftsmanship)
+	{
+		this.rCraftsmanship = rCraftsmanship;
+	}
+
+	public int getrControl()
+	{
+		return rControl;
+	}
+
+	public void setrControl(int rControl)
+	{
+		this.rControl = rControl;
+	}
+
+	public double getProgressDifference()
+	{
+		return progressDifference;
+	}
+
+	public void setProgressDifference(double progressDifference)
+	{
+		this.progressDifference = progressDifference;
+	}
+
+	public double getQualityDifference()
+	{
+		return qualityDifference;
+	}
+
+	public void setQualityDifference(double qualityDifference)
+	{
+		this.qualityDifference = qualityDifference;
+	}
+
+	public Text getSkillDescription()
+	{
+		return skillDescription;
+	}
+
+	public void setSkillDescription(Text skillDescription)
+	{
+		this.skillDescription = skillDescription;
+	}
+
+	public Skill getLastSkill()
+	{
+		return lastSkill;
+	}
+
+	public void setLastSkill(Skill lastSkill)
+	{
+		this.lastSkill = lastSkill;
+	}
+
+	public GridPane getIconContainer()
+	{
+		return iconContainer;
+	}
+
+	public void setIconContainer(GridPane iconContainer)
+	{
+		this.iconContainer = iconContainer;
+	}
 }
 
 

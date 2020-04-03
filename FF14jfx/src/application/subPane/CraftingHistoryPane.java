@@ -1,6 +1,7 @@
 package application.subPane;
 
 
+import application.ViewManager;
 import application.components.CraftingStatus;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -27,8 +28,13 @@ public class CraftingHistoryPane
 	private GridPane queue;
 	private int presentLoc;
 	
-	public CraftingHistoryPane()
+	@SuppressWarnings("unused")
+	private ViewManager vm;
+	
+	public CraftingHistoryPane(ViewManager vm)
 	{
+		this.vm = vm;
+		
 		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
@@ -43,8 +49,8 @@ public class CraftingHistoryPane
 		queue.setBackground(new Background(
 				new BackgroundFill(Color.DARKGRAY, null, null)));
 		
-		historyStage.setX(100.0);
-		historyStage.setY(100.0);
+		historyStage.setX(vm.getStage().getX() - BOX_WIDTH - 10.0);
+		historyStage.setY(vm.getStage().getY());
 		
 		queue.setPrefWidth(BOX_WIDTH);
 		queue.setPrefHeight(BOX_HEIGHT);

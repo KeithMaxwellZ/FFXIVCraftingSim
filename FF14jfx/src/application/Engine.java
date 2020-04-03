@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.components.CraftingStatus;
+import application.components.EngineStatus;
 import application.components.Timer;
 import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
@@ -38,7 +39,7 @@ public class Engine
 	
 	private boolean progIncreased;
 	private boolean qltyIncreased;
-	private boolean working;
+	private EngineStatus es;
 	
 	private Timer timer;
 	private CraftingHistoryPane ch;
@@ -83,7 +84,7 @@ public class Engine
 		csCount = 0;
 		presentCP = totalCP;
 		observed = false;
-		working = true;
+		es = EngineStatus.Crafting;
 		progIncreased = false;
 		qltyIncreased = false;
 		
@@ -500,12 +501,12 @@ public class Engine
 		return cs;
 	}
 	
-	public boolean isWorking() {
-		return working;
+	public EngineStatus getEngineStatus() {
+		return es;
 	}
 	
-	public void setWorking(boolean b) {
-		working = b;
+	public void setEngineStatus(EngineStatus es) {
+		this.es = es;
 	}
 	
 	public int getRound() {
