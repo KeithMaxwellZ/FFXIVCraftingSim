@@ -27,11 +27,13 @@ public class AdvancedSettingsPane
 	Text rControlT;
 	Text progDiffT;
 	Text qltyDiffT;
+	Text seedT;
 
 	TextField rCraftTf;
 	TextField rControlTf;
 	TextField progDiffTf;
 	TextField qltyDiffTf;
+	TextField seedTf;
 	
 	ArrayList<Text> t;
 	
@@ -53,11 +55,13 @@ public class AdvancedSettingsPane
 		rControlT = new Text("推荐加工");
 		progDiffT = new Text("制作等级差");
 		qltyDiffT = new Text("加工等级差");
+		seedT = new Text("随机种子");
 
 		rCraftTf = new TextField(Integer.toString(vm.getrCraftsmanship()));
 		rControlTf = new TextField(Integer.toString(vm.getrControl()));
 		progDiffTf = new TextField(Double.toString(vm.getProgressDifference()));
 		qltyDiffTf = new TextField(Double.toString(vm.getQualityDifference()));
+		seedTf = new TextField(Long.toString(vm.getSeed()));
 		
 		initDisplay();
 	}
@@ -70,11 +74,7 @@ public class AdvancedSettingsPane
 		rControlTf.setPrefWidth(TEXEFIELD_WIDTH);
 		progDiffTf.setPrefWidth(TEXEFIELD_WIDTH);
 		qltyDiffTf.setPrefWidth(TEXEFIELD_WIDTH);
-
-		vm.setrCraftsmanship(Integer.parseInt(rCraftTf.getText()));
-		vm.setrControl(Integer.parseInt(rControlTf.getText()));
-		vm.setProgressDifference(Double.parseDouble(progDiffTf.getText()));
-		vm.setQualityDifference(Double.parseDouble(qltyDiffTf.getText()));
+		seedTf.setPrefWidth(TEXEFIELD_WIDTH);
 
 		gp.setVgap(5.0);
 		gp.setHgap(5.0);
@@ -97,18 +97,25 @@ public class AdvancedSettingsPane
 		gp.add(qltyDiffTf, i + 1, j);
 		j++;
 		
+		gp.add(seedT, i, j);
+		gp.add(seedTf, i + 1, j);
+		j++;
+		
 		gp.add(b, i, j);
 		
 		t.add(rCraftT);
 		t.add(rControlT);
 		t.add(progDiffT);
 		t.add(qltyDiffT);
+		t.add(seedT);
 		
 		b.setOnMouseClicked(e -> {
 			vm.setrCraftsmanship(Integer.parseInt(rCraftTf.getText()));
 			vm.setrControl(Integer.parseInt(rControlTf.getText()));
 			vm.setProgressDifference(Double.parseDouble(progDiffTf.getText()));
 			vm.setQualityDifference(Double.parseDouble(qltyDiffTf.getText()));
+			vm.setSeed(Long.parseLong(seedTf.getText()));
+			
 			boxStage.close();
 		});
 		

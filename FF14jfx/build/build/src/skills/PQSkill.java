@@ -53,7 +53,7 @@ public enum PQSkill implements Skill
 
 	static Random r;
 	
-	Engine engine;
+	static Engine engine;
 	
 	static {
 		r = new Random();
@@ -139,8 +139,7 @@ public enum PQSkill implements Skill
 		return durabilityCost;
 	}
 	
-	@Override
-	public void setEngine(Engine e)
+	public static void setEngine(Engine e)
 	{
 		engine = e;
 	}
@@ -150,8 +149,8 @@ public enum PQSkill implements Skill
 		if(successRate == 1.0) {
 			return 1.0;
 		}
-		double d = successRate + (engine.getCraftingStatus() == CraftingStatus.Centered ? 0.3 : 0);
-		d = (double)Math.round(d * 10)/10;
+		double d = successRate + (engine.getCraftingStatus() == CraftingStatus.Centered ? 0.25 : 0);
+		d = (double)Math.round(d * 100)/100;
 		return d;
 	}
  

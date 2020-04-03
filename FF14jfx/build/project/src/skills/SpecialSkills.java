@@ -17,7 +17,7 @@ public enum SpecialSkills implements Skill
 	String name; 
 	String imgAddress;
 	int cpCost;
-	Engine engine;
+	static Engine engine;
 	
 	private SpecialSkills(String name, int cpCost) {
 		this.name = name;
@@ -93,10 +93,9 @@ public enum SpecialSkills implements Skill
 		}
 	}
 
-	@Override
-	public void setEngine(Engine e)
+	public static void setEngine(Engine e)
 	{
-		this.engine = e;
+		engine = e;
 	}
 	
 	@Override

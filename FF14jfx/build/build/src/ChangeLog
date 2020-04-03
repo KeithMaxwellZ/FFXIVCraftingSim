@@ -156,3 +156,22 @@ All notable changes to this project will be documented in this file.
 
 ## Changed
 - Changed the default location of crafting history pane and edit mode menu
+
+# [1.5.1-S]
+## Fixed
+- Fixed success rate display error
+
+# [1.5.2-S]
+## Changed
+- Changed the GCD animation to sudden appear
+
+# [1.5.3-S]
+## Added
+- Added random seed function
+
+## Changed
+- Now the effect of decreased of CP will be directly display by the skill costs
+
+# [1.5.4-S]
+## Fixed
+- Fixed the issue that last skill is not properly on the turn which crafting is finished

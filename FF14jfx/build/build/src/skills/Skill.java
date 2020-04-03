@@ -1,7 +1,5 @@
 package skills;
 
-import application.Engine;
-
 public interface Skill
 {
 //	 String name;
@@ -40,6 +38,4 @@ public interface Skill
 	public int getDurCost();
 	
 	public double getSuccessRate();
-	
-	public void setEngine(Engine e);
 }
