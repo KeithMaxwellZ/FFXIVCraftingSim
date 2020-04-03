@@ -46,69 +46,74 @@ import skills.PQSkill;
 import skills.Skill;
 import skills.SpecialSkills;
 
+/**
+ * The main scene of the program
+ * @author keithMaxwell 延夏 埃尔德里基
+ *
+ */
 public class ViewManager
 {
-	private static final double WIDTH = 650;
-	private static final double REC_WIDTH = 580;
-	private static final double HEIGHT = 690;
-	private static final double EDGE_GENERAL = 4.0;
-	private static final double SKILL_HEIGHT = 270;
-	private static final double BAR_EDGE = 5.0;
-	private static final double BAR_WIDTH = 400.0;
-	private static final double BAR_HEIGHT = 30.0;
-	private static final double CP_EDGE = 5.0;
-	private static final double CP_WIDTH = 150.0;
-	private static final double CP_HEIGHT = 15.0;
+	private static final double WIDTH = 650; 			// The width of the scene 
+	private static final double HEIGHT = 690;			// The height of the scene 
+	private static final double REC_WIDTH = 580;		// Width of the panes
+	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
+	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
+	private static final double BAR_EDGE = 5.0;			// The width of progress and quality bars
+	private static final double BAR_WIDTH = 400.0;		// The width of the bars
+	private static final double BAR_HEIGHT = 30.0;		// The height of the bars
+	private static final double CP_EDGE = 5.0;			// CP bar edge width
+	private static final double CP_WIDTH = 150.0;		// CP bar width
+	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.5.1-S";
+	private static final String VERSION = "V1.5.1-S";	// The version of the program
 	
-	private static final Color TEXT_COLOR = Color.BLACK;
+	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
-	private Stage stage;
-	private Scene mainScene;
-	private AnchorPane mainPane;
-	private AnchorPane lastSkillAp;
-	private GridPane iconContainer;
-	private VBox mainContainer;
-	private HBox buffContainer;
-	private Circle statusDisp;
-	private Text efficiencyDisp;
-	private Text durabilityText;
-	private Text round;
-	private Text skillDescription;
-	private Timeline tml = new Timeline();
+	private Stage stage;						// Main stage
+	private Scene mainScene;					// Main scene of the stage
+	private AnchorPane mainPane;				// Main pane of the scene, covers everything
+	private AnchorPane lastSkillAp;				// The anchor pane that displays the last skill used
+	private GridPane iconContainer;				// The pane that stores all the skill icons/buttons
+	private VBox mainContainer;					// The container that stores other panes
+	private HBox buffContainer;					// The container that display buffs
+	private Circle statusDisp;					// The circle that displays the crafting status
+	private Text efficiencyDisp;				// The text that displays current efficiency
+	private Text durabilityText;				// The text that displays current durability
+	private Text round;							// The text that displays current round
+	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
+	private Timeline tml = new Timeline();		// The timeline that stores GCD animation
 	
 	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	private ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
 	
-	private int craftsmanship = 2563;
+	private int craftsmanship = 2563;	
 	private int control = 2620;
 	private int cp = 635;
-	private int dura = 60;
-	private int tProg = 9181;
-	private int tQlty = 64862;
-	private int rCraftsmanship = 2484;
-	private int rControl = 2206;
-	private double progressDifference = 0.8;
-	private double qualityDifference = 0.6;
+	private int dura = 60;						// Durability
+	private int tProg = 9181;					// Total progress
+	private int tQlty = 64862;					// Total quality
+	private int rCraftsmanship = 2484;			// Recommended craftsmanship
+	private int rControl = 2206;				// Recommended control
+	private double progressDifference = 0.8;	// Level difference index of progress
+	private double qualityDifference = 0.6;		// Level difference index of quality
 	
-	private boolean hasGCD = true;
+	private boolean hasGCD = true;				// GCD mode
 
-	private Skill lastSkill = null;
+	private Skill lastSkill = null;				// Store the last skill used
 	
-	private ArrayList<Skill> progressSkills;
-	private ArrayList<Skill> qualitySkills;
+	private ArrayList<Skill> progressSkills;	// ArrayLists that stores different types of
+	private ArrayList<Skill> qualitySkills;		// skills, I defined the categories
 	private ArrayList<Skill> buffSkills;
 	private ArrayList<Skill> recoverySkills;
 	private ArrayList<Skill> otherSkills;
 	
-	private Engine engine;
+	private Engine engine;						// The engine of the program
 	
-	private CraftingHistoryPane ch;
-	private AdvancedSettingsPane asp;
-	private EditModePane emp;
+	private CraftingHistoryPane ch;				
+	private AdvancedSettingsPane asp;			
+	private EditModePane emp;					
 	
-	private Timer tm;
+	private Timer tm;		
 	
 	public ViewManager() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
@@ -123,9 +128,13 @@ public class ViewManager
 		initStage();
 		initMainDisplay();
 		
-		ch = new CraftingHistoryPane(this);
+		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
+											 // main stage so it's initialized at last
 	}
 	
+	/**
+	 * manually define the category of each skill......
+	 */
 	private void initSkillsList() {
 		progressSkills = new ArrayList<>();
 		qualitySkills = new ArrayList<>();
@@ -171,6 +180,9 @@ public class ViewManager
 		otherSkills.add(SpecialSkills.Careful_Observation);
 	}
 	
+	/**
+	 * initiate the main stage
+	 */
 	private void initStage() {
 		mainPane = new AnchorPane();
 		stage = new Stage();
@@ -182,7 +194,7 @@ public class ViewManager
 		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
 		stage.setScene(mainScene);
 		stage.setResizable(false);
-		stage.setOnCloseRequest(e -> {
+		stage.setOnCloseRequest(e -> {			// Close other related windows
 			if(asp != null) {
 				asp.close();
 			}
@@ -190,6 +202,9 @@ public class ViewManager
 		});
 	}
 	
+	/**
+	 * initiate the main display contents
+	 */
 	private void initMainDisplay() {
 		mainContainer = new VBox(20);
 		
@@ -211,11 +226,13 @@ public class ViewManager
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
-		engine.setEngineStatus(EngineStatus.Pending);;
-		
-		
+		engine.setEngineStatus(EngineStatus.Pending);
 	}
 	
+	/**
+	 * initiate the input section
+	 * @return the pane of input section
+	 */
 	private Node initInput() {		
 		double tfWidth = 70.0;
 		GridPane gp = new GridPane();
@@ -261,17 +278,20 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
-		finish.setOnMouseClicked(e -> {
+		// Define the action when finish button is clicked
+		finish.setOnMouseClicked(e -> {		
 			if(engine.getEngineStatus() == EngineStatus.Crafting) {
 				postFinishMessage(ExceptionStatus.Craft_Failed);
 			}
 		});
 		
-		iconRearr.setOnMouseClicked(e -> {
+		// Define the action when rearrange icon mapping button is clicked
+		iconRearr.setOnMouseClicked(e -> { 
 			emp = new EditModePane(this, engine);
 			emp.display();
 		});
 		
+		// Define the action when confirm button is clicked
 		confirm.setOnMouseClicked(e -> {
 			ch.destory();
 			setLastSkill(null);
@@ -284,16 +304,19 @@ public class ViewManager
 			ch = new CraftingHistoryPane(this);
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
+			// Creates a new engine to restart everything
 			hasGCD = GCDCb.isSelected();
 			SkillIcon.setVm(engine, tml, this);
 			updateAll();
 			ch.display();
 		});
 		
+		// Define the action when export logs button is clicked
 		logs.setOnMouseClicked(e -> {
 			exportLogs();
 		});
 		
+		// Define the action when advanced settings button is clicked
 		advanced.setOnMouseClicked(e -> {
 			asp = new AdvancedSettingsPane(t, this);
 			asp.display();
@@ -335,6 +358,7 @@ public class ViewManager
 		gp.add(iconRearr, i, j + 1);
 		i++;
 
+		// Draw the edge of the pane
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
 		border.add(back, 0, 0);
 		border.setBackground(new Background(new BackgroundFill(Color.SILVER, new CornerRadii(10.0), null)));
@@ -356,10 +380,14 @@ public class ViewManager
 			tx.setFill(Color.WHITE);
 		}
 		
-		
 		return border;
 	}
 	
+	
+	/**
+	 * Initiate the two progress bars and other related information display
+	 * @return
+	 */
 	private Node initProgressBar() {
 		GridPane container = new GridPane();
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
@@ -400,6 +428,10 @@ public class ViewManager
 		return container;
 	}
 	
+	/**
+	 * Initiate the CP display bar
+	 * @return
+	 */
 	private Node initCPDisplay() {
 		HBox container = new HBox();
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
@@ -436,12 +468,16 @@ public class ViewManager
 		return container;
 	} 
 	
+	/**
+	 * Initiate the efficiency display text and previous skill display
+	 * @return
+	 */
 	private Node initEfficiencyDisp() {
 		HBox container = new HBox();
 		Text lastSkillT = new Text("上一个技能:  ");
+		ArrayList<Text> t = new ArrayList<Text>();
 		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new Text(); 
-		ArrayList<Text> t = new ArrayList<Text>();
 		
 		lastSkillAp.setPrefSize(40.0, 40.0);
 		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
@@ -462,6 +498,10 @@ public class ViewManager
 		return container;
 	}
 	
+	/**
+	 * Initiate the buffs display bar
+	 * @return
+	 */
 	private Node initBuffDisp() {
 		Text buffText = new Text("  Buff:");
 		buffContainer = new HBox(10);
@@ -474,25 +514,25 @@ public class ViewManager
 		return buffContainer;
 	}
 	
+	/**
+	 * Initiate the skill icons display
+	 * @return
+	 */
 	private Node initSkills() {
 		GridPane skillContainer = new GridPane();
 		AnchorPane border = new AnchorPane();	
+		iconContainer = new GridPane();
+		skillDescription = new Text(" ");
 		
-		setIconContainer(new GridPane());
-		
-		setSkillDescription(new Text("  "));
-		
+		iconContainer.setHgap(5);
 		
 		skillContainer.setVgap(5);
-		getIconContainer().setHgap(5);
-		
-		int i = 2;
-		
 		skillContainer.add(getSkillDescription(), 0, 1);
 		skillContainer.add(getIconContainer(), 0, 2);
 		
 		GridPane.setMargin(getSkillDescription(), new Insets(10.0));
 		
+		int i = 2; // Makes it easier to code (easier to copy and paste)
 		createSkillList(progressSkills, getIconContainer(), i++);
 		createSkillList(qualitySkills, getIconContainer(), i++);
 		createSkillList(buffSkills, getIconContainer(), i++);
@@ -518,10 +558,13 @@ public class ViewManager
 		return border;
 	}
 	
+	/**
+	 * Initiate the skill icons display
+	 * @param skl the list that store skills that needed to be displayer
+	 * @param gp  the GridPane that stores all these icons
+	 * @param i   the line which these skills are located
+	 */
 	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
-		
-		//pqbro
-		
 		int j = 1;
 		for(Skill s: skl) {
 			engine.addToLogs(s.toString() + ": " + s.getAddress());;
@@ -531,7 +574,9 @@ public class ViewManager
 			gp.add(si, j, i);
 			j++;
 		}
-		for(; j <= 12; j++) {
+		
+		// Fill the rest with empty ones
+		for(; j <= 12; j++) { 
 			SkillIcon si = new SkillIcon(null, tml, this);
 			gp.add(si, j, i);
 		}
@@ -541,6 +586,14 @@ public class ViewManager
 		return;
 	}
 	
+	/**
+	 * The main method that draws the bar
+	 * @param c the color of the bar (Color class is from javafx)
+	 * @param width the width of the bar
+	 * @param height the height of the bar
+	 * @param paneEdge the edge thickness of the bar
+	 * @return
+	 */
 	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
 		AnchorPane bar = new AnchorPane();
 		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.BLACK);
@@ -568,6 +621,9 @@ public class ViewManager
 		return bar;
 	}
 	
+	/**
+	 * Updates all the displays
+	 */
 	public void updateAll() {
 		updateProgress();
 		updateQuality();
@@ -677,6 +733,10 @@ public class ViewManager
 		
 	}
 	
+	/**
+	 * pop up the crafting finished message box
+	 * @param es
+	 */
 	public void postFinishMessage(ExceptionStatus es) {
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane gp = new GridPane();
@@ -684,7 +744,7 @@ public class ViewManager
 		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
 		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
 		
-		updateAll();
+		updateAll(); // update before taking summary
 		
 		engine.setEngineStatus(EngineStatus.Pending);;
 		engine.addToLogs("========= Summary =========");
@@ -713,6 +773,10 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
+	/**
+	 *  Pop up the invalid action message box
+	 * @param es stores the error message
+	 */
 	public void postInvalidMessage(ExceptionStatus es) {
 		Alert al = new Alert(AlertType.WARNING);
 		
@@ -722,6 +786,9 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
+	/**
+	 *  Pop up unexpected error message (hasn't triggered yet
+	 */
 	public void postUnexpectedMessage() {
 		Alert al = new Alert(AlertType.WARNING);
 		
@@ -731,6 +798,9 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
+	/**
+	 * Main function to export the logs, which is stored in engine
+	 */
 	public void exportLogs() {
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane container = new GridPane();
@@ -761,6 +831,8 @@ public class ViewManager
 		al.showAndWait();
 	}
 	
+	
+	// == getters and setters ==
 	public Stage getStage() {
 		return stage;
 	}
@@ -773,76 +845,59 @@ public class ViewManager
 		return hasGCD;
 	}
 
-	public int getrCraftsmanship()
-	{
+	public int getrCraftsmanship() {
 		return rCraftsmanship;
 	}
 
-	public void setrCraftsmanship(int rCraftsmanship)
-	{
+	public void setrCraftsmanship(int rCraftsmanship) {
 		this.rCraftsmanship = rCraftsmanship;
 	}
 
-	public int getrControl()
-	{
+	public int getrControl() {
 		return rControl;
 	}
 
-	public void setrControl(int rControl)
-	{
+	public void setrControl(int rControl) {
 		this.rControl = rControl;
 	}
 
-	public double getProgressDifference()
-	{
+	public double getProgressDifference() {
 		return progressDifference;
 	}
 
-	public void setProgressDifference(double progressDifference)
-	{
+	public void setProgressDifference(double progressDifference) {
 		this.progressDifference = progressDifference;
 	}
 
-	public double getQualityDifference()
-	{
+	public double getQualityDifference() {
 		return qualityDifference;
 	}
 
-	public void setQualityDifference(double qualityDifference)
-	{
+	public void setQualityDifference(double qualityDifference) {
 		this.qualityDifference = qualityDifference;
 	}
 
-	public Text getSkillDescription()
-	{
+	public Text getSkillDescription() {
 		return skillDescription;
 	}
 
-	public void setSkillDescription(Text skillDescription)
-	{
+	public void setSkillDescription(Text skillDescription) {
 		this.skillDescription = skillDescription;
 	}
 
-	public Skill getLastSkill()
-	{
+	public Skill getLastSkill() {
 		return lastSkill;
 	}
 
-	public void setLastSkill(Skill lastSkill)
-	{
+	public void setLastSkill(Skill lastSkill) {
 		this.lastSkill = lastSkill;
 	}
 
-	public GridPane getIconContainer()
-	{
+	public GridPane getIconContainer() {
 		return iconContainer;
 	}
 
-	public void setIconContainer(GridPane iconContainer)
-	{
+	public void setIconContainer(GridPane iconContainer) {
 		this.iconContainer = iconContainer;
 	}
 }
-
-
-
