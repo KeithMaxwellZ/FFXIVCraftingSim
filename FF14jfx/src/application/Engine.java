@@ -286,6 +286,7 @@ public class Engine
 			coCount++;
 			beginning(sk);
 			success = true;
+			ch.addToQueue(sk, cs, true);
 			cs = CraftingStatus.getNextStatus();
 			return;
 		}
@@ -608,4 +609,16 @@ public class Engine
 	public double getRuntime() {
 		return timer.getTime();
 	}
+
+	public int getCraftsmanship()
+	{
+		return craftsmanship;
+	}
+
+	public int getControl()
+	{
+		return control;
+	}
+	
+	
 }
