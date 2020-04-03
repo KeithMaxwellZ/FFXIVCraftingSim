@@ -36,8 +36,10 @@ public class SkillIcon extends AnchorPane
 	private Rectangle rec;
 	private KeyValue kv1;
 	private KeyValue kv2;
+	private KeyValue kv3;
 	private KeyFrame kf1;
 	private KeyFrame kf2;
+	private KeyFrame kf3;
 	
 	private Skill s;
 	
@@ -66,14 +68,16 @@ public class SkillIcon extends AnchorPane
 		
 		kv1 = new KeyValue(getIv().opacityProperty(), 1.0);
 		kv2 = new KeyValue(getIv().opacityProperty(), 0.1);
+		kv3 = new KeyValue(getIv().opacityProperty(), 0.1);
 		
 		kf1 = new KeyFrame(Duration.millis(1900), kv1);
-		kf2 = new KeyFrame(Duration.millis(1), kv2);
+		kf2 = new KeyFrame(Duration.millis(1899), kv2);
+		kf3 = new KeyFrame(Duration.millis(1), kv3);
 		
 		getIv().setSmooth(true);
 		rec.setSmooth(true);
 		
-		tml.getKeyFrames().addAll(kf1, kf2);
+		tml.getKeyFrames().addAll(kf3, kf2, kf1);
 		
 		init();
 	}
