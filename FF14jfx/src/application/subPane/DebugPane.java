@@ -53,7 +53,6 @@ public class DebugPane
 		mainPane = new GridPane();
 		scene = new Scene(mainPane, BOX_WIDTH, BOX_HEIGHT);
 		stage.setScene(scene);
-		
 		stage.setTitle("≤‚ ‘ƒ£ Ω");
 		
 		init();
