@@ -43,7 +43,7 @@ public enum BuffSkill implements Skill
 
 	static Random r;
 	Buff buff;
-	Engine engine;
+	static Engine engine;
 	
 	static {
 		r = new Random();
@@ -127,8 +127,7 @@ public enum BuffSkill implements Skill
 		return durabilityCost;
 	}
 	
-	@Override
-	public void setEngine(Engine e)
+	public static void setEngine(Engine e)
 	{
 		engine = e;
 	}

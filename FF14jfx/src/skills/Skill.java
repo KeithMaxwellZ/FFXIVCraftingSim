@@ -40,6 +40,4 @@ public interface Skill
 	public int getDurCost();
 	
 	public double getSuccessRate();
-	
-	public void setEngine(Engine e);
 }
