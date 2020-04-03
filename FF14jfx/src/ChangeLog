@@ -1,8 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-# [Pending]
-
+# [Pending] 
 
 # [0.2.0] 2020-03-30
 ## Added
@@ -185,3 +184,8 @@ All notable changes to this project will be documented in this file.
 
 # Fixed 
 - Fixed the issue that Careful_Observation won't show in the crafting history
+
+# [1.5.6-S] 2020-04-04
+# Added
+- Added finish notification after successfully import / export config
+- Added debug pane in advanced options

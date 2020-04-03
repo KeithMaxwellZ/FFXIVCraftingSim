@@ -40,9 +40,15 @@ public class ConfigManager
 		OutputStream os = null;
 		
 		try {
+			Alert al = new Alert(AlertType.INFORMATION);
+
 			os = new FileOutputStream(CONFIG_NAME);
 			pt.store(os, "");
 			os.close();
+			
+			al.setTitle("完成");
+			al.setHeaderText(null);
+			al.setContentText("成功导出配置文件");
 		} catch (IOException e) {
 			Alert al = new Alert(AlertType.ERROR);
 			TextArea ta = new TextArea();
@@ -70,7 +76,8 @@ public class ConfigManager
 		try {
 			InputStream in = new BufferedInputStream(new FileInputStream(CONFIG_NAME));  
 			EditModePane emp = new EditModePane(vm, engine);
-			
+			Alert al = new Alert(AlertType.INFORMATION);
+
 			pt.load(in);
 			
 			vm.setCraftsmanship(Integer.parseInt(pt.getProperty("craftsmanship")));
@@ -78,6 +85,10 @@ public class ConfigManager
 			vm.setCP(Integer.parseInt(pt.getProperty("CP")));
 			
 			emp.importCode(pt.getProperty("iconMapping"));
+			
+			al.setTitle("完成");
+			al.setHeaderText(null);
+			al.setContentText("成功导入配置文件");
 		} catch (IOException e) {
 			if(showDialog) {
 				Alert al = new Alert(AlertType.ERROR);
