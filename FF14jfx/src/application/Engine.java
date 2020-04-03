@@ -620,5 +620,7 @@ public class Engine
 		return control;
 	}
 	
-	
+	public void setCraftingStatus(CraftingStatus cs) {
+		this.cs = cs;
+	}
 }
