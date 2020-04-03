@@ -1,7 +1,5 @@
 package skills;
 
-import application.Engine;
-
 public interface Skill
 {
 //	 String name;

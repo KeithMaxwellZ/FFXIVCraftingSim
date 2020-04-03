@@ -1,8 +1,10 @@
 package application;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import application.components.CraftingStatus;
 import application.components.EngineStatus;
 import application.components.SkillIcon;
 import application.components.Timer;
@@ -96,6 +98,7 @@ public class ViewManager
 	private int rControl = 2206;				// Recommended control
 	private double progressDifference = 0.8;	// Level difference index of progress
 	private double qualityDifference = 0.6;		// Level difference index of quality
+	private long seed = 0;
 	
 	private boolean hasGCD = true;				// GCD mode
 
@@ -107,6 +110,8 @@ public class ViewManager
 	private ArrayList<Skill> recoverySkills;
 	private ArrayList<Skill> otherSkills;
 	
+	private ArrayList<SkillIcon> skillIcons;
+	
 	private Engine engine;						// The engine of the program
 	
 	private CraftingHistoryPane ch;				
@@ -117,10 +122,11 @@ public class ViewManager
 	
 	public ViewManager() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-				rCraftsmanship, rControl, progressDifference, qualityDifference, ch);
+				rCraftsmanship, rControl, progressDifference, qualityDifference, ch, seed);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
+		skillIcons = new ArrayList<SkillIcon>();
 		
 		tm.startTimer();
 				
@@ -198,7 +204,12 @@ public class ViewManager
 			if(asp != null) {
 				asp.close();
 			}
-			ch.close();
+			if(ch != null) {
+				ch.close();
+			}
+			if(emp != null) {
+				emp.close();
+			}
 		});
 	}
 	
@@ -303,7 +314,7 @@ public class ViewManager
 			tQlty = Integer.parseInt(totalQltyTf.getText());
 			ch = new CraftingHistoryPane(this);
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-					rCraftsmanship, rControl, progressDifference,qualityDifference, ch);
+					rCraftsmanship, rControl, progressDifference,qualityDifference, ch, seed);
 			// Creates a new engine to restart everything
 			hasGCD = GCDCb.isSelected();
 			SkillIcon.setVm(engine, tml, this);
@@ -570,6 +581,7 @@ public class ViewManager
 			engine.addToLogs(s.toString() + ": " + s.getAddress());;
 			
 			SkillIcon si = new SkillIcon(s, tml, this);
+			skillIcons.add(si);
 			
 			gp.add(si, j, i);
 			j++;
@@ -634,6 +646,7 @@ public class ViewManager
 		updateBuffDIsp();
 		updateStatus();
 		updateLastSkill();
+		updateSkillCP();
 	}
 	
 	public void updateProgress() {
@@ -733,11 +746,41 @@ public class ViewManager
 		
 	}
 	
+	private void updateSkillCP() {
+		Iterator<Node> iter = iconContainer.getChildren().iterator();
+		while(iter.hasNext()) {
+			SkillIcon si = (SkillIcon)iter.next();
+			if(si.getSkill()!=null) {
+				int i = si.getSkill().getCPCost();
+				i = (engine.getCraftingStatus() == CraftingStatus.Pliant ? (i+1)/2 : i);
+				if(i!=0) {
+					si.setCostText(Integer.toString(i));
+				} else {
+					si.setCostText(" ");
+				}
+			}
+		}
+	}
+	
 	/**
 	 * pop up the crafting finished message box
 	 * @param es
 	 */
 	public void postFinishMessage(ExceptionStatus es) {
+		
+		Iterator<Node> iter = iconContainer.getChildren().iterator();
+		while(iter.hasNext()) {
+			SkillIcon si = (SkillIcon)iter.next();
+			if(si.getSkill()!=null) {
+				int i = si.getSkill().getCPCost();
+				if(i!=0) {
+					si.setCostText(Integer.toString(i));
+				} else {
+					si.setCostText(" ");
+				}
+			}
+		}
+		
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane gp = new GridPane();
 		Text GCDMode = new Text("GCD: " + (getHasGCD() ? "¿ªÆô" : "¹Ø±Õ"));
@@ -899,5 +942,13 @@ public class ViewManager
 
 	public void setIconContainer(GridPane iconContainer) {
 		this.iconContainer = iconContainer;
+	}
+	
+	public long getSeed() {
+		return seed;
+	}
+	
+	public void setSeed(long seed) {
+		this.seed = seed;
 	}
 }

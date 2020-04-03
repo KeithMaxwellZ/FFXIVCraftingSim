@@ -2,6 +2,7 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import application.components.CraftingStatus;
 import application.components.EngineStatus;
@@ -30,6 +31,7 @@ public class Engine
 	private int baseProgEff;	  // Base progress efficiency
 	private int baseQltyEff;	  // Base quality efficiency
 	private int round;			  // Present round
+	private long seed;			  // Random seed
 	
 	private int coCount;	// Counts the use of Careful_Observation
 	
@@ -62,7 +64,8 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference, CraftingHistoryPane ch) {
+				double porgressDifference, double qualityDifference, CraftingHistoryPane ch, 
+				long seed) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -74,6 +77,7 @@ public class Engine
 		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
 		this.ch = ch;
+		this.seed = seed;
 		
 		activeBuffs = new ArrayList<>();
 		logs = new ArrayList<>();
@@ -99,6 +103,7 @@ public class Engine
 		calcBaseQlty();			// Calculate the base efficiency
 		
 		setEnumEngine();		// Set the engine for all the enums
+		setRandom();			// Set the random generator for other classes
 		
 		addToLogs("Craftsmanship: " + craftsmanship);
 		addToLogs("Control: " + control);
@@ -132,6 +137,19 @@ public class Engine
 		PQSkill.setEngine(this);
 		BuffSkill.setEngine(this);
 		SpecialSkills.setEngine(this);
+	}
+	
+	/**
+	 * set the random seed for different classes that has the random generator
+	 */
+	public void setRandom() {
+		Random r = new Random();
+		if(seed != 0) {
+			r.setSeed(seed);
+		}
+		
+		PQSkill.setRandom(r);			// The other two skill class doesn't need random
+		CraftingStatus.setRandom(r);
 	}
 		
 	/**

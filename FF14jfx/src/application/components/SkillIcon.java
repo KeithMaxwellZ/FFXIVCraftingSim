@@ -248,4 +248,7 @@ public class SkillIcon extends AnchorPane
 		return iv;
 	}
 
+	public void setCostText(String s) {
+		costText.setText(s);
+	}
 }

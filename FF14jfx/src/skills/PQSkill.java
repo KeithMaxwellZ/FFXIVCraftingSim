@@ -150,7 +150,7 @@ public enum PQSkill implements Skill
 			return 1.0;
 		}
 		double d = successRate + (engine.getCraftingStatus() == CraftingStatus.Centered ? 0.25 : 0);
-		d = (double)Math.round(d * 10)/10;
+		d = (double)Math.round(d * 100)/100;
 		return d;
 	}
  
