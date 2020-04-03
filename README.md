@@ -2,7 +2,7 @@
 A simple Crafting Simulator for FFXIV expert recipes 
 
 Jar Version:
-- Make sure you have jre1.9 or higher
+- Make sure you have jre1.8 or higher
 - Double click to run
 
 exe Version:
