@@ -87,13 +87,14 @@ public class EditModePane
 		exportSettings.setPrefWidth(BUTTON_WIDTH);
 		exportSettings.setPrefHeight(BUTTON_HEIGHT);
 		exportSettings.setOnMouseClicked(e -> {
-			exportCode();
+			String s = exportCode();
+			displayCode(s);
 		});
 		
 		importSettings.setPrefWidth(BUTTON_WIDTH);
 		importSettings.setPrefHeight(BUTTON_HEIGHT);
 		importSettings.setOnMouseClicked(e -> {
-			importCode();
+			importCode("");
 		});
 		
 		gp.add(iconRearr, 0, 0);
@@ -145,18 +146,19 @@ public class EditModePane
 		}
 	}
 	
-	private void importCode() {
-		TextInputDialog dialog = new TextInputDialog("");
-		dialog.setTitle("导入键位");
-		dialog.setHeaderText(null);
-		dialog.setContentText("请填入键位代码");
-
-		// Traditional way to get the response value.
-		Optional<String> result = dialog.showAndWait();
-		String raw = "";
-		if (result.isPresent()){
-		    raw += result.get();
-		} 
+	public void importCode(String s) {
+		String raw = s;
+		if(s.equals("")) {
+			TextInputDialog dialog = new TextInputDialog("");
+			dialog.setTitle("导入键位");
+			dialog.setHeaderText(null);
+			dialog.setContentText("请填入键位代码");
+		
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()){
+			    raw += result.get();
+			} 
+		}
 		try {
 			decode(raw);
 		} catch (CraftingException ce) {
@@ -212,7 +214,7 @@ public class EditModePane
 		}
 	}
 	
-	private void exportCode() {
+	public String exportCode() {
 		String s = "";
 		Iterator<Node> irr = vm.getIconContainer().getChildren().iterator();
 		while(irr.hasNext()) {
@@ -235,7 +237,8 @@ public class EditModePane
 				s += "000";
 			}
 		}
-		displayCode(s);
+		
+		return s;
 	}
 	
 	public void displayCode(String s) {

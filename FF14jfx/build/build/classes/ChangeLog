@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+# [Pending]
+
+
 # [0.2.0] 2020-03-30
 ## Added
 - The display of skill name
@@ -91,7 +94,7 @@ All notable changes to this project will be documented in this file.
 - fixed the issue where manipulation buff doesn't work properly when the difference
 	between present dura and total dura is 5
 
-# [1.1.0-S]
+# [1.1.0-S] 2020-04-01
 ## Added
 - Added gcd mode
 - Added gcd animation
@@ -99,7 +102,7 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 - Fixed the issue when click on the text the button won't work
 
-# [1.1.1-S]
+# [1.1.1-S] 2020-04-01
 ## Added
 - Added advanced settings box
 
@@ -107,7 +110,7 @@ All notable changes to this project will be documented in this file.
 ## Fixed
 - Fixed the issue that inner quiet is rounded down when Patient_Touch fails
 
-# [1.2.0]
+# [1.2.0] 2020-04-01
 ## Added
 - Added crafting status to logs
 
@@ -115,41 +118,41 @@ All notable changes to this project will be documented in this file.
 - Fixed the issue that manipulation will take effect on 
 	the turn the skill manipulation is used
 
-# [1.2.1-S]
+# [1.2.1-S] 2020-04-01
 ## Changed
 - Updated Inner Quiet Buff icon
 
-# [1.3.0-S]
+# [1.3.0-S] 2020-04-02
 ## Added
 - Added crafting history display
 
-# [1.3.1-S]
+# [1.3.1-S] 2020-04-02
 ## Fixed
 - Fixed the bug of no scroll bar
 
 ## TODO
 - unknown issue of negative dura
 
-# [1.3.2-S]
+# [1.3.2-S] 2020-04-02
 ## Changed
 - Changed the background color of history pane
 
 ## Fixed
 - Fixed the issue that refresh buff doesn't work properly
 
-# [1.4.0]
+# [1.4.0] 2020-04-02
 ## Added
 - Added success rate display in the history bar
 
 ## Fixed
 - Fixed issue with manipulation buff calculation
 
-# [1.4.1]
+# [1.4.1] 2020-04-02
 ## Changed
 - Optimized codes a little bit
 - The history window now will close with the main window
 
-# [1.5.0-S]
+# [1.5.0-S] 2020-04-02
 ## Added
 - Added skill rearrange function
 - Added skill mapping import and export function
@@ -157,21 +160,28 @@ All notable changes to this project will be documented in this file.
 ## Changed
 - Changed the default location of crafting history pane and edit mode menu
 
-# [1.5.1-S]
+# [1.5.1-S] 2020-04-02
 ## Fixed
 - Fixed success rate display error
 
-# [1.5.2-S]
+# [1.5.2-S] 2020-04-03
 ## Changed
 - Changed the GCD animation to sudden appear
 
-# [1.5.3-S]
+# [1.5.3-S] 2020-04-03
 ## Added
 - Added random seed function
 
 ## Changed
 - Now the effect of decreased of CP will be directly display by the skill costs
 
-# [1.5.4-S]
+# [1.5.4-S] 2020-04-03
 ## Fixed
 - Fixed the issue that last skill is not properly on the turn which crafting is finished
+
+# [1.5.5-S] 2020-04-03
+# Added 
+- Added saving and loading config function
+
+# Fixed 
+- Fixed the issue that Careful_Observation won't show in the crafting history

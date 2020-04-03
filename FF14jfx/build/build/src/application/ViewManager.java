@@ -3,7 +3,9 @@ package application;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
+import application.components.ConfigManager;
 import application.components.CraftingStatus;
 import application.components.EngineStatus;
 import application.components.SkillIcon;
@@ -67,7 +69,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.5.4-S";	// The version of the program
+	private static final String VERSION = "V1.5.5-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -85,8 +87,9 @@ public class ViewManager
 	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
 	private Timeline tml = new Timeline();		// The timeline that stores GCD animation
 	
-	private ArrayList<Text> progText;	//0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
-	private ArrayList<Rectangle> bars; 	//0=>Progress 1=>Quality 2=>CP
+	private ArrayList<Text> progText;		// 0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
+	private ArrayList<Rectangle> bars; 		// 0=>Progress 1=>Quality 2=>CP
+	private ArrayList<TextField> inputTf; 	// The ArrayList that stores the TextFields for input
 	
 	private int craftsmanship = 2563;	
 	private int control = 2620;
@@ -110,9 +113,11 @@ public class ViewManager
 	private ArrayList<Skill> recoverySkills;
 	private ArrayList<Skill> otherSkills;
 	
-	private ArrayList<SkillIcon> skillIcons;
+	private ArrayList<SkillIcon> skillIcons;	// ArrayList that stores all skillIcon objects
+												// Makes it easier to operate
 	
 	private Engine engine;						// The engine of the program
+	private ConfigManager cm; 					// The config manager that loads/saves the config
 	
 	private CraftingHistoryPane ch;				
 	private AdvancedSettingsPane asp;			
@@ -126,13 +131,18 @@ public class ViewManager
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
-		skillIcons = new ArrayList<SkillIcon>();
+		skillIcons = new ArrayList<>();
+		inputTf = new ArrayList<>();
+		
+		cm = new ConfigManager(this, engine);
 		
 		tm.startTimer();
 				
 		initSkillsList();
 		initStage();
 		initMainDisplay();
+		
+//		cm.importConfig(false);
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
@@ -254,6 +264,8 @@ public class ViewManager
 		Button advanced = new Button("高级");
 		Button finish = new Button("结束制作");
 		Button iconRearr = new Button("编辑图标");
+		Button loadConfig = new Button("加载配置");
+		Button saveConfig = new Button("保存配置");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
 		
@@ -274,6 +286,13 @@ public class ViewManager
 
 		CheckBox GCDCb = new CheckBox("GCD");
 		
+		inputTf.add(craftTf);
+		inputTf.add(controlTf);
+		inputTf.add(CPTf);
+		inputTf.add(totalProgTf);
+		inputTf.add(totalQltyTf);
+		inputTf.add(totalDuraTf);
+		
 		gp.setHgap(5);
 		gp.setVgap(3);
 		gp.setPrefWidth(REC_WIDTH);
@@ -289,18 +308,6 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
-		// Define the action when finish button is clicked
-		finish.setOnMouseClicked(e -> {		
-			if(engine.getEngineStatus() == EngineStatus.Crafting) {
-				postFinishMessage(ExceptionStatus.Craft_Failed);
-			}
-		});
-		
-		// Define the action when rearrange icon mapping button is clicked
-		iconRearr.setOnMouseClicked(e -> { 
-			emp = new EditModePane(this, engine);
-			emp.display();
-		});
 		
 		// Define the action when confirm button is clicked
 		confirm.setOnMouseClicked(e -> {
@@ -322,15 +329,37 @@ public class ViewManager
 			ch.display();
 		});
 		
+		// Define the action when advanced settings button is clicked
+		advanced.setOnMouseClicked(e -> {
+			asp = new AdvancedSettingsPane(t, this);
+			asp.display();
+		});
 		// Define the action when export logs button is clicked
 		logs.setOnMouseClicked(e -> {
 			exportLogs();
 		});
 		
-		// Define the action when advanced settings button is clicked
-		advanced.setOnMouseClicked(e -> {
-			asp = new AdvancedSettingsPane(t, this);
-			asp.display();
+
+		// Define the action when finish button is clicked
+		finish.setOnMouseClicked(e -> {		
+			if(engine.getEngineStatus() == EngineStatus.Crafting) {
+				postFinishMessage(ExceptionStatus.Craft_Failed);
+			}
+		});
+		
+		// Define the action when rearrange icon mapping button is clicked
+		iconRearr.setOnMouseClicked(e -> { 
+			emp = new EditModePane(this, engine);
+			emp.display();
+		});
+		
+		// Define the action when save / load config button is clicked
+		saveConfig.setOnMouseClicked(e -> {
+			cm.exportConfig();
+		});
+		
+		loadConfig.setOnMouseClicked(e -> {
+			cm.importConfig(true);
 		});
 		
 		int i = 0;
@@ -359,14 +388,17 @@ public class ViewManager
 		i++;
 		
 		gp.add(confirm, i, j);
-		gp.add(logs, i, j + 1);
-		gp.add(advanced, i, j + 2);
+		gp.add(advanced, i, j + 1);
+		gp.add(logs, i, j + 2);
 		i++;
 		
 		i++;
 		i++;
 		gp.add(finish, i, j);
 		gp.add(iconRearr, i, j + 1);
+		i++;
+		gp.add(loadConfig, i, j);
+		gp.add(saveConfig, i, j + 1);
 		i++;
 
 		// Draw the edge of the pane
@@ -903,6 +935,34 @@ public class ViewManager
 
 	public void setrControl(int rControl) {
 		this.rControl = rControl;
+		
+	}
+	
+	public int getCraftsmanship() {
+		return craftsmanship;
+	}
+
+	public void setCraftsmanship(int craftsmanship) {
+		this.craftsmanship = craftsmanship;
+		inputTf.get(0).setText(Integer.toString(craftsmanship));
+	}
+
+	public int getControl() {
+		return control;
+	}
+
+	public void setControl(int control) {
+		this.control = control;
+		inputTf.get(1).setText(Integer.toString(control));
+	}
+
+	public int getCP() {
+		return cp;
+	}
+	
+	public void setCP(int cp) {
+		this.cp = cp;
+		inputTf.get(2).setText(Integer.toString(cp));
 	}
 
 	public double getProgressDifference() {
@@ -952,4 +1012,10 @@ public class ViewManager
 	public void setSeed(long seed) {
 		this.seed = seed;
 	}
+
+	public ArrayList<TextField> getInputTf()
+	{
+		return inputTf;
+	}
+	
 }
