@@ -164,3 +164,10 @@ All notable changes to this project will be documented in this file.
 # [1.5.2-S]
 ## Changed
 - Changed the GCD animation to sudden appear
+
+# [1.5.3-S]
+## Added
+- Added random seed function
+
+## Changed
+- Now the effect of decreased of CP will be directly display by the skill costs
