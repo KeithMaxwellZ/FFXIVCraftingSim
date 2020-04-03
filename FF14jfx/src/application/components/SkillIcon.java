@@ -164,6 +164,8 @@ public class SkillIcon extends AnchorPane
 			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
+				vm.setLastSkill(sk);
+				vm.updateAll();
 				vm.postFinishMessage(e.es);
 			} else if (	e.es == ExceptionStatus.Not_HQ ||
 						e.es == ExceptionStatus.No_Inner_Quiet ||

@@ -768,6 +768,7 @@ public class ViewManager
 	 */
 	public void postFinishMessage(ExceptionStatus es) {
 		
+		// Update the CP cost (otherwise it might be halved)
 		Iterator<Node> iter = iconContainer.getChildren().iterator();
 		while(iter.hasNext()) {
 			SkillIcon si = (SkillIcon)iter.next();
