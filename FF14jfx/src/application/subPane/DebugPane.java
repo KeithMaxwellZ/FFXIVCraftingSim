@@ -54,7 +54,6 @@ public class DebugPane
 		scene = new Scene(mainPane, BOX_WIDTH, BOX_HEIGHT);
 		stage.setScene(scene);
 		stage.setTitle("²âÊÔÄ£Ê½");
-		
 		init();
 	}
 	
