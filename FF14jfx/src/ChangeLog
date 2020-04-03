@@ -171,3 +171,7 @@ All notable changes to this project will be documented in this file.
 
 ## Changed
 - Now the effect of decreased of CP will be directly display by the skill costs
+
+# [1.5.4-S]
+## Fixed
+- Fixed the issue that last skill is not properly on the turn which crafting is finished
