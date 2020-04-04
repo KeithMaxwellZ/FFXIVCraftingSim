@@ -214,3 +214,7 @@ All notable changes to this project will be documented in this file.
 
 ## Fixed 
 - Fixed the bug that the edit pane cannot be displayed
+
+# [1.6.0] 2020-04-05
+## Fixed
+- Fixed the issue that multiple setting pane can be open simultaneously
