@@ -105,7 +105,7 @@ public class Engine
 		setEnumEngine();		// Set the engine for all the enums
 		setRandom();			// Set the random generator for other classes
 		
-		CraftingStatus.setMode(m); // Set the crafting mode 
+		CraftingStatus.setMode(m); // set the crafting mode 
 		
 		addToLogs("Craftsmanship: " + craftsmanship);
 		addToLogs("Control: " + control);

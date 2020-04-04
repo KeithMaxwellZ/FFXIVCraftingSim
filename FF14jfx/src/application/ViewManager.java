@@ -57,9 +57,9 @@ import skills.SpecialSkills;
  */
 public class ViewManager
 {
-	private static final double WIDTH = 650; 			// The width of the scene 
+	private static final double WIDTH = 750; 			// The width of the scene 
 	private static final double HEIGHT = 690;			// The height of the scene 
-	private static final double REC_WIDTH = 580;		// Width of the panes
+	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
 	private static final double BAR_EDGE = 5.0;			// The width of progress and quality bars
@@ -69,7 +69,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.5.7-S";	// The version of the program
+	private static final String VERSION = "V1.5.8-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -148,6 +148,10 @@ public class ViewManager
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
+		tml.setOnFinished(e -> {
+			updateAll();
+		});
+		
 	}
 	
 	/**
