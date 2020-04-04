@@ -21,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -127,7 +128,8 @@ public class ViewManager
 	
 	public ViewManager() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-				rCraftsmanship, rControl, progressDifference, qualityDifference, ch, seed);
+				rCraftsmanship, rControl, progressDifference, 
+				qualityDifference, ch, seed, CraftingStatus.Mode.Expert);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -278,6 +280,12 @@ public class ViewManager
 
 		CheckBox GCDCb = new CheckBox("GCD");
 		
+		ChoiceBox<String> cb = new ChoiceBox<String>();
+		
+		cb.getItems().add("高难");
+		cb.getItems().add("普通");
+		cb.getItems().add("无");
+		
 		inputTf.add(craftTf);
 		inputTf.add(controlTf);
 		inputTf.add(CPTf);
@@ -300,13 +308,17 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
+		cb.setValue("高难");
 		
 		// Define the action when confirm button is clicked
 		confirm.setOnMouseClicked(e -> {
+			CraftingStatus.Mode m = null;
+			
 			usedDebug = false;
 			
 			ch.destory();
 			setLastSkill(null);
+			
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
@@ -314,10 +326,22 @@ public class ViewManager
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
 			ch = new CraftingHistoryPane(this);
-			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-					rCraftsmanship, rControl, progressDifference,qualityDifference, ch, seed);
-			// Creates a new engine to restart everything
 			hasGCD = GCDCb.isSelected();
+			
+			if(cb.getValue().equals(cb.getItems().get(0))) {
+				m = CraftingStatus.Mode.Expert;
+			} else if(cb.getValue().equals(cb.getItems().get(1))) {
+				m = CraftingStatus.Mode.Normal;
+			} else {
+				m = CraftingStatus.Mode.Testing;
+			}
+			
+			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+					rCraftsmanship, rControl, progressDifference, 
+					qualityDifference, ch, seed, m);
+			// Creates a new engine to restart everything
+			
+		
 			
 			SkillIcon.setVm(getEngine(), tml, this);
 			updateAll();
@@ -382,6 +406,7 @@ public class ViewManager
 		i++;
 
 		gp.add(GCDCb, i, j);
+		gp.add(cb, i, j + 2);
 		i++;
 		
 		gp.add(confirm, i, j);

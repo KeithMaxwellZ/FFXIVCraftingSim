@@ -65,7 +65,7 @@ public class Engine
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
 				double porgressDifference, double qualityDifference, CraftingHistoryPane ch, 
-				long seed) {
+				long seed, CraftingStatus.Mode m) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
 		this.totalCP = totalCP;
@@ -105,11 +105,14 @@ public class Engine
 		setEnumEngine();		// Set the engine for all the enums
 		setRandom();			// Set the random generator for other classes
 		
+		CraftingStatus.setMode(m); // Set the crafting mode 
+		
 		addToLogs("Craftsmanship: " + craftsmanship);
 		addToLogs("Control: " + control);
 		addToLogs("CP: " + totalCP);
 		addToLogs("Progress: " + totalProgress);
 		addToLogs("Quality: " + totalQUality);
+		addToLogs("Crafting Status Mode: " + m.toString());
 		addToLogs("=========================");
 	}
 	
@@ -312,8 +315,18 @@ public class Engine
 		double tempQualityRate = sk.getActualQualityRate();
 		
 		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
-		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * 
-								   (cs == CraftingStatus.HQ ? 1.5 : 1)) * tempQualityRate);
+		double statusBuff = 0;
+		if(cs == CraftingStatus.HQ) {
+			statusBuff = 1.5;
+		} else if(cs == CraftingStatus.MQ) {
+			statusBuff = 4.0;
+		} else if(cs == CraftingStatus.LQ) {
+			statusBuff = 0.5;
+		} else {
+			statusBuff = 1.0;
+		}
+		
+		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * statusBuff * tempQualityRate));
 		addToLogs("Progress Increase: " + tempProgressIncrease + " rate: " + tempProgressRate);
 		addToLogs("Quality Increase: " + tempQualityIncrease + " rate: " + tempQualityRate);
 		
