@@ -84,7 +84,12 @@ public class ConfigManager
 			vm.setControl(Integer.parseInt(pt.getProperty("control")));
 			vm.setCP(Integer.parseInt(pt.getProperty("CP")));
 			
-			emp.importCode(pt.getProperty("iconMapping"));
+			if(vm.getEngine().getEngineStatus() == EngineStatus.Crafting) {
+				
+			} else {
+				emp.importCode(pt.getProperty("iconMapping"));
+			}
+			
 			
 			al.setTitle("Íê³É");
 			al.setHeaderText(null);

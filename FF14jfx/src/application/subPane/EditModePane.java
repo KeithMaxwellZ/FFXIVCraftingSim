@@ -71,6 +71,7 @@ public class EditModePane
 		iconRearr.setOnMouseClicked(e -> {
 			if(engine.getEngineStatus() == EngineStatus.Crafting) {
 				vm.postInvalidMessage(ExceptionStatus.Now_Crafting);
+				return;
 			} else if(engine.getEngineStatus() == EngineStatus.Editing) {
 				engine.setEngineStatus(EngineStatus.Pending);
 				iconRearr.setText("编辑模式：关");
@@ -132,41 +133,50 @@ public class EditModePane
 		al.setTitle("提示");
 		al.setHeaderText("关于编辑模式");
 		TextArea  hintTf = new TextArea("点击选中一个空格/技能后，点击另一个即可交换他们的位置。" + '\n'
-				+ "下次是否继续显示此提示？");
+				+ "下次是否不再显示此提示？");
 		hintTf.setEditable(false);
 		hintTf.setWrapText(true);
 		al.getDialogPane().setExpanded(true);
 		al.getDialogPane().setExpandableContent(hintTf);
 		Optional<ButtonType> result = al.showAndWait();
 		if (result.get() == ButtonType.OK){
-		    userGuide = true;
-		} else {
 		    userGuide = false;
+		} else {
+		    userGuide = true;
 		}
 	}
 	
 	public void importCode(String s) {
-		String raw = s;
-		if(s.equals("")) {
-			TextInputDialog dialog = new TextInputDialog("");
-			dialog.setTitle("导入键位");
-			dialog.setHeaderText(null);
-			dialog.setContentText("请填入键位代码");
-		
-			Optional<String> result = dialog.showAndWait();
-			if (result.isPresent()){
-			    raw += result.get();
-			} 
-		}
-		try {
-			decode(raw);
-		} catch (CraftingException ce) {
-			Alert al = new Alert(AlertType.WARNING);
+		if(engine.getEngineStatus() == EngineStatus.Crafting) {
+			Alert alt = new Alert(AlertType.WARNING);
+			alt.setTitle("警告");
+			alt.setHeaderText(null);
+			alt.setContentText("请结束制作后再导入键位");
 			
-			al.setTitle("错误");
-			al.setContentText(ce.es.getMessage());
+			alt.showAndWait();
+		} else {
+			String raw = s;
+			if(s.equals("")) {
+				TextInputDialog dialog = new TextInputDialog("");
+				dialog.setTitle("导入键位");
+				dialog.setHeaderText(null);
+				dialog.setContentText("请填入键位代码");
 			
-			al.showAndWait();
+				Optional<String> result = dialog.showAndWait();
+				if (result.isPresent()){
+				    raw += result.get();
+				} 
+			}
+			try {
+				decode(raw);
+			} catch (CraftingException ce) {
+				Alert al = new Alert(AlertType.WARNING);
+				
+				al.setTitle("错误");
+				al.setContentText(ce.es.getMessage());
+				
+				al.showAndWait();
+			}
 		}
 	}
 	
@@ -241,8 +251,6 @@ public class EditModePane
 	}
 	
 	public void displayCode(String s) {
-		
-		
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane container = new GridPane();
 		TextArea logsOutput = new TextArea();

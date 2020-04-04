@@ -211,15 +211,7 @@ public class ViewManager
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
-			if(asp != null) {
-				asp.close();
-			}
-			if(ch != null) {
-				ch.close();
-			}
-			if(emp != null) {
-				emp.close();
-			}
+			closeSubPanes(true);
 		});
 	}
 	
@@ -326,9 +318,12 @@ public class ViewManager
 					rCraftsmanship, rControl, progressDifference,qualityDifference, ch, seed);
 			// Creates a new engine to restart everything
 			hasGCD = GCDCb.isSelected();
+			
 			SkillIcon.setVm(getEngine(), tml, this);
 			updateAll();
 			ch.display();
+			
+			closeSubPanes(false);
 		});
 		
 		// Define the action when advanced settings button is clicked
@@ -665,6 +660,20 @@ public class ViewManager
 		AnchorPane.setLeftAnchor(progress, (double)BAR_EDGE);
 			
 		return bar;
+	}
+	
+	private void closeSubPanes(boolean closeDisplayPane) {
+		if(asp != null) {
+			asp.close();
+		}
+		if(emp != null) {
+			emp.close();
+		}
+		if(closeDisplayPane) {
+			if(ch != null) {
+				ch.close();
+			}
+		}
 	}
 	
 	/**
