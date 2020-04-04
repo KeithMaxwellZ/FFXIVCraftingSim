@@ -1,4 +1,4 @@
-package application.components;
+package engine;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -7,14 +7,14 @@ import javafx.scene.paint.Color;
 
 public enum CraftingStatus
 {
-	Sturdy(  "顽丈      ", Color.BLUE),
-	Centered("安定      ", Color.YELLOW),
-	Pliant(  "高性能   ", Color.GREEN),
-	HQ(      "高品质   ", Color.RED),
-	Normal(  "通常      ", Color.WHITE),
+	Sturdy(  "顽丈      ", Color.BLUE, java.awt.Color.BLUE),
+	Centered("安定      ", Color.YELLOW, java.awt.Color.YELLOW),
+	Pliant(  "高性能   ", Color.GREEN, java.awt.Color.GREEN),
+	HQ(      "高品质   ", Color.RED, java.awt.Color.RED),
+	Normal(  "通常      ", Color.WHITE, java.awt.Color.WHITE),
 	
-	MQ(		 "最高品质", Color.FUCHSIA),
-	LQ(	 	 "低品质   ", Color.BLACK),
+	MQ(		 "最高品质", Color.FUCHSIA, new java.awt.Color(Integer.parseInt("FF00FF", 16))),
+	LQ(	 	 "低品质   ", Color.BLACK, java.awt.Color.BLACK),
 	;
 	
 	
@@ -45,9 +45,8 @@ public enum CraftingStatus
 	private static CraftingStatus lastStatus;
 	
 	private String name;
-	private Color color;
-	
-	
+	private Color fxColor;
+	private java.awt.Color awtColor;
 	
 	static {
 		r = new Random();
@@ -70,9 +69,10 @@ public enum CraftingStatus
 		normalCs.add(new Node(LQ, 0.015));
 	}
 	
-	private CraftingStatus(String name, Color color) {
-		this.setName(name);
-		this.setColor(color);
+	private CraftingStatus(String name, Color fxColor, java.awt.Color awtColor) {
+		this.name = name;
+		this.fxColor = fxColor;
+		this.awtColor = awtColor;
 	}
 	
 	public static CraftingStatus getNextStatus() {
@@ -133,14 +133,14 @@ public enum CraftingStatus
 		this.name = name;
 	}
 
-	public Color getColor()
+	public Color getFxColor()
 	{
-		return color;
+		return fxColor;
 	}
-
-	public void setColor(Color color)
+	
+	public java.awt.Color getAwtColor()
 	{
-		this.color = color;
+		return awtColor;
 	}
 	
 	public static void setMode(Mode m) {

@@ -3,10 +3,10 @@ package application.subPane;
 import java.util.Iterator;
 import java.util.Optional;
 
-import application.Engine;
-import application.ViewManager;
-import application.components.EngineStatus;
+import application.ViewManagerPC;
 import application.components.SkillIcon;
+import engine.Engine;
+import engine.EngineStatus;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import javafx.scene.Node;
@@ -42,12 +42,12 @@ public class EditModePane
 	private Button exportSettings;
 	private Button importSettings;
 	
-	private ViewManager vm;
+	private ViewManagerPC vm;
 	private Engine engine;
 	
 	private boolean userGuide = true;
 	
-	public EditModePane(ViewManager vm, Engine engine) {
+	public EditModePane(ViewManagerPC vm, Engine engine) {
 		this.vm = vm;
 		this.engine = engine;
 		

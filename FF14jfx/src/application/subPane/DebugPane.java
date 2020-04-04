@@ -2,10 +2,10 @@ package application.subPane;
 
 import java.util.ArrayList;
 
-import application.ViewManager;
-import application.components.CraftingStatus;
-import application.components.CraftingStatus.Node;
-import application.components.EngineStatus;
+import application.ViewManagerPC;
+import engine.CraftingStatus;
+import engine.EngineStatus;
+import engine.CraftingStatus.Node;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -29,11 +29,11 @@ public class DebugPane
 	private Button HQB;
 	private Button NormalB;
 	
-	ViewManager vm;
+	ViewManagerPC vm;
 	
 	private ArrayList<Button> buttons;
 	
-	public DebugPane(ViewManager vm) {
+	public DebugPane(ViewManagerPC vm) {
 		this.vm = vm;
 		
 		buttons = new ArrayList<>();
@@ -56,6 +56,7 @@ public class DebugPane
 		stage.setScene(scene);
 		stage.setTitle("²âÊÔÄ£Ê½");
 		init();
+		
 	}
 	
 	private void init() {
@@ -74,7 +75,7 @@ public class DebugPane
 			b.setPrefHeight(BUTTON_HEIGHT);
 			
 			b.setText(n.getCs().getName());
-			b.setTextFill(n.getCs().getColor());
+			b.setTextFill(n.getCs().getFxColor());
 			b.setOnMouseClicked(e -> {
 				if(vm.getEngine().getEngineStatus() == EngineStatus.Crafting) {
 					vm.setUsedDebug(true);
@@ -93,5 +94,9 @@ public class DebugPane
 	
 	public void display() {
 		stage.show();
+	}
+	
+	public void close() {
+		stage.close();
 	}
 }

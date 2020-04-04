@@ -1,7 +1,8 @@
 package application.components;
 
-import application.Engine;
-import application.ViewManager;
+import application.ViewManagerPC;
+import engine.Engine;
+import engine.EngineStatus;
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import javafx.animation.KeyFrame;
@@ -23,7 +24,7 @@ import skills.Skill;
 public class SkillIcon extends AnchorPane
 {
 	private static Engine engine;
-	private static ViewManager vm;
+	private static ViewManagerPC vm;
 	private static Timeline tml;
 
 	private static SkillIcon icon1;
@@ -46,7 +47,7 @@ public class SkillIcon extends AnchorPane
 	private int[] pos;
 	
 	
-	public SkillIcon(Skill s, Timeline tml, ViewManager vm) {
+	public SkillIcon(Skill s, Timeline tml, ViewManagerPC vm) {
 		this.s = s;
 		
 		b = new Button();
@@ -202,7 +203,7 @@ public class SkillIcon extends AnchorPane
 		
 	}
 	
-	public static void setVm(Engine e, Timeline timeLine, ViewManager viewManager) {
+	public static void setVm(Engine e, Timeline timeLine, ViewManagerPC viewManager) {
 		engine = e;		
 		tml = timeLine;
 		vm = viewManager;

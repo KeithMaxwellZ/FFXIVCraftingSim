@@ -10,9 +10,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Properties;
 
-import application.Engine;
-import application.ViewManager;
+import application.ViewManagerPC;
 import application.subPane.EditModePane;
+import engine.Engine;
+import engine.EngineStatus;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
@@ -21,9 +22,9 @@ public class ConfigManager
 {
 	private static final String CONFIG_NAME = "Config"; // property file name
 	
-	ViewManager vm;
+	ViewManagerPC vm;
 	Engine engine;
-	public ConfigManager(ViewManager vm, Engine engine) {
+	public ConfigManager(ViewManagerPC vm, Engine engine) {
 		this.vm = vm;
 		this.engine = engine;
 	}
