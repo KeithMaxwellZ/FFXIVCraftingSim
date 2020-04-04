@@ -19,13 +19,17 @@ public enum CraftingStatus
 	
 	
 	
-	static class Node {
-		CraftingStatus cs;
-		double probability;
+	public static class Node {
+		private CraftingStatus cs;
+		private double probability;
 		
 		private Node(CraftingStatus cs, double probability) {
 			this.cs = cs;
 			this.probability = probability;
+		}
+		
+		public CraftingStatus getCs() {
+			return cs;
 		}
 	}
 	
@@ -141,6 +145,18 @@ public enum CraftingStatus
 	
 	public static void setMode(Mode m) {
 		mode = m;
+	}
+	
+	public static ArrayList<Node> getList() {
+		if(mode == Mode.Expert) {
+			return expertCs;
+		} else if(mode == Mode.Normal) {
+			return normalCs;
+		} else {
+			ArrayList<Node> al = new ArrayList<CraftingStatus.Node>();
+			al.add(new Node(Normal, 1.0));
+			return al;
+		}
 	}
 }
 

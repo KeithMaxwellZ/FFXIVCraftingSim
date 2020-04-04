@@ -69,7 +69,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.5.8-S";	// The version of the program
+	private static final String VERSION = "V1.5.9-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -374,7 +374,10 @@ public class ViewManager
 		
 		// Define the action when rearrange icon mapping button is clicked
 		iconRearr.setOnMouseClicked(e -> { 
-			emp = new EditModePane(this, getEngine());
+			if(emp == null) {
+				emp = new EditModePane(this, getEngine());
+			} 
+			emp.setEngine(getEngine());
 			emp.display();
 		});
 		

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import application.ViewManager;
 import application.components.CraftingStatus;
+import application.components.CraftingStatus.Node;
 import application.components.EngineStatus;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -66,18 +67,18 @@ public class DebugPane
 		
 		buttonContainer.setVgap(10.0);
 		
-		for(CraftingStatus cs: CraftingStatus.values()) {
+		for(Node n: CraftingStatus.getList()) {
 			Button b = buttons.get(i);
 			
 			b.setPrefWidth(BOX_WIDTH - SIDE_MARGIN);
 			b.setPrefHeight(BUTTON_HEIGHT);
 			
-			b.setText(cs.getName());
-			b.setTextFill(cs.getColor());
+			b.setText(n.getCs().getName());
+			b.setTextFill(n.getCs().getColor());
 			b.setOnMouseClicked(e -> {
 				if(vm.getEngine().getEngineStatus() == EngineStatus.Crafting) {
 					vm.setUsedDebug(true);
-					vm.getEngine().setCraftingStatus(cs);
+					vm.getEngine().setCraftingStatus(n.getCs());
 					vm.updateStatus();
 				}
 			});

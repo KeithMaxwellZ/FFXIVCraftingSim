@@ -201,3 +201,14 @@ All notable changes to this project will be documented in this file.
 # [1.5.8-S] 2020-04-04
 ## Changed
 - Now all info update is after the GCD animation
+
+# [1.5.9-S] 2020-04-04
+## Fixed 
+- Fixed the bug that when there's no GCD the information won't update
+
+# [1.5.10-S] 2020-04-04
+## Changed
+- Added download source from gitee
+
+## Fixed 
+- Fixed the bug that the edit pane cannot be displayed
