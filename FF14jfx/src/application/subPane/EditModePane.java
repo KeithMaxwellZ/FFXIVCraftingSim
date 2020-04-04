@@ -284,4 +284,8 @@ public class EditModePane
 	public void close() {
 		emStage.close();
 	}
+	
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
 }

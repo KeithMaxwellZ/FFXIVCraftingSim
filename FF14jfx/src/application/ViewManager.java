@@ -374,7 +374,10 @@ public class ViewManager
 		
 		// Define the action when rearrange icon mapping button is clicked
 		iconRearr.setOnMouseClicked(e -> { 
-			emp = new EditModePane(this, getEngine());
+			if(emp == null) {
+				emp = new EditModePane(this, getEngine());
+			} 
+			emp.setEngine(getEngine());
 			emp.display();
 		});
 		
