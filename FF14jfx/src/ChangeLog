@@ -1,7 +1,12 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-# [Pending] 
+
+# [Pending]
+
+
+## Changed
+- Changed interaction logic
 
 # [0.2.0] 2020-03-30
 ## Added
@@ -189,3 +194,8 @@ All notable changes to this project will be documented in this file.
 # Added
 - Added finish notification after successfully import / export config
 - Added debug pane in advanced options
+
+# [1.5.7-S] 2020-04-04
+## Added 
+- Added Normal mode and Testing mode
+
