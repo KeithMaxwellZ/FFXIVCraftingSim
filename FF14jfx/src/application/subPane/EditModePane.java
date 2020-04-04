@@ -63,7 +63,7 @@ public class EditModePane
 	}
 	
 	private void initDisplay() {
-		emStage.setTitle("±à¼­²Ëµ¥");
+		emStage.setTitle("±à¼­¼üÎ»");
 		emStage.setScene(emScene);
 		
 		iconRearr.setPrefWidth(BUTTON_WIDTH);
