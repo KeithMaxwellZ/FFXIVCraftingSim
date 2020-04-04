@@ -3,7 +3,6 @@ package application;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 import application.components.ConfigManager;
 import application.components.CraftingStatus;
@@ -22,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -57,9 +57,9 @@ import skills.SpecialSkills;
  */
 public class ViewManager
 {
-	private static final double WIDTH = 650; 			// The width of the scene 
+	private static final double WIDTH = 750; 			// The width of the scene 
 	private static final double HEIGHT = 690;			// The height of the scene 
-	private static final double REC_WIDTH = 580;		// Width of the panes
+	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
 	private static final double BAR_EDGE = 5.0;			// The width of progress and quality bars
@@ -69,7 +69,7 @@ public class ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.5.5-S";	// The version of the program
+	private static final String VERSION = "V1.5.8-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -104,6 +104,7 @@ public class ViewManager
 	private long seed = 0;
 	
 	private boolean hasGCD = true;				// GCD mode
+	private boolean usedDebug = false;
 
 	private Skill lastSkill = null;				// Store the last skill used
 	
@@ -127,14 +128,15 @@ public class ViewManager
 	
 	public ViewManager() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-				rCraftsmanship, rControl, progressDifference, qualityDifference, ch, seed);
+				rCraftsmanship, rControl, progressDifference, 
+				qualityDifference, ch, seed, CraftingStatus.Mode.Expert);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
 		skillIcons = new ArrayList<>();
 		inputTf = new ArrayList<>();
 		
-		cm = new ConfigManager(this, engine);
+		cm = new ConfigManager(this, getEngine());
 		
 		tm.startTimer();
 				
@@ -146,6 +148,10 @@ public class ViewManager
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
+		tml.setOnFinished(e -> {
+			updateAll();
+		});
+		
 	}
 	
 	/**
@@ -211,15 +217,7 @@ public class ViewManager
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
-			if(asp != null) {
-				asp.close();
-			}
-			if(ch != null) {
-				ch.close();
-			}
-			if(emp != null) {
-				emp.close();
-			}
+			closeSubPanes(true);
 		});
 	}
 	
@@ -247,7 +245,7 @@ public class ViewManager
 		AnchorPane.setTopAnchor(mainContainer, 30.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
-		engine.setEngineStatus(EngineStatus.Pending);
+		getEngine().setEngineStatus(EngineStatus.Pending);
 	}
 	
 	/**
@@ -286,6 +284,12 @@ public class ViewManager
 
 		CheckBox GCDCb = new CheckBox("GCD");
 		
+		ChoiceBox<String> cb = new ChoiceBox<String>();
+		
+		cb.getItems().add("高难");
+		cb.getItems().add("普通");
+		cb.getItems().add("无");
+		
 		inputTf.add(craftTf);
 		inputTf.add(controlTf);
 		inputTf.add(CPTf);
@@ -308,11 +312,17 @@ public class ViewManager
 		totalQltyTf.setPrefWidth(tfWidth);
 		totalDuraTf.setPrefWidth(tfWidth);
 
+		cb.setValue("高难");
 		
 		// Define the action when confirm button is clicked
 		confirm.setOnMouseClicked(e -> {
+			CraftingStatus.Mode m = null;
+			
+			usedDebug = false;
+			
 			ch.destory();
 			setLastSkill(null);
+			
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
@@ -320,13 +330,28 @@ public class ViewManager
 			tProg = Integer.parseInt(totalProgTf.getText()); 
 			tQlty = Integer.parseInt(totalQltyTf.getText());
 			ch = new CraftingHistoryPane(this);
-			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
-					rCraftsmanship, rControl, progressDifference,qualityDifference, ch, seed);
-			// Creates a new engine to restart everything
 			hasGCD = GCDCb.isSelected();
-			SkillIcon.setVm(engine, tml, this);
+			
+			if(cb.getValue().equals(cb.getItems().get(0))) {
+				m = CraftingStatus.Mode.Expert;
+			} else if(cb.getValue().equals(cb.getItems().get(1))) {
+				m = CraftingStatus.Mode.Normal;
+			} else {
+				m = CraftingStatus.Mode.Testing;
+			}
+			
+			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+					rCraftsmanship, rControl, progressDifference, 
+					qualityDifference, ch, seed, m);
+			// Creates a new engine to restart everything
+			
+		
+			
+			SkillIcon.setVm(getEngine(), tml, this);
 			updateAll();
 			ch.display();
+			
+			closeSubPanes(false);
 		});
 		
 		// Define the action when advanced settings button is clicked
@@ -342,14 +367,14 @@ public class ViewManager
 
 		// Define the action when finish button is clicked
 		finish.setOnMouseClicked(e -> {		
-			if(engine.getEngineStatus() == EngineStatus.Crafting) {
+			if(getEngine().getEngineStatus() == EngineStatus.Crafting) {
 				postFinishMessage(ExceptionStatus.Craft_Failed);
 			}
 		});
 		
 		// Define the action when rearrange icon mapping button is clicked
 		iconRearr.setOnMouseClicked(e -> { 
-			emp = new EditModePane(this, engine);
+			emp = new EditModePane(this, getEngine());
 			emp.display();
 		});
 		
@@ -385,6 +410,7 @@ public class ViewManager
 		i++;
 
 		gp.add(GCDCb, i, j);
+		gp.add(cb, i, j + 2);
 		i++;
 		
 		gp.add(confirm, i, j);
@@ -435,12 +461,12 @@ public class ViewManager
 		GridPane container = new GridPane();
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
-		Text progressText = new Text(engine.presentProgress + "/" + engine.totalProgress);
-		Text qualityText = new Text(engine.presentQuality + "/" + engine.totalQuality);
+		Text progressText = new Text(getEngine().presentProgress + "/" + getEngine().totalProgress);
+		Text qualityText = new Text(getEngine().presentQuality + "/" + getEngine().totalQuality);
 		ArrayList<Text> t = new ArrayList<Text>();
 		
-		durabilityText = new Text("耐久:  " + engine.presentDurability + "/" + engine.totalDurability);
-		round = new Text("工次:  " + engine.getRound());
+		durabilityText = new Text("耐久:  " + getEngine().presentDurability + "/" + getEngine().totalDurability);
+		round = new Text("工次:  " + getEngine().getRound());
 		
 		progText.add(progressText);
 		progText.add(qualityText);
@@ -479,7 +505,7 @@ public class ViewManager
 		HBox container = new HBox();
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
 		Text status = new Text("  通常     ");
-		Text cpVal = new Text(engine.presentCP + "/" + engine.totalCP);
+		Text cpVal = new Text(getEngine().presentCP + "/" + getEngine().totalCP);
 		Text success = new Text("");
 		Text cp = new Text("CP");
 		ArrayList<Text> t = new ArrayList<Text>();
@@ -525,8 +551,8 @@ public class ViewManager
 		lastSkillAp.setPrefSize(40.0, 40.0);
 		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
 
-		efficiencyDisp.setText("  100%效率下的进展: " + engine.getBaseProgEff() + 
-							" | 100%效率下的品质: " + engine.getBaseQltyEff());
+		efficiencyDisp.setText("  100%效率下的进展: " + getEngine().getBaseProgEff() + 
+							" | 100%效率下的品质: " + getEngine().getBaseQltyEff());
 		
 		container.setAlignment(Pos.CENTER);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
@@ -610,7 +636,7 @@ public class ViewManager
 	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
 		int j = 1;
 		for(Skill s: skl) {
-			engine.addToLogs(s.toString() + ": " + s.getAddress());;
+			getEngine().addToLogs(s.toString() + ": " + s.getAddress());;
 			
 			SkillIcon si = new SkillIcon(s, tml, this);
 			skillIcons.add(si);
@@ -625,7 +651,7 @@ public class ViewManager
 			gp.add(si, j, i);
 		}
 		
-		SkillIcon.setVm(engine, tml, this);
+		SkillIcon.setVm(getEngine(), tml, this);
 
 		return;
 	}
@@ -665,6 +691,20 @@ public class ViewManager
 		return bar;
 	}
 	
+	private void closeSubPanes(boolean closeDisplayPane) {
+		if(asp != null) {
+			asp.close();
+		}
+		if(emp != null) {
+			emp.close();
+		}
+		if(closeDisplayPane) {
+			if(ch != null) {
+				ch.close();
+			}
+		}
+	}
+	
 	/**
 	 * Updates all the displays
 	 */
@@ -682,47 +722,47 @@ public class ViewManager
 	}
 	
 	public void updateProgress() {
-		progText.get(0).setText(engine.presentProgress + "/" + engine.totalProgress);
-		if(engine.presentProgress>=engine.totalProgress) {
+		progText.get(0).setText(getEngine().presentProgress + "/" + getEngine().totalProgress);
+		if(getEngine().presentProgress>=getEngine().totalProgress) {
 			bars.get(0).setWidth(BAR_WIDTH);
 		} else {
-			bars.get(0).setWidth((double)engine.presentProgress/engine.totalProgress*BAR_WIDTH);
+			bars.get(0).setWidth((double)getEngine().presentProgress/getEngine().totalProgress*BAR_WIDTH);
 		}	}
 	
 	public void updateQuality() {
-		progText.get(1).setText(engine.presentQuality + "/" + engine.totalQuality);
-		if(engine.presentQuality>=engine.totalQuality) {
+		progText.get(1).setText(getEngine().presentQuality + "/" + getEngine().totalQuality);
+		if(getEngine().presentQuality>=getEngine().totalQuality) {
 			bars.get(1).setWidth(BAR_WIDTH);
 		} else {
-			bars.get(1).setWidth((double)engine.presentQuality/engine.totalQuality*BAR_WIDTH);
+			bars.get(1).setWidth((double)getEngine().presentQuality/getEngine().totalQuality*BAR_WIDTH);
 		}
 	}
 	
 	public void updateCP() {
-		progText.get(2).setText(engine.presentCP + "/" + engine.totalCP);
-		if(engine.presentCP>=engine.totalCP) {
+		progText.get(2).setText(getEngine().presentCP + "/" + getEngine().totalCP);
+		if(getEngine().presentCP>=getEngine().totalCP) {
 			bars.get(2).setWidth(CP_WIDTH);
 		} else {
-			bars.get(2).setWidth((double)engine.presentCP/engine.totalCP*CP_WIDTH);
+			bars.get(2).setWidth((double)getEngine().presentCP/getEngine().totalCP*CP_WIDTH);
 		}
 	}
 	
 	public void updateDur() {
-		engine.addToLogs("Present dur: " + engine.presentDurability);
-		durabilityText.setText("耐久:  " + engine.presentDurability+ "/" + engine.totalDurability);
-		round.setText("工次:  " + engine.getRound());;
+		getEngine().addToLogs("Present dur: " + getEngine().presentDurability);
+		durabilityText.setText("耐久:  " + getEngine().presentDurability+ "/" + getEngine().totalDurability);
+		round.setText("工次:  " + getEngine().getRound());;
 		
 	}
 	
 	public void updateEffDisp() {
-		efficiencyDisp.setText("  100%效率下的进展: " + engine.getBaseProgEff() + 
-							" | 100%效率下的品质: " + engine.getBaseQltyEff());
+		efficiencyDisp.setText("  100%效率下的进展: " + getEngine().getBaseProgEff() + 
+							" | 100%效率下的品质: " + getEngine().getBaseQltyEff());
 	}
 	
 	public void updateSuccess() {
 		Text t = progText.get(4);
 		
-		if(engine.success) {
+		if(getEngine().success) {
 			t.setText("Success!");
 			t.setFill(Color.GREEN);
 		} else {
@@ -746,8 +786,8 @@ public class ViewManager
 		buffText.setFill(TEXT_COLOR);
 		buffContainer.getChildren().add(buffText);
 		
-		for(ActiveBuff ab: engine.activeBuffs) {
-			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
+		for(ActiveBuff ab: getEngine().activeBuffs) {
+			getEngine().addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
 			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = null;
@@ -784,7 +824,7 @@ public class ViewManager
 			SkillIcon si = (SkillIcon)iter.next();
 			if(si.getSkill()!=null) {
 				int i = si.getSkill().getCPCost();
-				i = (engine.getCraftingStatus() == CraftingStatus.Pliant ? (i+1)/2 : i);
+				i = (getEngine().getCraftingStatus() == CraftingStatus.Pliant ? (i+1)/2 : i);
 				if(i!=0) {
 					si.setCostText(Integer.toString(i));
 				} else {
@@ -816,30 +856,36 @@ public class ViewManager
 		
 		Alert al = new Alert(AlertType.INFORMATION);
 		GridPane gp = new GridPane();
+		Text DebugMode = new Text(usedDebug ? "使用过Debug" : "");
 		Text GCDMode = new Text("GCD: " + (getHasGCD() ? "开启" : "关闭"));
-		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
-		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
+		Text runTime = new Text("总用时:  " + Double.toString(getEngine().getRuntime()) + "秒");
+		Text val = new Text("收藏价值:  " + getEngine().getPresentQuality() / 10);
 		
 		updateAll(); // update before taking summary
 		
-		engine.setEngineStatus(EngineStatus.Pending);;
-		engine.addToLogs("========= Summary =========");
-		engine.addToLogs("Status: " + es.toString());
-		engine.addToLogs("Total time: " + engine.getRuntime());
-		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
-		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("===========================");
+		getEngine().setEngineStatus(EngineStatus.Pending);;
+		getEngine().addToLogs("========= Summary =========");
+		getEngine().addToLogs("Used Debug: " + usedDebug);
+		getEngine().addToLogs("Has GCD: " + hasGCD);
+		getEngine().addToLogs("Status: " + es.toString());
+		getEngine().addToLogs("Total time: " + getEngine().getRuntime());
+		getEngine().addToLogs("Value: " + (getEngine().getPresentQuality() / 10));
+		getEngine().addToLogs("Skill Points: " + getEngine().SPCalc());
+		getEngine().addToLogs("===========================");
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
 		
 		int i = 0;
+		if(usedDebug) {
+			gp.add(DebugMode, 0, i++);
+		}
 		gp.add(GCDMode, 0, i++);
 		gp.add(runTime, 0, i++);
 		gp.add(val, 0, i++);
 		
 		if(es == ExceptionStatus.Craft_Success) {		
-			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
+			Text SP = new Text("技巧点数(暂译):  " + getEngine().SPCalc());
 			gp.add(SP, 0, i++);	
 		}
 		
@@ -886,7 +932,7 @@ public class ViewManager
 		logsOutput.setEditable(false);
 		logsOutput.setWrapText(false);
 		
-		for(String s: engine.getLogs()) {
+		for(String s: getEngine().getLogs()) {
 			System.out.println(s);
 			logsOutput.setText(logsOutput.getText() + "\n" + s);
 		}
@@ -1016,6 +1062,15 @@ public class ViewManager
 	public ArrayList<TextField> getInputTf()
 	{
 		return inputTf;
+	}
+
+	public Engine getEngine()
+	{
+		return engine;
+	}
+	
+	public void setUsedDebug(boolean b) {
+		this.usedDebug = b;
 	}
 	
 }

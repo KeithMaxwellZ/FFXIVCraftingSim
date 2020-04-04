@@ -69,6 +69,7 @@ public class AdvancedSettingsPane
 	private void initDisplay() {
 		GridPane gp = new GridPane();
 		Button b = new Button("确认");
+		Button debugMode = new Button("测试模式");
 		
 		rCraftTf.setPrefWidth(TEXEFIELD_WIDTH);
 		rControlTf.setPrefWidth(TEXEFIELD_WIDTH);
@@ -83,6 +84,7 @@ public class AdvancedSettingsPane
 		int j = 0;
 		gp.add(rCraftT, i, j);
 		gp.add(rCraftTf, i + 1, j);
+		gp.add(debugMode, i + 2, j);
 		j++;
 		
 		gp.add(rControlT, i, j);
@@ -117,6 +119,11 @@ public class AdvancedSettingsPane
 			vm.setSeed(Long.parseLong(seedTf.getText()));
 			
 			boxStage.close();
+		});
+		
+		debugMode.setOnMouseClicked(e -> {
+			DebugPane dp = new DebugPane(vm); 
+			dp.display();
 		});
 		
 		mainBoxPane.add(gp, 0, 0);

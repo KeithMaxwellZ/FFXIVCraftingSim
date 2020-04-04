@@ -180,7 +180,7 @@ public class SkillIcon extends AnchorPane
 			}
 		} finally {
 			if(engine.getEngineStatus() == EngineStatus.Crafting) {
-				vm.updateAll();
+				// do nothing
 			}
 		}
 	}
