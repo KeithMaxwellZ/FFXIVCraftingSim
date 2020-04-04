@@ -2,8 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-# [Pending]
-
+# [Pending] 
 
 ## Changed
 - Changed interaction logic
@@ -199,3 +198,6 @@ All notable changes to this project will be documented in this file.
 ## Added 
 - Added Normal mode and Testing mode
 
+# [1.5.8-S] 2020-04-04
+## Changed
+- Now all info update is after the GCD animation
