@@ -151,7 +151,7 @@
 			<fx:resources refid="appRes"/>
 	
 			<manifest>
-				<attribute name="Implementation-Vendor" value="KZ"/>
+				<attribute name="Implementation-Vendor" value="KMW"/>
 				<attribute name="Implementation-Title" value="FF14 Crafting Simulator"/>
 				<attribute name="Implementation-Version" value="1.0.0"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
