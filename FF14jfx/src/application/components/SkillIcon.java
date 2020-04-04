@@ -161,6 +161,8 @@ public class SkillIcon extends AnchorPane
 			vm.setLastSkill(sk);
 			if(vm.getHasGCD()) {
 				tml.play();
+			} else {
+				vm.updateAll();
 			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
