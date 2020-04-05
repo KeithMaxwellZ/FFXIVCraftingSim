@@ -7,14 +7,14 @@ import javafx.scene.paint.Color;
 
 public enum CraftingStatus
 {
-	Sturdy(  "顽丈      ", Color.BLUE, java.awt.Color.BLUE),
-	Centered("安定      ", Color.YELLOW, java.awt.Color.YELLOW),
-	Pliant(  "高性能   ", Color.GREEN, java.awt.Color.GREEN),
-	HQ(      "高品质   ", Color.RED, java.awt.Color.RED),
-	Normal(  "通常      ", Color.WHITE, java.awt.Color.WHITE),
+	Sturdy(  "顽丈　　", Color.BLUE, java.awt.Color.BLUE),
+	Centered("安定　　", Color.YELLOW, java.awt.Color.YELLOW),
+	Pliant(  "高性能　", Color.GREEN, java.awt.Color.GREEN),
+	HQ(      "高品质　", Color.RED, java.awt.Color.RED),
+	Normal(  "通常　　", Color.WHITE, java.awt.Color.WHITE),
 	
 	MQ(		 "最高品质", Color.FUCHSIA, new java.awt.Color(Integer.parseInt("FF00FF", 16))),
-	LQ(	 	 "低品质   ", Color.BLACK, java.awt.Color.BLACK),
+	LQ(	 	 "低品质　", Color.BLACK, java.awt.Color.BLACK),
 	;
 	
 	

@@ -59,7 +59,7 @@ import skills.SpecialSkills;
 public class ViewManagerPC extends ViewManager
 {
 	private static final double WIDTH = 750; 			// The width of the scene 
-	private static final double HEIGHT = 695;			// The height of the scene 
+	private static final double HEIGHT = 700;			// The height of the scene 
 	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
@@ -468,7 +468,7 @@ public class ViewManagerPC extends ViewManager
 		
 		GridPane lb = new GridPane();
 		GridPane rt = new GridPane();
-		Text status = new Text("通常");
+		Text status = new Text("通常　　");
 		status.setFill(Color.WHITE);
 		statusDisp = new Circle(10, Color.WHITE);
 		
@@ -556,7 +556,9 @@ public class ViewManagerPC extends ViewManager
 		Text cp = new Text("CP");
 		ArrayList<Text> t = new ArrayList<Text>();
 
-		success.setFill(Color.LIGHTGRAY);
+		
+//		success.setFill(Color.rgb(48, 48, 48));
+		success.setFont(Font.font(15));
 		
 		container.setAlignment(Pos.CENTER);
 		
@@ -571,7 +573,6 @@ public class ViewManagerPC extends ViewManager
 		container.setLayoutX(10);
 		
 		t.add(cpVal);
-		t.add(success);
 		t.add(cp);
 		
 		for(Text tx: t) {
@@ -620,15 +621,19 @@ public class ViewManagerPC extends ViewManager
 		Text line1 = new Text("   100%效率下的进展: " + getEngine().getBaseProgEff());
 		Text line2 = new Text("   100%效率下的品质: " + getEngine().getBaseQltyEff());
 		
-		lastSkillAp.setPrefSize(40.0, 40.0);
-		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
+		lastSkillAp.setPrefSize(39.0, 39.0);
+		lastSkillAp.setMaxSize(39.0, 39.0);
+		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
+		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
 		
 		efficiencyDisp.add(line1, 0, 0);
 		efficiencyDisp.add(line2, 0, 1);
 		
 		efficiencyDisp.setVgap(8.0);
 		
-		container.setAlignment(Pos.CENTER);
+		container.setMinWidth(REC_WIDTH - 32.0);
+		container.setAlignment(Pos.CENTER_LEFT);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
 		
 		t.add(lastSkillT);
@@ -642,10 +647,12 @@ public class ViewManagerPC extends ViewManager
 //		container.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
 		GridPane ap = new GridPane();
 		ap.add(container, 0, 0);
-		GridPane.setMargin(container, new Insets(10.0));
+		GridPane.setMargin(container, new Insets(2.0));
 		
-		ap.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
-		container.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+		ap.setBackground(new Background(
+				new BackgroundFill(Color.rgb(0, 195, 249), new CornerRadii(5.0), null)));
+		container.setBackground(new Background(
+				new BackgroundFill(Color.rgb(30, 24, 30), new CornerRadii(5.0), null)));
 		
 		return ap;
 	}
@@ -660,6 +667,8 @@ public class ViewManagerPC extends ViewManager
 		buffContainer.setPrefHeight(32.0);
 		
 		buffContainer.getChildren().add(buffText);
+		
+		buffContainer.setMinHeight(40.0);
 		
 		buffText.setFont(Font.font(15.0));
 		buffText.setFill(Color.WHITE);
@@ -686,7 +695,7 @@ public class ViewManagerPC extends ViewManager
 		
 		skillContainer.add(iconContainer, 0, 2);
 				
-		
+		skillDescription.setFill(Color.WHITE);
 		iconContainer.setHgap(5);
 		
 		int i = 2; // Makes it easier to code (easier to copy and paste)
@@ -701,9 +710,9 @@ public class ViewManagerPC extends ViewManager
 		skillContainer.setPrefSize(REC_WIDTH, SKILL_HEIGHT);
 		
 		border.setBackground(new Background(
-				new BackgroundFill(Color.SILVER, new CornerRadii(5.0), null)));
+				new BackgroundFill(Color.WHITE, new CornerRadii(5.0), null)));
 		skillContainer.setBackground(new Background(
-				new BackgroundFill(Color.AZURE, new CornerRadii(5.0), null)));
+				new BackgroundFill(Color.rgb(35, 35, 35), new CornerRadii(5.0), null)));
 		
 		
 		
@@ -865,11 +874,10 @@ public class ViewManagerPC extends ViewManager
 			t.setFill(Color.RED);
 		}
 		
-		t.setFont(Font.font(20));
 	}
 	
 	public void updateStatus() {
-		progText.get(2).setText("  " + engine.getCraftingStatus().getName());
+		progText.get(2).setText(engine.getCraftingStatus().getName());
 		progText.get(2).setFill(engine.getCraftingStatus().getFxColor());
 		statusDisp.setFill(engine.getCraftingStatus().getFxColor());
 	}
@@ -877,8 +885,9 @@ public class ViewManagerPC extends ViewManager
 	public void updateBuffDIsp() {
 		Text buffText = new Text("  Buff:");
 		
+		buffText.setFill(Color.WHITE);
+		
 		buffContainer.getChildren().clear();
-		buffText.setFill(TEXT_COLOR);
 		buffContainer.getChildren().add(buffText);
 		
 		for(ActiveBuff ab: getEngine().getActiveBuffs()) {
@@ -893,12 +902,13 @@ public class ViewManagerPC extends ViewManager
 				iv = new ImageView(new Image(ab.buff.getAddress(), true));
 			}
 			Text remaining = new Text(Integer.toString(ab.getRemaining()));
+			remaining.setFill(Color.WHITE);
 			
 			ap.getChildren().add(iv);
 			ap.getChildren().add(remaining);
 
 			buffContainer.getChildren().add(ap);
-			
+			HBox.setMargin(ap, new Insets(5.0, 0.0, 5.0, 0.0));
 		}
 	}
 	
