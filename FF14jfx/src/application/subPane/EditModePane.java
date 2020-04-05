@@ -43,6 +43,7 @@ public class EditModePane
 	private Button importSettings;
 	
 	private ViewManagerPC vm;
+	private HotkeyBindingPane hbp;
 	private Engine engine;
 	
 	private boolean userGuide = true;
@@ -82,6 +83,11 @@ public class EditModePane
 			if(userGuide) {
 				displayGuide();
 			}
+			
+			if(hbp == null) {
+				hbp = new HotkeyBindingPane(vm, this);
+			}
+			hbp.display();
 		});
 		
 		exportSettings.setPrefWidth(BUTTON_WIDTH);
@@ -116,6 +122,10 @@ public class EditModePane
 				SkillIcon.getIcon1().getIv().setOpacity(1.0);
 			}
 			engine.setEngineStatus(EngineStatus.Pending);
+			
+			if(hbp != null) {
+				hbp.close();
+			}
 		});
 	}
 	
@@ -132,7 +142,8 @@ public class EditModePane
 		Alert al = new Alert(AlertType.CONFIRMATION);
 		al.setTitle("提示");
 		al.setHeaderText("关于编辑模式");
-		TextArea  hintTf = new TextArea("点击选中一个空格/技能后，点击另一个即可交换他们的位置。" + '\n'
+		TextArea  hintTf = new TextArea("点击选中一个空格/技能后，点击另一个即可交换他们的位置。" + '\n' + 
+				"点击一个格子并按下想要绑定的按键，然后按下右边的确认键即可绑定。" + "\n"
 				+ "下次是否不再显示此提示？");
 		hintTf.setEditable(false);
 		hintTf.setWrapText(true);
@@ -192,7 +203,6 @@ public class EditModePane
 				try {
 					String type = raw.substring(i, i+1);
 					String skl = raw.substring(i+1, i+3);
-					System.out.println(i + " " + type + " " + skl);
 					int typeI = Integer.parseInt(type);
 					int sklI = Integer.parseInt(skl);
 					if(typeI == 0) {
@@ -208,14 +218,11 @@ public class EditModePane
 						}
 						si.refreshDisplay(si.getSkill());
 					} else {
-						System.out.println("Type");
 						throw new CraftingException(ExceptionStatus.Code_Error);
 					}
 				} catch(NumberFormatException e) {
-					System.out.println("Format");
 					throw new CraftingException(ExceptionStatus.Code_Error);
 				} catch(IndexOutOfBoundsException e) {
-					System.out.println("Index");
 					throw new CraftingException(ExceptionStatus.Code_Error);
 				}
 				i += 3;
@@ -283,6 +290,14 @@ public class EditModePane
 	
 	public void close() {
 		emStage.close();
+	}
+	
+	public Stage getStage() {
+		return emStage;
+	}
+	
+	public HotkeyBindingPane getHotkeyBindingPane() {
+		return hbp;
 	}
 	
 	public void setEngine(Engine engine) {

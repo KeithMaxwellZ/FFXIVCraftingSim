@@ -36,7 +36,7 @@ public class ConfigManager
 		pt.setProperty("control", vm.getInputTf().get(1).getText());
 		pt.setProperty("CP", vm.getInputTf().get(2).getText());
 		pt.setProperty("iconMapping", new EditModePane(vm, engine).exportCode());
-		
+		pt.setProperty("HotkeyBinding", vm.exportHotkeyBinding());
 		
 		OutputStream os = null;
 		
@@ -84,6 +84,7 @@ public class ConfigManager
 			vm.setCraftsmanship(Integer.parseInt(pt.getProperty("craftsmanship")));
 			vm.setControl(Integer.parseInt(pt.getProperty("control")));
 			vm.setCP(Integer.parseInt(pt.getProperty("CP")));
+			vm.importHotkeyBinding(pt.getProperty("HotkeyBinding"));
 			
 			if(vm.getEngine().getEngineStatus() == EngineStatus.Crafting) {
 				

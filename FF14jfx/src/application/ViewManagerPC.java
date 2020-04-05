@@ -1,5 +1,6 @@
 package application;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +9,7 @@ import application.components.ConfigManager;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
+import application.subPane.HotkeyBindingPane;
 import application.subPane.CraftingHistoryPane;
 import application.subPane.EditModePane;
 import engine.CraftingStatus;
@@ -15,6 +17,8 @@ import engine.Engine;
 import engine.EngineStatus;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -27,6 +31,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -87,7 +94,7 @@ public class ViewManagerPC extends ViewManager
 	private Text round;							// The text that displays current round
 	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
 	private Timeline tml = new Timeline();		// The timeline that stores GCD animation
-	
+	private Button confirm;
 	private ArrayList<Text> progText;		// 0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
 	private ArrayList<Rectangle> bars; 		// 0=>Progress 1=>Quality 2=>CP
 	private ArrayList<TextField> inputTf; 	// The ArrayList that stores the TextFields for input
@@ -120,6 +127,7 @@ public class ViewManagerPC extends ViewManager
 		initMainDisplay();
 		initStage();
 		
+		confirm.requestFocus();
 //		cm.importConfig(false);
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
@@ -196,6 +204,15 @@ public class ViewManagerPC extends ViewManager
 			closeSubPanes(true);
 		});
 		
+		mainScene.setOnKeyPressed(e -> {
+			for(SkillIcon si: skillIcons) {
+				if(si.getKeyCodeCombination() != null) {
+					if(si.getKeyCodeCombination().match(e)) {
+						si.fireButton();
+					}
+				}
+			}
+		});
 	}
 	
 	/**
@@ -234,7 +251,8 @@ public class ViewManagerPC extends ViewManager
 		GridPane gp = new GridPane();
 		GridPane border = new GridPane();
 		GridPane back = new GridPane();
-		Button confirm = new Button("确认");
+//		Button confirm = new Button("确认");
+		confirm = new Button("确认");
 		Button logs = new Button("日志"); 
 		Button advanced = new Button("高级");
 		Button finish = new Button("结束制作");
@@ -250,7 +268,6 @@ public class ViewManagerPC extends ViewManager
 		Text totalProgT = new Text("总进度");
 		Text totalQltyT = new Text("总品质");
 		Text totalDuraT = new Text("总耐久");
-
 		
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
@@ -408,6 +425,14 @@ public class ViewManagerPC extends ViewManager
 		gp.add(loadConfig, i, j);
 		gp.add(saveConfig, i, j + 1);
 		i++;
+		
+//		Button b1 = new Button("Test");
+//		b1.setOnMouseClicked(e -> {
+//			HotkeyBindingPane btp = new HotkeyBindingPane(this);
+//		});
+//		
+//		gp.add(b1, i, j);
+//		i++;
 
 		// Draw the edge of the pane
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
@@ -747,6 +772,7 @@ public class ViewManagerPC extends ViewManager
 		// Fill the rest with empty ones
 		for(; j <= 12; j++) { 
 			SkillIcon si = new SkillIcon(null, tml, this);
+			skillIcons.add(si);
 			gp.add(si, j, i);
 		}
 		
@@ -864,7 +890,6 @@ public class ViewManagerPC extends ViewManager
 	
 	public void updateSuccess() {
 		Text t = progText.get(4);
-		System.out.println(t.getText());
 		
 		if(getEngine().isSkillSuccess()) {
 			t.setText("Success!");
@@ -1064,10 +1089,63 @@ public class ViewManagerPC extends ViewManager
 		inputTf.get(2).setText(Integer.toString(cp));
 	}
 	
+	public String exportHotkeyBinding() {
+		String res = "";
+		for(SkillIcon si: skillIcons) {	
+			if(si.getKey() == null && si.getMod() == null) {
+				res += "XX";
+			} else {
+				res += (si.getKey() + si.getMod());
+			}
+		}
+		return res;
+	}
+	
+	public void importHotkeyBinding(String s) throws IOException {
+		if(s.length() != 120) {
+			throw new IOException();
+		}
+		
+		for(int i = 0; i < 60; i++) {
+			SkillIcon si = skillIcons.get(i);
+			String rawKey = s.substring(i * 2, i * 2 + 1);
+
+			String rawMod = s.substring(i * 2 + 1, i * 2 + 2);
+			if(rawKey.equals("X") && rawMod.equals("X") ) {
+				si.setKeyCombination(null, null);
+			} else if(rawMod.equals("S")) {
+				si.setKeyCombination(rawKey, "SHIFT");
+			} else if(rawMod.equals("C")) {
+				si.setKeyCombination(rawKey, "CONTROL");
+			} else if(rawMod.equals("A")) {
+				si.setKeyCombination(rawKey, "ALT");
+			} else if(rawMod.equals("E")) {
+				si.setKeyCombination(rawKey, null);
+			} else {
+				importHotkeyError();;
+			}
+		}
+	}
+	
+	private void importHotkeyError() throws IOException {
+		for(SkillIcon si: skillIcons) {
+			si.setKeyCombination(null, null);
+		}
+		throw new IOException();
+	}
+	
 	
 	// == getters and setters ==
 	public Stage getStage() {
 		return stage;
+	}
+	
+	public ArrayList<SkillIcon> getSkillIcons() {
+		return skillIcons;
+	}
+	
+	public EditModePane getEditModePane() {
+		return emp;
 	}
 	
 	public Text getSkillDescription() {

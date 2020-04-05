@@ -59,7 +59,6 @@ public abstract class ViewManager
 
 	public void setrControl(int rControl) {
 		this.rControl = rControl;
-		
 	}
 	
 	public int getCraftsmanship() {
