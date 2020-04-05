@@ -1,13 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+# [Pending]
 
-# [Pending] 
-# Changed
-- Optimized codes to prepare for the support of awt
-
-## Changed
-- Changed interaction logic
 
 # [0.2.0] 2020-03-30
 ## Added
@@ -218,3 +213,11 @@ All notable changes to this project will be documented in this file.
 # [1.6.0] 2020-04-05
 ## Fixed
 - Fixed the issue that multiple setting pane can be open simultaneously
+
+# [1.6.1-S] 2020-04-05
+# Changed
+- Optimized codes to prepare for the support of awt
+- ui upgrade
+
+## Changed
+- Changed interaction logic

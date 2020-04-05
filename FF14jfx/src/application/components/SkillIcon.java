@@ -67,6 +67,9 @@ public class SkillIcon extends AnchorPane
 			rec = new Rectangle(40.0, 40.0, Color.DARKGRAY);
 		}
 		
+		rec.setArcHeight(7.0);
+		rec.setArcWidth(7.0);
+		
 		kv1 = new KeyValue(getIv().opacityProperty(), 1.0);
 		kv2 = new KeyValue(getIv().opacityProperty(), 0.1);
 		kv3 = new KeyValue(getIv().opacityProperty(), 0.1);

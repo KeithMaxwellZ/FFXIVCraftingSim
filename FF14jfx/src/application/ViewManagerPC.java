@@ -59,18 +59,18 @@ import skills.SpecialSkills;
 public class ViewManagerPC extends ViewManager
 {
 	private static final double WIDTH = 750; 			// The width of the scene 
-	private static final double HEIGHT = 690;			// The height of the scene 
+	private static final double HEIGHT = 700;			// The height of the scene 
 	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
-	private static final double BAR_EDGE = 5.0;			// The width of progress and quality bars
+	private static final double BAR_EDGE = 1.5;			// The width of progress and quality bars
 	private static final double BAR_WIDTH = 400.0;		// The width of the bars
 	private static final double BAR_HEIGHT = 30.0;		// The height of the bars
-	private static final double CP_EDGE = 5.0;			// CP bar edge width
+	private static final double CP_EDGE = 1.5;			// CP bar edge width
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.0";	// The version of the program
+	private static final String VERSION = "V1.6.1-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -82,7 +82,7 @@ public class ViewManagerPC extends ViewManager
 	private VBox mainContainer;					// The container that stores other panes
 	private HBox buffContainer;					// The container that display buffs
 	private Circle statusDisp;					// The circle that displays the crafting status
-	private Text efficiencyDisp;				// The text that displays current efficiency
+	private GridPane efficiencyDisp;				// The text that displays current efficiency
 	private Text durabilityText;				// The text that displays current durability
 	private Text round;							// The text that displays current round
 	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
@@ -110,12 +110,15 @@ public class ViewManagerPC extends ViewManager
 		inputTf = new ArrayList<>();
 		
 		cm = new ConfigManager(this, getEngine());
+		mainPane = new AnchorPane();
+
 		
 		tm.startTimer();
 				
+		
 		initSkillsList();
-		initStage();
 		initMainDisplay();
+		initStage();
 		
 //		cm.importConfig(false);
 		
@@ -179,8 +182,8 @@ public class ViewManagerPC extends ViewManager
 	 * initiate the main stage
 	 */
 	private void initStage() {
-		mainPane = new AnchorPane();
 		stage = new Stage();
+
 		mainScene = new Scene(mainPane, WIDTH, HEIGHT);
 		
 		mainPane.setBackground(new Background(
@@ -192,6 +195,7 @@ public class ViewManagerPC extends ViewManager
 		stage.setOnCloseRequest(e -> {			// Close other related windows
 			closeSubPanes(true);
 		});
+		
 	}
 	
 	/**
@@ -207,15 +211,15 @@ public class ViewManagerPC extends ViewManager
 		mainPane.getChildren().add(mainContainer);
 
 		mainContainer.getChildren().add(initInput());
-		mainContainer.getChildren().add(initProgressBar());
-		mainContainer.getChildren().add(initCPDisplay());
-		mainContainer.getChildren().add(initEfficiencyDisp());
-		mainContainer.getChildren().add(initBuffDisp());
+		mainContainer.getChildren().add(initInfoDisplay());
+//		mainContainer.getChildren().add(initCPDisplay());
+//		mainContainer.getChildren().add(initEffAndBuffDisplay());
+//		mainContainer.getChildren().add(initBuffDisp());
 		mainContainer.getChildren().add(initSkills());
 
 		VBox.setMargin(efficiencyDisp, new Insets(0, 0, 0 , 140.0));
 		
-		AnchorPane.setTopAnchor(mainContainer, 30.0);
+		AnchorPane.setTopAnchor(mainContainer, 10.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
 		getEngine().setEngineStatus(EngineStatus.Pending);
@@ -272,6 +276,7 @@ public class ViewManagerPC extends ViewManager
 		
 		gp.setHgap(5);
 		gp.setVgap(3);
+		
 		gp.setPrefWidth(REC_WIDTH);
 		
 		GCDCb.setIndeterminate(false);
@@ -317,8 +322,6 @@ public class ViewManagerPC extends ViewManager
 					rCraftsmanship, rControl, progressDifference, 
 					qualityDifference, ch, seed, m);
 			// Creates a new engine to restart everything
-			
-		
 			
 			SkillIcon.setVm(getEngine(), tml, this);
 			updateAll();
@@ -417,6 +420,8 @@ public class ViewManagerPC extends ViewManager
 		GridPane.setMargin(back, new Insets(EDGE_GENERAL / 2));
 		GridPane.setMargin(gp, new Insets(10));
 		
+		gp.autosize();		
+		
 		t.add(craftT);
 		t.add(controlT);
 		t.add(CPT);
@@ -431,6 +436,21 @@ public class ViewManagerPC extends ViewManager
 		return border;
 	}
 	
+	private Node initInfoDisplay() {
+		GridPane gp = new GridPane();
+		Rectangle rec1 = new Rectangle(REC_WIDTH, 2, Color.rgb(64, 64, 64));
+		Rectangle rec2 = new Rectangle(REC_WIDTH, 2, Color.rgb(38, 38, 38));
+		
+		int i = 0;
+		gp.add(initProgressBar(), 0, i++);
+		gp.add(rec2, 0, i++);
+		gp.add(rec1, 0, i++);
+		gp.add(initEffAndBuffDisplay(), 0, i++);
+		
+		gp.setVgap(0);
+		
+		return gp;
+	}
 	
 	/**
 	 * Initiate the two progress bars and other related information display
@@ -438,42 +458,90 @@ public class ViewManagerPC extends ViewManager
 	 */
 	private Node initProgressBar() {
 		GridPane container = new GridPane();
+		GridPane left = new GridPane();
+		GridPane right = new GridPane();
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		Text progressText = new Text(getEngine().getPresentProgress() + "/" + getEngine().getTotalProgress());
 		Text qualityText = new Text(getEngine().getPresentQuality() + "/" + getEngine().getTotalQuality());
 		ArrayList<Text> t = new ArrayList<Text>();
 		
+		GridPane lb = new GridPane();
+		GridPane rt = new GridPane();
+		Text status = new Text("通常　　");
+		status.setFill(Color.WHITE);
+		statusDisp = new Circle(10, Color.WHITE);
+		
 		durabilityText = new Text("耐久:  " + getEngine().getPresentDurability() + "/" + getEngine().getTotalDurability());
 		round = new Text("工次:  " + getEngine().getRound());
 		
 		progText.add(progressText);
 		progText.add(qualityText);
+		progText.add(status);
 		
 		container.setAlignment(Pos.CENTER);
+		left.setAlignment(Pos.CENTER);
+		right.setAlignment(Pos.CENTER);
 		
-		container.add(durabilityText, 0, 0);
-		container.add(round, 0, 1);
+		lb.add(statusDisp, 0, 0);
+		lb.add(status, 1, 0);
 		
-		container.add(progressBar, 1, 0);
-		container.add(progressText, 2, 0);
+		left.add(durabilityText, 0, 0);
+		left.add(round, 0, 1);
+		left.add(lb, 0, 2);
 		
-		container.add(qualityBar, 1, 1);
-		container.add(qualityText, 2, 1);
+		rt.add(progressBar, 1, 0);
+		rt.add(progressText, 2, 0);
+		rt.add(qualityBar, 1, 1);
+		rt.add(qualityText, 2, 1);
 		
-		container.setVgap(20);
+		right.add(rt, 0, 0);
+		right.add(initCPDisplay(), 0, 1);
+		
+		GridPane leftBack = new GridPane();
+		leftBack.add(left, 0, 0);
+		GridPane.setMargin(left, new Insets(10.0));
+		
+		leftBack.setBackground(new Background(
+				new BackgroundFill(Color.rgb(34, 34, 34), new CornerRadii(10.0, 0, 0, 0, false), null)));
+		
+		GridPane rightBack = new GridPane();
+		rightBack.add(right, 0, 0);
+		GridPane.setMargin(right, new Insets(10.0));
+		
+		rightBack.setBackground(new Background(
+				new BackgroundFill(Color.rgb(48, 48, 48), new CornerRadii(0, 10.0, 0, 0, false), null)));
+		
+		container.add(leftBack, 0, 0);
+		container.add(rightBack, 1, 0);
+		
+		rt.setVgap(10.0);
+		rt.setHgap(10.0);
+		
+		left.setVgap(20.0);
+		right.setVgap(10.0);
+		
 		container.setHgap(20);
-		
+				
 		t.add(durabilityText);
 		t.add(round);
 		t.add(progressText);
 		t.add(qualityText);
 		
 		for(Text tx: t) {
-			tx.setFill(TEXT_COLOR);
+			tx.setFill(Color.WHITE);
 		}
 		
-		return container;
+		
+		
+		GridPane ap = new GridPane();
+		ap.add(container, 0, 0);
+		GridPane.setMargin(container, new Insets(0, 10.0, 0, 0));
+		
+		ap.setBackground(new Background(new BackgroundFill(Color.rgb(48, 48, 48), new CornerRadii(10.0, 10.0, 0, 0, false), null)));
+//		container.setBackground(new Background(new BackgroundFill(Color.rgb(48, 48, 48), null, null)));
+		
+		return ap;
 	}
 	
 	/**
@@ -483,67 +551,110 @@ public class ViewManagerPC extends ViewManager
 	private Node initCPDisplay() {
 		HBox container = new HBox();
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
-		Text status = new Text("  通常     ");
 		Text cpVal = new Text(getEngine().getPresentCP() + "/" + getEngine().getTotalCP());
-		Text success = new Text("");
+		Text success = new Text("Success!");
 		Text cp = new Text("CP");
 		ArrayList<Text> t = new ArrayList<Text>();
 
-		statusDisp = new Circle(10, Color.WHITE);
+		
+//		success.setFill(Color.rgb(48, 48, 48));
+		success.setFont(Font.font(15));
 		
 		container.setAlignment(Pos.CENTER);
 		
-		status.setFill(Color.WHITE);
 		
 		progText.add(cpVal);
-		progText.add(status);
 		progText.add(success);
 		bars.get(2).setWidth(CP_WIDTH);
 		
-		container.getChildren().addAll(status, statusDisp, cp, cpBar, cpVal, success);
+		container.getChildren().addAll(cp, cpBar, cpVal, success); //status, statusDisp,
 		
 		container.setSpacing(30);
 		container.setLayoutX(10);
 		
 		t.add(cpVal);
-		t.add(success);
 		t.add(cp);
 		
 		for(Text tx: t) {
-			tx.setFill(TEXT_COLOR);
+			tx.setFill(Color.WHITE);
 		}
 		
-		return container;
+		GridPane ap = new GridPane();
+		ap.add(container, 0, 0);
+		GridPane.setMargin(container, new Insets(10.0));
+		
+//		ap.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
+//		container.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+		
+		return ap;
 	} 
+	
+	private Node initEffAndBuffDisplay() {
+		GridPane container = new GridPane();
+		
+		container.add(initBuffDisp(), 0, 0);
+		container.add(initefficiencyDisp(), 0, 1);
+		container.setVgap(10.0);
+		
+		GridPane ap = new GridPane();
+		ap.setMinWidth(REC_WIDTH);
+		ap.add(container, 0, 0);
+		GridPane.setMargin(container, new Insets(10.0));
+
+		ap.setBackground(new Background(new BackgroundFill(Color.rgb(32, 28, 32), new CornerRadii(0, 0, 10.0, 10.0, false), null)));
+//		container.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+		
+		return ap;
+	}
 	
 	/**
 	 * Initiate the efficiency display text and previous skill display
 	 * @return
 	 */
-	private Node initEfficiencyDisp() {
+	private Node initefficiencyDisp() {
 		HBox container = new HBox();
 		Text lastSkillT = new Text("上一个技能:  ");
 		ArrayList<Text> t = new ArrayList<Text>();
 		lastSkillAp = new AnchorPane();
-		efficiencyDisp = new Text(); 
+		efficiencyDisp = new GridPane(); 
 		
-		lastSkillAp.setPrefSize(40.0, 40.0);
-		HBox.setMargin(lastSkillAp, new Insets(0, 30.0, 0, 0));
-
-		efficiencyDisp.setText("  100%效率下的进展: " + getEngine().getBaseProgEff() + 
-							" | 100%效率下的品质: " + getEngine().getBaseQltyEff());
+		Text line1 = new Text("   100%效率下的进展: " + getEngine().getBaseProgEff());
+		Text line2 = new Text("   100%效率下的品质: " + getEngine().getBaseQltyEff());
 		
-		container.setAlignment(Pos.CENTER);
+		lastSkillAp.setPrefSize(39.0, 39.0);
+		lastSkillAp.setMaxSize(39.0, 39.0);
+		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
+		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
+		
+		efficiencyDisp.add(line1, 0, 0);
+		efficiencyDisp.add(line2, 0, 1);
+		
+		efficiencyDisp.setVgap(8.0);
+		
+		container.setMinWidth(REC_WIDTH - 32.0);
+		container.setAlignment(Pos.CENTER_LEFT);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
 		
 		t.add(lastSkillT);
-		t.add(efficiencyDisp);
+		t.add(line1);
+		t.add(line2);
 		
 		for(Text tx: t) {
-			tx.setFill(TEXT_COLOR);
+			tx.setFill(Color.WHITE);
 		}
 		
-		return container;
+//		container.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
+		GridPane ap = new GridPane();
+		ap.add(container, 0, 0);
+		GridPane.setMargin(container, new Insets(2.0));
+		
+		ap.setBackground(new Background(
+				new BackgroundFill(Color.rgb(0, 195, 249), new CornerRadii(5.0), null)));
+		container.setBackground(new Background(
+				new BackgroundFill(Color.rgb(30, 24, 30), new CornerRadii(5.0), null)));
+		
+		return ap;
 	}
 	
 	/**
@@ -557,7 +668,10 @@ public class ViewManagerPC extends ViewManager
 		
 		buffContainer.getChildren().add(buffText);
 		
-		buffText.setFill(TEXT_COLOR);
+		buffContainer.setMinHeight(40.0);
+		
+		buffText.setFont(Font.font(15.0));
+		buffText.setFill(Color.WHITE);
 		
 		return buffContainer;
 	}
@@ -581,7 +695,7 @@ public class ViewManagerPC extends ViewManager
 		
 		skillContainer.add(iconContainer, 0, 2);
 				
-		
+		skillDescription.setFill(Color.WHITE);
 		iconContainer.setHgap(5);
 		
 		int i = 2; // Makes it easier to code (easier to copy and paste)
@@ -596,9 +710,9 @@ public class ViewManagerPC extends ViewManager
 		skillContainer.setPrefSize(REC_WIDTH, SKILL_HEIGHT);
 		
 		border.setBackground(new Background(
-				new BackgroundFill(Color.SILVER, new CornerRadii(5.0), null)));
+				new BackgroundFill(Color.WHITE, new CornerRadii(5.0), null)));
 		skillContainer.setBackground(new Background(
-				new BackgroundFill(Color.AZURE, new CornerRadii(5.0), null)));
+				new BackgroundFill(Color.rgb(35, 35, 35), new CornerRadii(5.0), null)));
 		
 		
 		
@@ -651,8 +765,8 @@ public class ViewManagerPC extends ViewManager
 	 */
 	private AnchorPane createBar(Color c, double width, double height, double paneEdge) {
 		AnchorPane bar = new AnchorPane();
-		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.BLACK);
-		Rectangle fill = new Rectangle(width, height, Color.WHITE);
+		Rectangle edgeR = new Rectangle(width + 2 * paneEdge, height + 2 * paneEdge, Color.SILVER);
+		Rectangle fill = new Rectangle(width, height, Color.rgb(32, 32, 32));
 		Rectangle progress = new Rectangle(0, height, c);
 		
 		edgeR.setArcWidth(15.0);
@@ -727,7 +841,7 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateCP() {
-		progText.get(2).setText(getEngine().getPresentCP() + "/" + getEngine().getTotalCP());
+		progText.get(3).setText(getEngine().getPresentCP() + "/" + getEngine().getTotalCP());
 		if(getEngine().getPresentCP()>=getEngine().getTotalCP()) {
 			bars.get(2).setWidth(CP_WIDTH);
 		} else {
@@ -743,12 +857,14 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateEffDisp() {
-		efficiencyDisp.setText("  100%效率下的进展: " + getEngine().getBaseProgEff() + 
-							" | 100%效率下的品质: " + getEngine().getBaseQltyEff());
+		((Text)efficiencyDisp.getChildren().get(0)).setText("  100%效率下的进展: " + getEngine().getBaseProgEff());
+		((Text)efficiencyDisp.getChildren().get(1)).setText("  100%效率下的品质: " + getEngine().getBaseQltyEff());
+
 	}
 	
 	public void updateSuccess() {
 		Text t = progText.get(4);
+		System.out.println(t.getText());
 		
 		if(getEngine().isSkillSuccess()) {
 			t.setText("Success!");
@@ -758,20 +874,20 @@ public class ViewManagerPC extends ViewManager
 			t.setFill(Color.RED);
 		}
 		
-		t.setFont(Font.font(20));
 	}
 	
 	public void updateStatus() {
-		progText.get(3).setText("  " + engine.getCraftingStatus().getName());
-		progText.get(3).setFill(engine.getCraftingStatus().getFxColor());
+		progText.get(2).setText(engine.getCraftingStatus().getName());
+		progText.get(2).setFill(engine.getCraftingStatus().getFxColor());
 		statusDisp.setFill(engine.getCraftingStatus().getFxColor());
 	}
 	
 	public void updateBuffDIsp() {
 		Text buffText = new Text("  Buff:");
 		
+		buffText.setFill(Color.WHITE);
+		
 		buffContainer.getChildren().clear();
-		buffText.setFill(TEXT_COLOR);
 		buffContainer.getChildren().add(buffText);
 		
 		for(ActiveBuff ab: getEngine().getActiveBuffs()) {
@@ -786,12 +902,13 @@ public class ViewManagerPC extends ViewManager
 				iv = new ImageView(new Image(ab.buff.getAddress(), true));
 			}
 			Text remaining = new Text(Integer.toString(ab.getRemaining()));
+			remaining.setFill(Color.WHITE);
 			
 			ap.getChildren().add(iv);
 			ap.getChildren().add(remaining);
 
 			buffContainer.getChildren().add(ap);
-			
+			HBox.setMargin(ap, new Insets(5.0, 0.0, 5.0, 0.0));
 		}
 	}
 	
