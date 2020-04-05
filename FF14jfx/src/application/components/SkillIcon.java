@@ -8,7 +8,6 @@ import exceptions.ExceptionStatus;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
@@ -16,10 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyCombination.Modifier;
 import javafx.scene.input.KeyCombination.ModifierValue;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -60,7 +56,6 @@ public class SkillIcon extends AnchorPane
 		this.s = s;
 		
 		b = new Button();
-//		kcc = new KeyCodeCombination(null, null);
 		
 		if(s == null) {
 			icon = new Image("/icons/Blank.png");
@@ -81,8 +76,8 @@ public class SkillIcon extends AnchorPane
 		rec.setArcWidth(7.0);
 		
 		kv1 = new KeyValue(getIv().opacityProperty(), 1.0);
-		kv2 = new KeyValue(getIv().opacityProperty(), 0.1);
-		kv3 = new KeyValue(getIv().opacityProperty(), 0.1);
+		kv2 = new KeyValue(getIv().opacityProperty(), 0.4);
+		kv3 = new KeyValue(getIv().opacityProperty(), 0.4);
 		
 		kf1 = new KeyFrame(Duration.millis(1900), kv1);
 		kf2 = new KeyFrame(Duration.millis(1899), kv2);
@@ -119,14 +114,6 @@ public class SkillIcon extends AnchorPane
 		b.setOnAction(e -> {
 			clicked();
 		});
-		
-//		b.defaultButtonProperty().bind(focusedProperty());
-//		b.addEventFilter(MouseEvent.ANY, event -> {
-//			System.out.println("eventReceived");
-//            if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
-//                clicked();
-//             } 
-//         });
 		
 		this.setOnMouseEntered(e -> {
 			if(s != null) {
@@ -189,6 +176,8 @@ public class SkillIcon extends AnchorPane
 			if(vm.getHasGCD()) {
 				tml.play();
 			} else {
+				vm.getCraftingHistoryPane().addToQueue(sk, 
+						vm.getEngine().getLastCraftingStatus(), vm.getEngine().isSkillSuccess());
 				vm.updateAll();
 			}
 		} catch (CraftingException e) {

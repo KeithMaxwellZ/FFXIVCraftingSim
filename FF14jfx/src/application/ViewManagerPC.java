@@ -9,7 +9,6 @@ import application.components.ConfigManager;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
-import application.subPane.HotkeyBindingPane;
 import application.subPane.CraftingHistoryPane;
 import application.subPane.EditModePane;
 import engine.CraftingStatus;
@@ -17,8 +16,6 @@ import engine.Engine;
 import engine.EngineStatus;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
-import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -31,9 +28,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -66,7 +60,7 @@ import skills.SpecialSkills;
 public class ViewManagerPC extends ViewManager
 {
 	private static final double WIDTH = 750; 			// The width of the scene 
-	private static final double HEIGHT = 700;			// The height of the scene 
+	private static final double HEIGHT = 710;			// The height of the scene 
 	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
@@ -79,7 +73,7 @@ public class ViewManagerPC extends ViewManager
 	
 	private static final String VERSION = "V1.6.2-S";	// The version of the program
 	
-	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
+//	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
 	private Stage stage;						// Main stage
 	private Scene mainScene;					// Main scene of the stage
@@ -134,6 +128,7 @@ public class ViewManagerPC extends ViewManager
 											 // main stage so it's initialized at last
 		tml.setOnFinished(e -> {
 			updateAll();
+			ch.addToQueue(lastSkill, engine.getLastCraftingStatus(), engine.isSkillSuccess());
 		});
 		
 	}
@@ -315,6 +310,13 @@ public class ViewManagerPC extends ViewManager
 			
 			usedDebug = false;
 			
+			if(emp != null) {
+				emp.close();
+				if(emp.getHotkeyBindingPane() != null) {
+					emp.getHotkeyBindingPane().close();
+				}
+				emp = new EditModePane(this, engine);
+			}
 			ch.destory();
 			setLastSkill(null);
 			
@@ -1170,5 +1172,9 @@ public class ViewManagerPC extends ViewManager
 	public ArrayList<TextField> getInputTf()
 	{
 		return inputTf;
+	}
+	
+	public CraftingHistoryPane getCraftingHistoryPane() {
+		return ch;
 	}
 }
