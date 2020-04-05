@@ -1,8 +1,8 @@
 package application.subPane;
 
 
-import application.ViewManager;
-import application.components.CraftingStatus;
+import application.ViewManagerPC;
+import engine.CraftingStatus;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
@@ -28,10 +28,9 @@ public class CraftingHistoryPane
 	private GridPane queue;
 	private int presentLoc;
 	
-	@SuppressWarnings("unused")
-	private ViewManager vm;
+	private ViewManagerPC vm;
 	
-	public CraftingHistoryPane(ViewManager vm)
+	public CraftingHistoryPane(ViewManagerPC vm)
 	{
 		this.vm = vm;
 		
@@ -64,7 +63,7 @@ public class CraftingHistoryPane
 		Text csT = new Text(cs.getName());
 		Text successT = new Text(success ? "Success" : "Failed");
 		Text srT = new Text(Double.toString(sk.getSuccessRate()));
-		Circle statusDisp = new Circle(10.0, cs.getColor());
+		Circle statusDisp = new Circle(10.0, cs.getFxColor());
 		
 		gp.add(iv, 0, 0);
 		gp.add(csT, 1, 0);
@@ -74,7 +73,7 @@ public class CraftingHistoryPane
 		
 		gp.setHgap(10.0);
 		
-		csT.setFill(cs.getColor());
+		csT.setFill(cs.getFxColor());
 		successT.setFill(success ? Color.GREEN : Color.RED);
 		
 		queue.add(gp, 0, presentLoc);
@@ -84,6 +83,7 @@ public class CraftingHistoryPane
 	
 	public void display() {
 		historyStage.show();
+		vm.getStage().requestFocus();
 	}
 	
 	public void destory() {

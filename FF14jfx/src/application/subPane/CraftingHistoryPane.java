@@ -28,7 +28,6 @@ public class CraftingHistoryPane
 	private GridPane queue;
 	private int presentLoc;
 	
-	@SuppressWarnings("unused")
 	private ViewManagerPC vm;
 	
 	public CraftingHistoryPane(ViewManagerPC vm)
@@ -84,6 +83,7 @@ public class CraftingHistoryPane
 	
 	public void display() {
 		historyStage.show();
+		vm.getStage().requestFocus();
 	}
 	
 	public void destory() {

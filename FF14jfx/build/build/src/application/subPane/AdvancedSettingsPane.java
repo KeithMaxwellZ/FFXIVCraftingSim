@@ -2,7 +2,7 @@ package application.subPane;
 
 import java.util.ArrayList;
 
-import application.ViewManager;
+import application.ViewManagerPC;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,8 +20,9 @@ public class AdvancedSettingsPane
 	private Stage boxStage;
 	private Scene scene;
 	private GridPane mainBoxPane;
+	private DebugPane dp;
 
-	private ViewManager vm;
+	private ViewManagerPC vm;
 	
 	Text rCraftT;
 	Text rControlT;
@@ -37,7 +38,7 @@ public class AdvancedSettingsPane
 	
 	ArrayList<Text> t;
 	
-	public AdvancedSettingsPane(ArrayList<Text> t, ViewManager vm)
+	public AdvancedSettingsPane(ArrayList<Text> t, ViewManagerPC vm)
 	{
 		this.t = t;
 		this.vm = vm;
@@ -64,6 +65,12 @@ public class AdvancedSettingsPane
 		seedTf = new TextField(Long.toString(vm.getSeed()));
 		
 		initDisplay();
+		
+		boxStage.setOnCloseRequest(e -> {
+			if(dp != null) {
+				dp.close();
+			}
+		});
 	}
 	
 	private void initDisplay() {
@@ -122,7 +129,10 @@ public class AdvancedSettingsPane
 		});
 		
 		debugMode.setOnMouseClicked(e -> {
-			DebugPane dp = new DebugPane(vm); 
+			if (dp != null) {
+				dp.close();
+			}
+			dp = new DebugPane(vm); 
 			dp.display();
 		});
 		
@@ -138,5 +148,9 @@ public class AdvancedSettingsPane
 	
 	public void close() {
 		boxStage.close();
+	}
+	
+	public DebugPane getDp() {
+		return dp;
 	}
 }
