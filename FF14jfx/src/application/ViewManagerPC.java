@@ -70,7 +70,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.0";	// The version of the program
+	private static final String VERSION = "V1.6.1-S";	// The version of the program
 	
 	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
