@@ -825,6 +825,9 @@ public class ViewManagerPC extends ViewManager
 		}
 		if(emp != null) {
 			emp.close();
+			if(emp.getHotkeyBindingPane() != null) {
+				emp.getHotkeyBindingPane().close();
+			}
 		}
 		if(closeDisplayPane) {
 			if(ch != null) {
