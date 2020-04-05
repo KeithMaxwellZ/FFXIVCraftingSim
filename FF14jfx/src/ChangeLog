@@ -1,8 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-# [Pending]
-
+# [Pending] 
 
 # [0.2.0] 2020-03-30
 ## Added
@@ -221,3 +220,7 @@ All notable changes to this project will be documented in this file.
 
 ## Changed
 - Changed interaction logic
+
+# [1.6.2-S] 2020-04-06
+# Added 
+- Added hotkey binding function
