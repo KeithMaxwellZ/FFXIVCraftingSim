@@ -1,11 +1,9 @@
-package application;
+package engine;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import application.components.CraftingStatus;
-import application.components.EngineStatus;
 import application.components.Timer;
 import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
@@ -59,7 +57,7 @@ public class Engine
 	protected int innerQuietLvl;
 	
 	protected boolean observed;  // Record if last turn used the skill Observe
-	protected boolean success = true; // Record if the skill is success
+	protected boolean skillSuccess = true; // Record if the skill is success
 	
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
@@ -160,7 +158,7 @@ public class Engine
 	 * @param sk 
 	 */
 	public void beginning(Skill sk) {
-		success = false;
+		skillSuccess = false;
 		progIncreased = false;
 		qltyIncreased = false;
 		addToLogs(" ");
@@ -211,7 +209,7 @@ public class Engine
 
 		// Check if the skill is success
 		if(sk.isSuccess()) {
-			success = true;
+			skillSuccess = true;
 			forwardProgress(sk);
 		} else {
 			if(sk == PQSkill.Patient_Touch) {
@@ -221,7 +219,7 @@ public class Engine
 			}
 		}
 		
-		addToLogs("Success? : " + success);
+		addToLogs("Success? : " + skillSuccess);
 		
 		observed = false;
 		finalizeRound(sk);
@@ -235,10 +233,10 @@ public class Engine
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
 		if(sk == BuffSkill.Final_Appraisal) {
 			beginning(sk);
-			success = true;
+			skillSuccess = true;
 			presentCP--;
 			sk.createBuff();
-			ch.addToQueue(sk, cs, success);
+			ch.addToQueue(sk, cs, skillSuccess);
 			return;
 		}
 		
@@ -256,7 +254,7 @@ public class Engine
 		beginning(sk);
 
 		if(sk.isSuccess()) {
-			success = true;
+			skillSuccess = true;
 			forwardProgress(sk);
 		}
 		
@@ -288,7 +286,7 @@ public class Engine
 			}
 			coCount++;
 			beginning(sk);
-			success = true;
+			skillSuccess = true;
 			ch.addToQueue(sk, cs, true);
 			cs = CraftingStatus.getNextStatus();
 			return;
@@ -298,7 +296,7 @@ public class Engine
 		observed = false;
 
 		if(sk.isSuccess()) {
-			success = true;
+			skillSuccess = true;
 			forwardProgress(sk);
 		}
 		
@@ -371,7 +369,7 @@ public class Engine
 	}
 	
 	private void finalizeRound(Skill sk) throws CraftingException {
-		ch.addToQueue(sk, cs, success);
+		ch.addToQueue(sk, cs, skillSuccess);
 		
 		successfulUse(sk);
 				
@@ -391,8 +389,7 @@ public class Engine
 									  (cs == CraftingStatus.Sturdy ? 2 : 1));
 		int cpDec = (int)Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1));
 
-		addToLogs("Duration Cost: " + durDec)
-		;
+		addToLogs("Duration Cost: " + durDec);
 
 		presentDurability -= durDec;
 		presentCP -= cpDec; 
@@ -635,5 +632,9 @@ public class Engine
 	
 	public void setCraftingStatus(CraftingStatus cs) {
 		this.cs = cs;
+	}
+	
+	public boolean isSkillSuccess() {
+		return skillSuccess;
 	}
 }

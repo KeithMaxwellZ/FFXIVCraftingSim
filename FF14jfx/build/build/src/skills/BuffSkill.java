@@ -1,8 +1,9 @@
 package skills;
 
 import java.util.Random;
+
+import engine.Engine;
 import skills.Buff;
-import application.Engine;
 
 public enum BuffSkill implements Skill
 {

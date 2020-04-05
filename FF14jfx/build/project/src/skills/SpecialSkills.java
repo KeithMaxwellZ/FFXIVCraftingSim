@@ -2,8 +2,8 @@ package skills;
 
 import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
-import application.Engine;
-import application.components.CraftingStatus;
+import engine.CraftingStatus;
+import engine.Engine;
 
 public enum SpecialSkills implements Skill
 {
