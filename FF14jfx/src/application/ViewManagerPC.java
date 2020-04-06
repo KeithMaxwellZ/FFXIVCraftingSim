@@ -1118,13 +1118,13 @@ public class ViewManagerPC extends ViewManager
 			String rawMod = s.substring(i * 2 + 1, i * 2 + 2);
 			if(rawKey.equals("X") && rawMod.equals("X") ) {
 				si.setKeyCombination(null, null);
-			} else if(rawMod.equals("S")) {
+			} else if(rawMod.equals("s")) {
 				si.setKeyCombination(rawKey, "SHIFT");
-			} else if(rawMod.equals("C")) {
+			} else if(rawMod.equals("c")) {
 				si.setKeyCombination(rawKey, "CONTROL");
-			} else if(rawMod.equals("A")) {
+			} else if(rawMod.equals("a")) {
 				si.setKeyCombination(rawKey, "ALT");
-			} else if(rawMod.equals("E")) {
+			} else if(rawMod.equals("n")) {
 				si.setKeyCombination(rawKey, null);
 			} else {
 				importHotkeyError();;
