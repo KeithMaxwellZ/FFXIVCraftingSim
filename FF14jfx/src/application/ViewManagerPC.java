@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import application.components.ConfigManager;
+import application.components.MusicPlayer;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
@@ -74,6 +75,8 @@ public class ViewManagerPC extends ViewManager
 	private static final String VERSION = "V1.6.2-S";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
+	
+	MusicPlayer mp = new MusicPlayer();
 	
 	private Stage stage;						// Main stage
 	private Scene mainScene;					// Main scene of the stage
@@ -196,6 +199,8 @@ public class ViewManagerPC extends ViewManager
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
+			mp.interrupt();
+			mp.stop();
 			closeSubPanes(true);
 		});
 		
@@ -242,6 +247,7 @@ public class ViewManagerPC extends ViewManager
 	 * @return the pane of input section
 	 */
 	private Node initInput() {		
+		
 		double tfWidth = 70.0;
 		GridPane gp = new GridPane();
 		GridPane border = new GridPane();
@@ -428,13 +434,13 @@ public class ViewManagerPC extends ViewManager
 		gp.add(saveConfig, i, j + 1);
 		i++;
 		
-//		Button b1 = new Button("Test");
-//		b1.setOnMouseClicked(e -> {
-//			HotkeyBindingPane btp = new HotkeyBindingPane(this);
-//		});
-//		
-//		gp.add(b1, i, j);
-//		i++;
+		Button b1 = new Button("²¥·ÅÒôÀÖ");
+		b1.setOnMouseClicked(e -> {
+			mp.start();
+		});
+		
+		gp.add(b1, i, j);
+		i++;
 
 		// Draw the edge of the pane
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
@@ -1127,7 +1133,7 @@ public class ViewManagerPC extends ViewManager
 			} else if(rawMod.equals("n")) {
 				si.setKeyCombination(rawKey, null);
 			} else {
-				importHotkeyError();;
+				importHotkeyError();
 			}
 		}
 	}

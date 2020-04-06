@@ -79,15 +79,14 @@ public class EditModePane
 			} else if(engine.getEngineStatus() == EngineStatus.Pending) {
 				engine.setEngineStatus(EngineStatus.Editing);
 				iconRearr.setText("编辑模式：开");
+				if(hbp == null) {
+					hbp = new HotkeyBindingPane(vm, this);
+				}
+				hbp.display();
 			}
 			if(userGuide) {
 				displayGuide();
 			}
-			
-			if(hbp == null) {
-				hbp = new HotkeyBindingPane(vm, this);
-			}
-			hbp.display();
 		});
 		
 		exportSettings.setPrefWidth(BUTTON_WIDTH);
@@ -122,7 +121,7 @@ public class EditModePane
 				SkillIcon.getIcon1().getIv().setOpacity(1.0);
 			}
 			engine.setEngineStatus(EngineStatus.Pending);
-			
+			iconRearr.setText("编辑模式：关");
 			if(hbp != null) {
 				hbp.close();
 			}

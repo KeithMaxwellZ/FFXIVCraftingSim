@@ -36,6 +36,7 @@ public class Engine
 	private ArrayList<String> logs; // Stores the logs of the whole crafting process
 	
 	private CraftingStatus cs; // Stores the current crafting status (see enum CraftingStatus)
+	private CraftingStatus lastCs;
 	
 	private boolean progIncreased;	// Record if the progress and quality has increased or not
 	private boolean qltyIncreased;	// These two are for updating the buff
@@ -94,7 +95,7 @@ public class Engine
 		timer.startTimer();
 		
 		round = 0;
-		
+
 		cs = CraftingStatus.Normal;
 		
 		calcBaseProg();			// Calculate the base progress
@@ -236,7 +237,7 @@ public class Engine
 			skillSuccess = true;
 			presentCP--;
 			sk.createBuff();
-			ch.addToQueue(sk, cs, skillSuccess);
+//			ch.addToQueue(sk, cs, skillSuccess);
 			return;
 		}
 		
@@ -287,7 +288,8 @@ public class Engine
 			coCount++;
 			beginning(sk);
 			skillSuccess = true;
-			ch.addToQueue(sk, cs, true);
+//			ch.addToQueue(sk, cs, true);
+			lastCs = cs;
 			cs = CraftingStatus.getNextStatus();
 			return;
 		}
@@ -369,7 +371,7 @@ public class Engine
 	}
 	
 	private void finalizeRound(Skill sk) throws CraftingException {
-		ch.addToQueue(sk, cs, skillSuccess);
+//		ch.addToQueue(sk, cs, skillSuccess);
 		
 		successfulUse(sk);
 				
@@ -445,6 +447,7 @@ public class Engine
 	 * Refresh the crafting status
 	 */
 	private void updateStatus() {
+		lastCs = cs;
 		cs = CraftingStatus.getNextStatus();
 	}
 	
@@ -636,5 +639,9 @@ public class Engine
 	
 	public boolean isSkillSuccess() {
 		return skillSuccess;
+	}
+	
+	public CraftingStatus getLastCraftingStatus() {
+		return lastCs;
 	}
 }

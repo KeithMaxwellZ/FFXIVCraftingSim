@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-	<project name="FFXIVCraftingSimulator" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+	<project name="FF14jfx" default="do-deploy" basedir="."  xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<target name="init-fx-tasks">
 		<path id="fxant">
 			<filelist>
@@ -55,11 +55,6 @@
 			</fileset>
 		</copy>
 		<copy todir="externalLibs">
-			<fileset dir="D:\编程\jlayer1.0.1\JLayer1.0.1">
-				<filename name="jl1.0.1.jar"/>
-			</fileset>
-		</copy>
-		<copy todir="externalLibs">
 			<fileset dir="D:\Softwares\eclipse-java-2019-06-R-win32-x86_64\javafx-sdk-13\lib">
 				<filename name="javafx.base.jar"/>
 			</fileset>
@@ -83,7 +78,6 @@
 		<!-- Copy project-libs references -->
 		<copy todir="build/libs">
 			<fileset dir="externalLibs">
-				<include name="jl1.0.1.jar"/>
 				<include name="javafx-swt.jar"/>
 				<include name="javafx.fxml.jar"/>
 				<include name="javafx.swing.jar"/>
@@ -136,7 +130,7 @@
 	
 	
 		<fx:resources id="appRes">
-			<fx:fileset dir="dist" includes="FFXIVCraftingSimulator.jar"/>
+			<fx:fileset dir="dist" includes="FF14jfx.jar"/>
 			<fx:fileset dir="dist" includes="libs/*"/>
 		</fx:resources>
 	
@@ -150,14 +144,14 @@
 	
 	
 	
-		<fx:jar destfile="dist/FFXIVCraftingSimulator.jar">
+		<fx:jar destfile="dist/FF14jfx.jar">
 			<fx:application refid="fxApplication"/>
 			<fileset dir="build/classes">
 			</fileset>
 			<fx:resources refid="appRes"/>
 	
 			<manifest>
-				<attribute name="Implementation-Vendor" value="KZ"/>
+				<attribute name="Implementation-Vendor" value="KMW"/>
 				<attribute name="Implementation-Title" value="FF14 Crafting Simulator"/>
 				<attribute name="Implementation-Version" value="1.0.0"/>
 				<attribute name="JavaFX-Feature-Proxy" value="None"/>
@@ -173,11 +167,11 @@
 			includeDT="false"
 			offlineAllowed="true"
 			outdir="${basedir}/deploy"
-			outfile="FFXIVCraftingSimulator" nativeBundles="exe"
+			outfile="FF14jfx" nativeBundles="exe"
 			updatemode="background" >
 	
 			<fx:platform basedir="${java.home}"/>
-			<fx:info title="FFXIVCraftingSimulator" vendor="KZ"/>
+			<fx:info title="FF14jfx" vendor="KZ"/>
 	
 			<fx:application refId="fxApplication"/>
 			<fx:resources refid="appRes"/>

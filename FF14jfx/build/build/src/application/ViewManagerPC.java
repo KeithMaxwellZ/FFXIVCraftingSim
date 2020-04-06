@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import application.components.ConfigManager;
+import application.components.MusicPlayer;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
-import application.subPane.HotkeyBindingPane;
 import application.subPane.CraftingHistoryPane;
 import application.subPane.EditModePane;
 import engine.CraftingStatus;
@@ -17,8 +17,6 @@ import engine.Engine;
 import engine.EngineStatus;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
-import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -31,9 +29,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -66,7 +61,7 @@ import skills.SpecialSkills;
 public class ViewManagerPC extends ViewManager
 {
 	private static final double WIDTH = 750; 			// The width of the scene 
-	private static final double HEIGHT = 700;			// The height of the scene 
+	private static final double HEIGHT = 710;			// The height of the scene 
 	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
@@ -79,7 +74,9 @@ public class ViewManagerPC extends ViewManager
 	
 	private static final String VERSION = "V1.6.2-S";	// The version of the program
 	
-	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
+//	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
+	
+	MusicPlayer mp = new MusicPlayer();
 	
 	private Stage stage;						// Main stage
 	private Scene mainScene;					// Main scene of the stage
@@ -134,6 +131,7 @@ public class ViewManagerPC extends ViewManager
 											 // main stage so it's initialized at last
 		tml.setOnFinished(e -> {
 			updateAll();
+			ch.addToQueue(lastSkill, engine.getLastCraftingStatus(), engine.isSkillSuccess());
 		});
 		
 	}
@@ -201,6 +199,8 @@ public class ViewManagerPC extends ViewManager
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
+			mp.interrupt();
+			mp.stop();
 			closeSubPanes(true);
 		});
 		
@@ -247,6 +247,7 @@ public class ViewManagerPC extends ViewManager
 	 * @return the pane of input section
 	 */
 	private Node initInput() {		
+		
 		double tfWidth = 70.0;
 		GridPane gp = new GridPane();
 		GridPane border = new GridPane();
@@ -315,6 +316,13 @@ public class ViewManagerPC extends ViewManager
 			
 			usedDebug = false;
 			
+			if(emp != null) {
+				emp.close();
+				if(emp.getHotkeyBindingPane() != null) {
+					emp.getHotkeyBindingPane().close();
+				}
+				emp = new EditModePane(this, engine);
+			}
 			ch.destory();
 			setLastSkill(null);
 			
@@ -426,13 +434,13 @@ public class ViewManagerPC extends ViewManager
 		gp.add(saveConfig, i, j + 1);
 		i++;
 		
-//		Button b1 = new Button("Test");
-//		b1.setOnMouseClicked(e -> {
-//			HotkeyBindingPane btp = new HotkeyBindingPane(this);
-//		});
-//		
-//		gp.add(b1, i, j);
-//		i++;
+		Button b1 = new Button("²¥·ÅÒôÀÖ");
+		b1.setOnMouseClicked(e -> {
+			mp.start();
+		});
+		
+		gp.add(b1, i, j);
+		i++;
 
 		// Draw the edge of the pane
 		border.setPrefWidth(REC_WIDTH + EDGE_GENERAL);
@@ -825,6 +833,9 @@ public class ViewManagerPC extends ViewManager
 		}
 		if(emp != null) {
 			emp.close();
+			if(emp.getHotkeyBindingPane() != null) {
+				emp.getHotkeyBindingPane().close();
+			}
 		}
 		if(closeDisplayPane) {
 			if(ch != null) {
@@ -1113,16 +1124,16 @@ public class ViewManagerPC extends ViewManager
 			String rawMod = s.substring(i * 2 + 1, i * 2 + 2);
 			if(rawKey.equals("X") && rawMod.equals("X") ) {
 				si.setKeyCombination(null, null);
-			} else if(rawMod.equals("S")) {
+			} else if(rawMod.equals("s")) {
 				si.setKeyCombination(rawKey, "SHIFT");
-			} else if(rawMod.equals("C")) {
+			} else if(rawMod.equals("c")) {
 				si.setKeyCombination(rawKey, "CONTROL");
-			} else if(rawMod.equals("A")) {
+			} else if(rawMod.equals("a")) {
 				si.setKeyCombination(rawKey, "ALT");
-			} else if(rawMod.equals("E")) {
+			} else if(rawMod.equals("n")) {
 				si.setKeyCombination(rawKey, null);
 			} else {
-				importHotkeyError();;
+				importHotkeyError();
 			}
 		}
 	}
@@ -1167,5 +1178,9 @@ public class ViewManagerPC extends ViewManager
 	public ArrayList<TextField> getInputTf()
 	{
 		return inputTf;
+	}
+	
+	public CraftingHistoryPane getCraftingHistoryPane() {
+		return ch;
 	}
 }
