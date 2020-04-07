@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import application.components.LogManager;
 import application.components.Timer;
 import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
@@ -43,6 +44,7 @@ public class Engine
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
 	private Timer timer;
+	private LogManager lm;
 	
 	protected ArrayList<ActiveBuff> activeBuffs; // Stores the buffs that are active now
 	
@@ -78,6 +80,7 @@ public class Engine
 		
 		activeBuffs = new ArrayList<>();
 		logs = new ArrayList<>();
+		lm = new LogManager();
 		
 		presentDurability = totalDurability;
 		presentProgress = 0;
@@ -669,5 +672,9 @@ public class Engine
 	
 	public long getSeed() {
 		return seed;
+	}
+	
+	public LogManager getLogManager() {
+		return lm;
 	}
 }

@@ -224,3 +224,10 @@ All notable changes to this project will be documented in this file.
 # [1.6.2-S] 2020-04-06
 # Added 
 - Added hotkey binding function
+
+# [1.6.3-S] 2020-04-06
+# Changed
+- Changed the size of some fonts
+
+# Fixed
+- Fixed the issue that crafting history is not displayed correctly

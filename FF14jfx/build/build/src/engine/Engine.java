@@ -36,13 +36,13 @@ public class Engine
 	private ArrayList<String> logs; // Stores the logs of the whole crafting process
 	
 	private CraftingStatus cs; // Stores the current crafting status (see enum CraftingStatus)
+	private CraftingStatus lastCs;
 	
 	private boolean progIncreased;	// Record if the progress and quality has increased or not
 	private boolean qltyIncreased;	// These two are for updating the buff
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
 	private Timer timer;
-	private CraftingHistoryPane ch; 
 	
 	protected ArrayList<ActiveBuff> activeBuffs; // Stores the buffs that are active now
 	
@@ -62,7 +62,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference, CraftingHistoryPane ch, 
+				double porgressDifference, double qualityDifference,  
 				long seed, CraftingStatus.Mode m) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
@@ -74,7 +74,6 @@ public class Engine
 		this.recControl = recControl;
 		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
-		this.ch = ch;
 		this.seed = seed;
 		
 		activeBuffs = new ArrayList<>();
@@ -94,7 +93,7 @@ public class Engine
 		timer.startTimer();
 		
 		round = 0;
-		
+
 		cs = CraftingStatus.Normal;
 		
 		calcBaseProg();			// Calculate the base progress
@@ -146,6 +145,9 @@ public class Engine
 	public void setRandom() {
 		Random r = new Random();
 		if(seed != 0) {
+			r.setSeed(seed);
+		} else {
+			seed = r.nextLong();
 			r.setSeed(seed);
 		}
 		
@@ -236,7 +238,7 @@ public class Engine
 			skillSuccess = true;
 			presentCP--;
 			sk.createBuff();
-			ch.addToQueue(sk, cs, skillSuccess);
+//			ch.addToQueue(sk, cs, skillSuccess);
 			return;
 		}
 		
@@ -274,7 +276,7 @@ public class Engine
 	/**
 	 * Execute a special skill 
 	 * @param sk
-	 * @throws CraftingException ee crafting exception enum
+	 * @throws CraftingException see crafting exception enum
 	 */
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
 		if(innerQuietLvl <= 1 && sk == SpecialSkills.Byregots_Blessing) {
@@ -287,7 +289,8 @@ public class Engine
 			coCount++;
 			beginning(sk);
 			skillSuccess = true;
-			ch.addToQueue(sk, cs, true);
+//			ch.addToQueue(sk, cs, true);
+			lastCs = cs;
 			cs = CraftingStatus.getNextStatus();
 			return;
 		}
@@ -369,7 +372,7 @@ public class Engine
 	}
 	
 	private void finalizeRound(Skill sk) throws CraftingException {
-		ch.addToQueue(sk, cs, skillSuccess);
+//		ch.addToQueue(sk, cs, skillSuccess);
 		
 		successfulUse(sk);
 				
@@ -445,6 +448,7 @@ public class Engine
 	 * Refresh the crafting status
 	 */
 	private void updateStatus() {
+		lastCs = cs;
 		cs = CraftingStatus.getNextStatus();
 	}
 	
@@ -493,6 +497,27 @@ public class Engine
 		} else {
 			return (int)Math.floor(800 + ((double)presentQuality/10 - lv3) * 0.9);
 		}
+	}
+	
+	public double getProgressBuffRate()
+	{
+
+		double temp = 1.0;
+		for(ActiveBuff ab: activeBuffs) {
+			temp += ab.buff.getProgressBuff();
+		}
+		
+		return temp;
+	}
+
+	public double getQualityBuffRate()
+	{
+		double temp = 1.0;
+		for(ActiveBuff ab: activeBuffs) {
+			temp += ab.buff.getQualityBuff();
+		}
+		
+		return temp;
 	}
 	
 	/**
@@ -581,11 +606,11 @@ public class Engine
 	}
 	
 	public int getBaseProgEff() {
-		return baseProgEff;
+		return (int)((double)baseProgEff * getProgressBuffRate());
 	}
 	
 	public int getBaseQltyEff() {
-		return baseQltyEff;
+		return (int)((double)baseQltyEff * getQualityBuffRate());
 	}
 	
 	public int getInnerQuiet() {
@@ -636,5 +661,13 @@ public class Engine
 	
 	public boolean isSkillSuccess() {
 		return skillSuccess;
+	}
+	
+	public CraftingStatus getLastCraftingStatus() {
+		return lastCs;
+	}
+	
+	public long getSeed() {
+		return seed;
 	}
 }

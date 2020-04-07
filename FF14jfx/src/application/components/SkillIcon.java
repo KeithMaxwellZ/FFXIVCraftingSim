@@ -194,6 +194,8 @@ public class SkillIcon extends AnchorPane
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				vm.setLastSkill(sk);
+				vm.getCraftingHistoryPane().addToQueue(sk, 
+						vm.getEngine().getLastCraftingStatus(), vm.getEngine().isSkillSuccess());
 				vm.updateAll();
 				vm.postFinishMessage(e.es);
 			} else if (	e.es == ExceptionStatus.Not_HQ ||
@@ -237,9 +239,7 @@ public class SkillIcon extends AnchorPane
 			} else {
 				s = " ";
 			}
-			System.out.println(s);
 			s.toLowerCase(Locale.US);
-			System.out.println(s);
 			s += key;
 			hotkeyText.setText(s);
 		}
@@ -324,7 +324,6 @@ public class SkillIcon extends AnchorPane
 		} else if(modIn.equals("ALT")) {
 			modIn = "a";
 		} else
-		System.out.println(keyIn + " " + modIn);
 		if(!uniqueCheck(this, keyIn, modIn)) {
 			Alert al = new Alert(AlertType.WARNING);
 			
@@ -384,7 +383,6 @@ public class SkillIcon extends AnchorPane
 	private boolean uniqueCheck(SkillIcon thisSi, String key, String mod) {
 		for(SkillIcon si: vm.getSkillIcons()) {
 			if(si!=thisSi && si.getKeyCodeCombination() != null) {
-				System.out.println(si.getKey() + " " + si.getMod() + " " + key + " " + mod);
 				if(si.getKey().equals(key) && si.getMod().equals(mod)) {
 					return false;
 				}

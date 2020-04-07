@@ -1,5 +1,7 @@
 package application.components;
 
+import java.util.Locale;
+
 import application.ViewManagerPC;
 import engine.Engine;
 import engine.EngineStatus;
@@ -8,7 +10,6 @@ import exceptions.ExceptionStatus;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert.AlertType;
@@ -16,10 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyCombination.Modifier;
 import javafx.scene.input.KeyCombination.ModifierValue;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -40,6 +38,7 @@ public class SkillIcon extends AnchorPane
 	private Image icon;
 	private Button b = new Button();
 	private Text costText;
+	private Text hotkeyText;
 	private ImageView iv = new ImageView(icon);
 	private Rectangle rec;
 	private KeyValue kv1;
@@ -60,7 +59,7 @@ public class SkillIcon extends AnchorPane
 		this.s = s;
 		
 		b = new Button();
-//		kcc = new KeyCodeCombination(null, null);
+		hotkeyText = new Text("  ");
 		
 		if(s == null) {
 			icon = new Image("/icons/Blank.png");
@@ -81,8 +80,8 @@ public class SkillIcon extends AnchorPane
 		rec.setArcWidth(7.0);
 		
 		kv1 = new KeyValue(getIv().opacityProperty(), 1.0);
-		kv2 = new KeyValue(getIv().opacityProperty(), 0.1);
-		kv3 = new KeyValue(getIv().opacityProperty(), 0.1);
+		kv2 = new KeyValue(getIv().opacityProperty(), 0.4);
+		kv3 = new KeyValue(getIv().opacityProperty(), 0.4);
 		
 		kf1 = new KeyFrame(Duration.millis(1900), kv1);
 		kf2 = new KeyFrame(Duration.millis(1899), kv2);
@@ -103,6 +102,11 @@ public class SkillIcon extends AnchorPane
 		getChildren().add(getIv());
 		getChildren().add(costText);
 		getChildren().add(b);
+		getChildren().add(hotkeyText);
+		
+		hotkeyText.setFill(Color.WHITE);
+		hotkeyText.setLayoutX(30);
+		hotkeyText.setLayoutY(10);
 		
 		costText.setLayoutX(0);
 		costText.setLayoutY(40.0);
@@ -120,14 +124,6 @@ public class SkillIcon extends AnchorPane
 			clicked();
 		});
 		
-//		b.defaultButtonProperty().bind(focusedProperty());
-//		b.addEventFilter(MouseEvent.ANY, event -> {
-//			System.out.println("eventReceived");
-//            if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
-//                clicked();
-//             } 
-//         });
-		
 		this.setOnMouseEntered(e -> {
 			if(s != null) {
 				vm.getSkillDescription().setText("  " + s.getName() + " " +
@@ -140,6 +136,8 @@ public class SkillIcon extends AnchorPane
 		this.setOnMouseExited(e -> {
 			vm.getSkillDescription().setText("");
 		});
+		
+		refreshDisplay(getSkill());
 	}
 	
 	private void clicked() {
@@ -189,11 +187,15 @@ public class SkillIcon extends AnchorPane
 			if(vm.getHasGCD()) {
 				tml.play();
 			} else {
+				vm.getCraftingHistoryPane().addToQueue(sk, 
+						vm.getEngine().getLastCraftingStatus(), vm.getEngine().isSkillSuccess());
 				vm.updateAll();
 			}
 		} catch (CraftingException e) {
 			if(e.es == ExceptionStatus.Craft_Failed || e.es == ExceptionStatus.Craft_Success) {
 				vm.setLastSkill(sk);
+				vm.getCraftingHistoryPane().addToQueue(sk, 
+						vm.getEngine().getLastCraftingStatus(), vm.getEngine().isSkillSuccess());
 				vm.updateAll();
 				vm.postFinishMessage(e.es);
 			} else if (	e.es == ExceptionStatus.Not_HQ ||
@@ -230,7 +232,17 @@ public class SkillIcon extends AnchorPane
 				costText.setText("");
 			}
 		}
-		
+		if(key != null && mod != null) {
+			String s = "";
+			if(!mod.equals("n")) {
+				s = mod;
+			} else {
+				s = " ";
+			}
+			s.toLowerCase(Locale.US);
+			s += key;
+			hotkeyText.setText(s);
+		}
 	}
 	
 	public static void setVm(Engine e, Timeline timeLine, ViewManagerPC viewManager) {
@@ -303,6 +315,15 @@ public class SkillIcon extends AnchorPane
 			kcc = null;
 			return;
 		}
+		if(modIn == null) {
+			modIn = "n";
+		} else if(modIn.equals("SHIFT")) {
+			modIn = "s";
+		} else if(modIn.equals("CONTROL")) {
+			modIn = "c";
+		} else if(modIn.equals("ALT")) {
+			modIn = "a";
+		} else
 		if(!uniqueCheck(this, keyIn, modIn)) {
 			Alert al = new Alert(AlertType.WARNING);
 			
@@ -316,54 +337,53 @@ public class SkillIcon extends AnchorPane
 
 		this.key = keyIn;
 
-		
-		if(modIn.equals("SHIFT")) {
-			this.mod = "S";
+		if(modIn.equals("n")) {
+			this.mod = "n";
+			kcc = new KeyCodeCombination(KeyCode.getKeyCode(keyIn), 
+					ModifierValue.UP, 
+					ModifierValue.UP, 
+					ModifierValue.UP, 
+					ModifierValue.ANY, 
+					ModifierValue.ANY);
+		} else if(modIn.equals("s")) {
+			this.mod = "s";
 			kcc = new KeyCodeCombination(KeyCode.getKeyCode(keyIn), 
 					ModifierValue.DOWN, 
 					ModifierValue.UP, 
 					ModifierValue.UP, 
 					ModifierValue.ANY, 
 					ModifierValue.ANY);
-		} else if(modIn.equals("CONTROL")) {
-			this.mod = "C";
+		} else if(modIn.equals("c")) {
+			this.mod = "c";
 			kcc = new KeyCodeCombination(KeyCode.getKeyCode(keyIn), 
 					ModifierValue.UP, 
 					ModifierValue.DOWN, 
 					ModifierValue.UP, 
 					ModifierValue.ANY, 
 					ModifierValue.ANY);
-		} else if(modIn.equals("ALT")) {
-			this.mod = "A";
+		} else if(modIn.equals("a")) {
+			this.mod = "a";
 			kcc = new KeyCodeCombination(KeyCode.getKeyCode(keyIn), 
 					ModifierValue.UP, 
 					ModifierValue.UP, 
 					ModifierValue.DOWN, 
 					ModifierValue.ANY, 
 					ModifierValue.ANY);
-		} else if(modIn == null) {
-			this.mod = "N";
-			kcc = new KeyCodeCombination(KeyCode.getKeyCode(keyIn), 
-					ModifierValue.UP, 
-					ModifierValue.UP, 
-					ModifierValue.UP, 
-					ModifierValue.ANY, 
-					ModifierValue.ANY);
-		}
+		} 
 		
 		if(s == null) {
 			rec.setOpacity(0);
 		} else {
 			iv.setOpacity(1.0);
 		}
-		
+		refreshDisplay(getSkill());
 		icon1 = null;
 	}
 	
 	private boolean uniqueCheck(SkillIcon thisSi, String key, String mod) {
 		for(SkillIcon si: vm.getSkillIcons()) {
-			if(si!=thisSi) {
-				if(si.getKey() == key && si.getMod() == mod) {
+			if(si!=thisSi && si.getKeyCodeCombination() != null) {
+				if(si.getKey().equals(key) && si.getMod().equals(mod)) {
 					return false;
 				}
 			}

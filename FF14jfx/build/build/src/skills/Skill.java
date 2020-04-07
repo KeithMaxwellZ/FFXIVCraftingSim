@@ -1,5 +1,7 @@
 package skills;
 
+import engine.CraftingStatus;
+
 public interface Skill
 {
 //	 String name;
@@ -38,4 +40,6 @@ public interface Skill
 	public int getDurCost();
 	
 	public double getSuccessRate();
+	
+	public double getSuccessRate(CraftingStatus cs);
 }

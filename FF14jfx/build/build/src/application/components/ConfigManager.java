@@ -86,6 +86,8 @@ public class ConfigManager
 			vm.setCP(Integer.parseInt(pt.getProperty("CP")));
 			vm.importHotkeyBinding(pt.getProperty("HotkeyBinding"));
 			
+			vm.importPlayerData(pt.getProperty("craftsmanship"), pt.getProperty("control"), pt.getProperty("CP"));
+			
 			if(vm.getEngine().getEngineStatus() == EngineStatus.Crafting) {
 				
 			} else {

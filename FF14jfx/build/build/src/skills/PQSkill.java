@@ -154,6 +154,16 @@ public enum PQSkill implements Skill
 		return d;
 	}
  
+	@Override
+	public double getSuccessRate(CraftingStatus cs) {
+		if(successRate == 1.0) {
+			return 1.0;
+		}
+		double d = successRate + (cs == CraftingStatus.Centered ? 0.25 : 0);
+		d = (double)Math.round(d * 100)/100;
+		return d;
+	}
+	
 	public static void setRandom(Random ra) {
 		r = ra;
 	}

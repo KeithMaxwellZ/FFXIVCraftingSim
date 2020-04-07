@@ -22,6 +22,8 @@ public class HotkeyBindingPane
 	private Scene mainScene;
 	private AnchorPane mainPane;
 	
+	private Text t;
+	
 	private String key;
 	private String mod;
 	
@@ -48,7 +50,7 @@ public class HotkeyBindingPane
 	private void init() {
 		GridPane gp = new GridPane();
 		HBox hb = new HBox();
-		Text t = new Text("");
+		t = new Text("");
 		Button confirm = new Button("È·¶¨");
 		Button cancel = new Button("Çå¿Õ");
 		
@@ -85,6 +87,9 @@ public class HotkeyBindingPane
 				al.showAndWait();
 			} else if(SkillIcon.getIcon1() != null) {
 				SkillIcon.getIcon1().setKeyCombination(key, mod);
+				key = null;
+				mod = null;
+				updateDisplay(t);
 			}
 		});
 		
@@ -99,10 +104,10 @@ public class HotkeyBindingPane
 	private void updateDisplay(Text t) {
 		t.setText("");
 		if(mod != null) {
-			t.setText(mod);
+			t.setText(mod + "+");
 		} 
 		if(key != null) {
-			t.setText(t.getText() + "+" + key);
+			t.setText(t.getText() + key);
 		}
 	}
 	

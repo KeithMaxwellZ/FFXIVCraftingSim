@@ -2,6 +2,7 @@ package skills;
 
 import java.util.Random;
 
+import engine.CraftingStatus;
 import engine.Engine;
 import skills.Buff;
 
@@ -139,6 +140,11 @@ public enum BuffSkill implements Skill
 	
 	@Override
 	public double getSuccessRate() {
+		return 1.0;
+	}
+	
+	@Override
+	public double getSuccessRate(CraftingStatus cs) {
 		return 1.0;
 	}
 	

@@ -9,7 +9,6 @@ import application.components.ConfigManager;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
-import application.subPane.HotkeyBindingPane;
 import application.subPane.CraftingHistoryPane;
 import application.subPane.EditModePane;
 import engine.CraftingStatus;
@@ -17,8 +16,6 @@ import engine.Engine;
 import engine.EngineStatus;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
-import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -31,9 +28,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -66,7 +60,7 @@ import skills.SpecialSkills;
 public class ViewManagerPC extends ViewManager
 {
 	private static final double WIDTH = 750; 			// The width of the scene 
-	private static final double HEIGHT = 700;			// The height of the scene 
+	private static final double HEIGHT = 710;			// The height of the scene 
 	private static final double REC_WIDTH = 680;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
@@ -77,9 +71,9 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.2-S";	// The version of the program
+	private static final String VERSION = "V1.6.3-S";	// The version of the program
 	
-	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
+//	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
 	private Stage stage;						// Main stage
 	private Scene mainScene;					// Main scene of the stage
@@ -109,7 +103,7 @@ public class ViewManagerPC extends ViewManager
 	public ViewManagerPC() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 				rCraftsmanship, rControl, progressDifference, 
-				qualityDifference, ch, seed, CraftingStatus.Mode.Expert);
+				qualityDifference, seed, CraftingStatus.Mode.Expert);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -134,6 +128,7 @@ public class ViewManagerPC extends ViewManager
 											 // main stage so it's initialized at last
 		tml.setOnFinished(e -> {
 			updateAll();
+			ch.addToQueue(lastSkill, engine.getLastCraftingStatus(), engine.isSkillSuccess());
 		});
 		
 	}
@@ -315,6 +310,13 @@ public class ViewManagerPC extends ViewManager
 			
 			usedDebug = false;
 			
+			if(emp != null) {
+				emp.close();
+				if(emp.getHotkeyBindingPane() != null) {
+					emp.getHotkeyBindingPane().close();
+				}
+				emp = new EditModePane(this, engine);
+			}
 			ch.destory();
 			setLastSkill(null);
 			
@@ -337,7 +339,7 @@ public class ViewManagerPC extends ViewManager
 			
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 					rCraftsmanship, rControl, progressDifference, 
-					qualityDifference, ch, seed, m);
+					qualityDifference, seed, m);
 			// Creates a new engine to restart everything
 			
 			SkillIcon.setVm(getEngine(), tml, this);
@@ -500,6 +502,9 @@ public class ViewManagerPC extends ViewManager
 		durabilityText = new Text("耐久:  " + getEngine().getPresentDurability() + "/" + getEngine().getTotalDurability());
 		round = new Text("工次:  " + getEngine().getRound());
 		
+		durabilityText.setFont(new Font(20));
+		
+		
 		progText.add(progressText);
 		progText.add(qualityText);
 		progText.add(status);
@@ -556,7 +561,6 @@ public class ViewManagerPC extends ViewManager
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
-		
 		
 		
 		GridPane ap = new GridPane();
@@ -825,6 +829,9 @@ public class ViewManagerPC extends ViewManager
 		}
 		if(emp != null) {
 			emp.close();
+			if(emp.getHotkeyBindingPane() != null) {
+				emp.getHotkeyBindingPane().close();
+			}
 		}
 		if(closeDisplayPane) {
 			if(ch != null) {
@@ -876,10 +883,17 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateDur() {
-		getEngine().addToLogs("Present dur: " + getEngine().getPresentDurability());
-		durabilityText.setText("耐久:  " + getEngine().getPresentDurability()+ "/" + getEngine().getTotalDurability());
-		round.setText("工次:  " + getEngine().getRound());;
+		getEngine().addToLogs("Present dur: " + engine.getPresentDurability());
+		durabilityText.setText("耐久:  " + engine.getPresentDurability()+ "/" + getEngine().getTotalDurability());
+		round.setText("工次:  " + engine.getRound());;
 		
+		if(engine.getPresentDurability() <= 10) {
+			durabilityText.setFill(Color.RED);
+		} else if(engine.getPresentDurability() <= 20) {
+			durabilityText.setFill(Color.ORANGE);
+		} else {
+			durabilityText.setFill(Color.WHITE);
+		}
 	}
 	
 	public void updateEffDisp() {
@@ -1021,7 +1035,7 @@ public class ViewManagerPC extends ViewManager
 		
 		al.getDialogPane().setExpandableContent(gp);
 		al.getDialogPane().setExpanded(true);
-		
+
 		al.showAndWait();
 	}
 	
@@ -1113,13 +1127,13 @@ public class ViewManagerPC extends ViewManager
 			String rawMod = s.substring(i * 2 + 1, i * 2 + 2);
 			if(rawKey.equals("X") && rawMod.equals("X") ) {
 				si.setKeyCombination(null, null);
-			} else if(rawMod.equals("S")) {
+			} else if(rawMod.equals("s")) {
 				si.setKeyCombination(rawKey, "SHIFT");
-			} else if(rawMod.equals("C")) {
+			} else if(rawMod.equals("c")) {
 				si.setKeyCombination(rawKey, "CONTROL");
-			} else if(rawMod.equals("A")) {
+			} else if(rawMod.equals("a")) {
 				si.setKeyCombination(rawKey, "ALT");
-			} else if(rawMod.equals("E")) {
+			} else if(rawMod.equals("n")) {
 				si.setKeyCombination(rawKey, null);
 			} else {
 				importHotkeyError();;
@@ -1132,6 +1146,12 @@ public class ViewManagerPC extends ViewManager
 			si.setKeyCombination(null, null);
 		}
 		throw new IOException();
+	}
+	
+	public void importPlayerData(String craft, String control, String cp) {
+		inputTf.get(0).setText(craft);
+		inputTf.get(1).setText(control);
+		inputTf.get(2).setText(cp);
 	}
 	
 	
@@ -1167,5 +1187,9 @@ public class ViewManagerPC extends ViewManager
 	public ArrayList<TextField> getInputTf()
 	{
 		return inputTf;
+	}
+	
+	public CraftingHistoryPane getCraftingHistoryPane() {
+		return ch;
 	}
 }
