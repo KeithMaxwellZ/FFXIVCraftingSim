@@ -97,13 +97,14 @@ public class ViewManagerPC extends ViewManager
 												// Makes it easier to operate
 	private ConfigManager cm; 					// The config manager that loads/saves the config
 	private LogManager lm;
+	private LogManager.Node node;
 	
 	private CraftingHistoryPane ch;				
 	private AdvancedSettingsPane asp;			
 	private EditModePane emp;	
 	
 	public ViewManagerPC() {
-		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+		engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
 				rCraftsmanship, rControl, progressDifference, 
 				qualityDifference, seed, CraftingStatus.Mode.Expert);
 		lm = engine.getLogManager();
@@ -131,7 +132,7 @@ public class ViewManagerPC extends ViewManager
 											 // main stage so it's initialized at last
 		tml.setOnFinished(e -> {
 			updateAll();
-			ch.addToQueue(lastSkill, engine.getLastCraftingStatus(), engine.isSkillSuccess());
+			ch.addToQueue(node.getSkill(), node.getCraftingStatus(), node.isSkillSuccess());
 		});
 		
 	}
@@ -270,9 +271,9 @@ public class ViewManagerPC extends ViewManager
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
 		TextField CPTf = new TextField(Integer.toString(cp));
-		TextField totalProgTf = new TextField(Integer.toString(tProg));
-		TextField totalQltyTf = new TextField(Integer.toString(tQlty));
-		TextField totalDuraTf = new TextField(Integer.toString(dura));
+		TextField totalProgTf = new TextField(Integer.toString(totalProgress));
+		TextField totalQltyTf = new TextField(Integer.toString(totalQuality));
+		TextField totalDuraTf = new TextField(Integer.toString(totalDurability));
 
 		CheckBox GCDCb = new CheckBox("GCD");
 		
@@ -326,9 +327,9 @@ public class ViewManagerPC extends ViewManager
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
-			dura = Integer.parseInt(totalDuraTf.getText());
-			tProg = Integer.parseInt(totalProgTf.getText()); 
-			tQlty = Integer.parseInt(totalQltyTf.getText());
+			totalDurability = Integer.parseInt(totalDuraTf.getText());
+			totalProgress = Integer.parseInt(totalProgTf.getText()); 
+			totalQuality = Integer.parseInt(totalQltyTf.getText());
 			ch = new CraftingHistoryPane(this);
 			hasGCD = GCDCb.isSelected();
 			
@@ -340,7 +341,7 @@ public class ViewManagerPC extends ViewManager
 				m = CraftingStatus.Mode.Testing;
 			}
 			
-			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+			engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
 					rCraftsmanship, rControl, progressDifference, 
 					qualityDifference, seed, m);
 			// Creates a new engine to restart everything
@@ -493,8 +494,8 @@ public class ViewManagerPC extends ViewManager
 		GridPane right = new GridPane();
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
-		Text progressText = new Text(engine.getPresentProgress() + "/" + engine.getTotalProgress());
-		Text qualityText = new Text(engine.getPresentQuality() + "/" + engine.getTotalQuality());
+		Text progressText = new Text(totalProgress + "/" + totalProgress);
+		Text qualityText = new Text(totalQuality + "/" + totalQuality);
 		ArrayList<Text> t = new ArrayList<Text>();
 		
 		GridPane lb = new GridPane();
@@ -503,8 +504,8 @@ public class ViewManagerPC extends ViewManager
 		status.setFill(Color.WHITE);
 		statusDisp = new Circle(10, Color.WHITE);
 		
-		durabilityText = new Text("耐久:  " + engine.getPresentDurability() + "/" + engine.getTotalDurability());
-		round = new Text("工次:  " + engine.getRound());
+		durabilityText = new Text("耐久:  " + totalDurability + "/" + totalDurability);
+		round = new Text("工次:  1");
 		
 		durabilityText.setFont(new Font(20));
 		
@@ -584,7 +585,7 @@ public class ViewManagerPC extends ViewManager
 	private Node initCPDisplay() {
 		HBox container = new HBox();
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
-		Text cpVal = new Text(engine.getPresentCP() + "/" + engine.getTotalCP());
+		Text cpVal = new Text(cp + "/" + cp);
 		Text success = new Text("Success!");
 		Text cp = new Text("CP");
 		ArrayList<Text> t = new ArrayList<Text>();
@@ -767,9 +768,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
 		int j = 1;
-		for(Skill s: skl) {
-			engine.addToLogs(s.toString() + ": " + s.getAddress());;
-			
+		for(Skill s: skl) {			
 			SkillIcon si = new SkillIcon(s, tml, this);
 			skillIcons.add(si);
 			
@@ -848,6 +847,7 @@ public class ViewManagerPC extends ViewManager
 	 * Updates all the displays
 	 */
 	public void updateAll() {
+		node = lm.getPresentNode();
 		updateProgress();
 		updateQuality();
 		updateCP();
@@ -887,7 +887,6 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateDur() {
-		engine.addToLogs("Present dur: " + engine.getPresentDurability());
 		durabilityText.setText("耐久:  " + engine.getPresentDurability()+ "/" + engine.getTotalDurability());
 		round.setText("工次:  " + engine.getRound());;
 		
@@ -933,9 +932,7 @@ public class ViewManagerPC extends ViewManager
 		buffContainer.getChildren().clear();
 		buffContainer.getChildren().add(buffText);
 		
-		for(ActiveBuff ab: engine.getActiveBuffs()) {
-			engine.addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
-			
+		for(ActiveBuff ab: engine.getActiveBuffs()) {			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = null;
 			if(ab.buff == Buff.inner_quiet) {
@@ -1012,14 +1009,8 @@ public class ViewManagerPC extends ViewManager
 		updateAll(); // update before taking summary
 		
 		engine.setEngineStatus(EngineStatus.Pending);;
-		engine.addToLogs("========= Summary =========");
-		engine.addToLogs("Used Debug: " + usedDebug);
-		engine.addToLogs("Has GCD: " + hasGCD);
-		engine.addToLogs("Status: " + es.toString());
-		engine.addToLogs("Total time: " + engine.getRuntime());
-		engine.addToLogs("Value: " + (engine.getPresentQuality() / 10));
-		engine.addToLogs("Skill Points: " + engine.SPCalc());
-		engine.addToLogs("===========================");
+		
+		lm.setFinishInfo(usedDebug, hasGCD, engine.getRuntime(), engine.getPresentProgress() / 10, engine.SPCalc());
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
@@ -1080,8 +1071,9 @@ public class ViewManagerPC extends ViewManager
 		logsOutput.setEditable(false);
 		logsOutput.setWrapText(false);
 		
-		for(String s: engine.getLogs()) {
-			System.out.println(s);
+		lm.createLogs();
+		
+		for(String s: lm.exportLogs()) {
 			logsOutput.setText(logsOutput.getText() + "\n" + s);
 		}
 		

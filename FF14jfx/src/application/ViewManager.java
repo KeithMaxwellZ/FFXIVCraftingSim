@@ -12,9 +12,9 @@ public abstract class ViewManager
 	protected int craftsmanship = 2563;	
 	protected int control = 2620;
 	protected int cp = 635;
-	protected int dura = 60;						// Durability
-	protected int tProg = 9181;					// Total progress
-	protected int tQlty = 64862;					// Total quality
+	protected int totalDurability = 60;						// Durability
+	protected int totalProgress = 9181;					// Total progress
+	protected int totalQuality = 64862;					// Total quality
 	protected int rCraftsmanship = 2484;			// Recommended craftsmanship
 	protected int rControl = 2206;				// Recommended control
 	protected double progressDifference = 0.8;	// Level difference index of progress
