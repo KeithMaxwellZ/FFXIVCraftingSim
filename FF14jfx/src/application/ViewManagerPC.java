@@ -71,7 +71,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.2-S";	// The version of the program
+	private static final String VERSION = "V1.6.3-S";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -103,7 +103,7 @@ public class ViewManagerPC extends ViewManager
 	public ViewManagerPC() {
 		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 				rCraftsmanship, rControl, progressDifference, 
-				qualityDifference, ch, seed, CraftingStatus.Mode.Expert);
+				qualityDifference, seed, CraftingStatus.Mode.Expert);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -339,7 +339,7 @@ public class ViewManagerPC extends ViewManager
 			
 			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
 					rCraftsmanship, rControl, progressDifference, 
-					qualityDifference, ch, seed, m);
+					qualityDifference, seed, m);
 			// Creates a new engine to restart everything
 			
 			SkillIcon.setVm(getEngine(), tml, this);
@@ -502,6 +502,9 @@ public class ViewManagerPC extends ViewManager
 		durabilityText = new Text("耐久:  " + getEngine().getPresentDurability() + "/" + getEngine().getTotalDurability());
 		round = new Text("工次:  " + getEngine().getRound());
 		
+		durabilityText.setFont(new Font(20));
+		
+		
 		progText.add(progressText);
 		progText.add(qualityText);
 		progText.add(status);
@@ -558,7 +561,6 @@ public class ViewManagerPC extends ViewManager
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
-		
 		
 		
 		GridPane ap = new GridPane();
@@ -881,10 +883,17 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateDur() {
-		getEngine().addToLogs("Present dur: " + getEngine().getPresentDurability());
-		durabilityText.setText("耐久:  " + getEngine().getPresentDurability()+ "/" + getEngine().getTotalDurability());
-		round.setText("工次:  " + getEngine().getRound());;
+		getEngine().addToLogs("Present dur: " + engine.getPresentDurability());
+		durabilityText.setText("耐久:  " + engine.getPresentDurability()+ "/" + getEngine().getTotalDurability());
+		round.setText("工次:  " + engine.getRound());;
 		
+		if(engine.getPresentDurability() <= 10) {
+			durabilityText.setFill(Color.RED);
+		} else if(engine.getPresentDurability() <= 20) {
+			durabilityText.setFill(Color.ORANGE);
+		} else {
+			durabilityText.setFill(Color.WHITE);
+		}
 	}
 	
 	public void updateEffDisp() {
@@ -1026,7 +1035,7 @@ public class ViewManagerPC extends ViewManager
 		
 		al.getDialogPane().setExpandableContent(gp);
 		al.getDialogPane().setExpanded(true);
-		
+
 		al.showAndWait();
 	}
 	
@@ -1137,6 +1146,12 @@ public class ViewManagerPC extends ViewManager
 			si.setKeyCombination(null, null);
 		}
 		throw new IOException();
+	}
+	
+	public void importPlayerData(String craft, String control, String cp) {
+		inputTf.get(0).setText(craft);
+		inputTf.get(1).setText(control);
+		inputTf.get(2).setText(cp);
 	}
 	
 	

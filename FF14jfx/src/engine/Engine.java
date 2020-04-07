@@ -43,7 +43,6 @@ public class Engine
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
 	private Timer timer;
-	private CraftingHistoryPane ch; 
 	
 	protected ArrayList<ActiveBuff> activeBuffs; // Stores the buffs that are active now
 	
@@ -63,7 +62,7 @@ public class Engine
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
-				double porgressDifference, double qualityDifference, CraftingHistoryPane ch, 
+				double porgressDifference, double qualityDifference,  
 				long seed, CraftingStatus.Mode m) {
 		this.craftsmanship = craftsmanship; 
 		this.control = control;
@@ -75,7 +74,6 @@ public class Engine
 		this.recControl = recControl;
 		this.progressDifference = porgressDifference;
 		this.qualityDifference = qualityDifference;
-		this.ch = ch;
 		this.seed = seed;
 		
 		activeBuffs = new ArrayList<>();
@@ -147,6 +145,9 @@ public class Engine
 	public void setRandom() {
 		Random r = new Random();
 		if(seed != 0) {
+			r.setSeed(seed);
+		} else {
+			seed = r.nextLong();
 			r.setSeed(seed);
 		}
 		
@@ -275,7 +276,7 @@ public class Engine
 	/**
 	 * Execute a special skill 
 	 * @param sk
-	 * @throws CraftingException ee crafting exception enum
+	 * @throws CraftingException see crafting exception enum
 	 */
 	public void useSpecialSkills(SpecialSkills sk) throws CraftingException {
 		if(innerQuietLvl <= 1 && sk == SpecialSkills.Byregots_Blessing) {
@@ -498,6 +499,27 @@ public class Engine
 		}
 	}
 	
+	public double getProgressBuffRate()
+	{
+
+		double temp = 1.0;
+		for(ActiveBuff ab: activeBuffs) {
+			temp += ab.buff.getProgressBuff();
+		}
+		
+		return temp;
+	}
+
+	public double getQualityBuffRate()
+	{
+		double temp = 1.0;
+		for(ActiveBuff ab: activeBuffs) {
+			temp += ab.buff.getQualityBuff();
+		}
+		
+		return temp;
+	}
+	
 	/**
 	 * just.... adds to logs
 	 */
@@ -584,11 +606,11 @@ public class Engine
 	}
 	
 	public int getBaseProgEff() {
-		return baseProgEff;
+		return (int)((double)baseProgEff * getProgressBuffRate());
 	}
 	
 	public int getBaseQltyEff() {
-		return baseQltyEff;
+		return (int)((double)baseQltyEff * getQualityBuffRate());
 	}
 	
 	public int getInnerQuiet() {
@@ -643,5 +665,9 @@ public class Engine
 	
 	public CraftingStatus getLastCraftingStatus() {
 		return lastCs;
+	}
+	
+	public long getSeed() {
+		return seed;
 	}
 }
