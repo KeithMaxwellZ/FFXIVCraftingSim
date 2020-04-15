@@ -231,3 +231,14 @@ All notable changes to this project will be documented in this file.
 
 # Fixed
 - Fixed the issue that crafting history is not displayed correctly
+
+# [1.6.4-S] 2020-04-07
+# Changed
+- Changed the format of logs
+
+# [1.7.0] 2020-04-15
+# Added
+- Added the function of saving replay
+
+# Fixed
+- Fixed the issue that modification key cannot be processed properly

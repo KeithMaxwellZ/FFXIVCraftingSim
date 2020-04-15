@@ -1,6 +1,8 @@
 package application.subPane;
 
 
+import java.util.ArrayList;
+
 import application.ViewManagerPC;
 import engine.CraftingStatus;
 import javafx.geometry.Insets;
@@ -28,12 +30,15 @@ public class CraftingHistoryPane
 	private GridPane queue;
 	private int presentLoc;
 	
+	private ArrayList<Skill> skillQueue;
+	
 	private ViewManagerPC vm;
 	
 	public CraftingHistoryPane(ViewManagerPC vm)
 	{
 		this.vm = vm;
 		
+		skillQueue = new ArrayList<>();
 		mainHistoryPane = new ScrollPane();
 		historyStage = new Stage();
 		scene = new Scene(mainHistoryPane, BOX_WIDTH, BOX_HEIGHT);
@@ -62,8 +67,10 @@ public class CraftingHistoryPane
 		ImageView iv = new ImageView(new Image(sk.getAddress(), true));
 		Text csT = new Text(cs.getName());
 		Text successT = new Text(success ? "Success" : "Failed");
-		Text srT = new Text(Double.toString(sk.getSuccessRate()));
+		Text srT = new Text(Double.toString(sk.getSuccessRate(cs)));
 		Circle statusDisp = new Circle(10.0, cs.getFxColor());
+		
+		skillQueue.add(sk);
 		
 		gp.add(iv, 0, 0);
 		gp.add(csT, 1, 0);

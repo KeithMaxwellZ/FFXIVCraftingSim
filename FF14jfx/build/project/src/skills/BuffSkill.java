@@ -2,6 +2,7 @@ package skills;
 
 import java.util.Random;
 
+import engine.CraftingStatus;
 import engine.Engine;
 import skills.Buff;
 
@@ -142,8 +143,24 @@ public enum BuffSkill implements Skill
 		return 1.0;
 	}
 	
+	@Override
+	public double getSuccessRate(CraftingStatus cs) {
+		return 1.0;
+	}
+	
+	@Override
+	public int getSkillIndex()
+	{
+		
+		for(int i = 0; i < values().length; i++) {
+			if(this == values()[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public void createBuff() {
-		engine.addToLogs("Buff Created: " + buff.toString() + " " + last);
 		engine.addActiveBuff(buff, last);
 		if(this == Inner_Quiet || this == Reflect) {
 			engine.setInnerQuiet(last);
