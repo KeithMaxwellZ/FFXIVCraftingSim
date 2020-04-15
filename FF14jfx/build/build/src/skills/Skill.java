@@ -42,4 +42,6 @@ public interface Skill
 	public double getSuccessRate();
 	
 	public double getSuccessRate(CraftingStatus cs);
+	
+	public int getSkillIndex();
 }

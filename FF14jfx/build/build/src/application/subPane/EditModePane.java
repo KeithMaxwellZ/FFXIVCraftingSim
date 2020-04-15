@@ -70,7 +70,8 @@ public class EditModePane
 		iconRearr.setPrefWidth(BUTTON_WIDTH);
 		iconRearr.setPrefHeight(BUTTON_HEIGHT);
 		iconRearr.setOnMouseClicked(e -> {
-			if(engine.getEngineStatus() == EngineStatus.Crafting) {
+			if(engine.getEngineStatus() == EngineStatus.Crafting || 
+					engine.getEngineStatus() == EngineStatus.Replaying) {
 				vm.postInvalidMessage(ExceptionStatus.Now_Crafting);
 				return;
 			} else if(engine.getEngineStatus() == EngineStatus.Editing) {

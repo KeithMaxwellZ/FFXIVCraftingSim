@@ -13,6 +13,7 @@ public enum ExceptionStatus
 	Maximun_Reached("现在无法使用（已达到最大使用次数）"),
 	Now_Crafting("正在制作中，无法编辑技能位置"),
 	Code_Error("代码错误，无法导入"),
+	Replay_loading_Error("文件错误，无法正确导入"),
 	;
 	
 	private String message;

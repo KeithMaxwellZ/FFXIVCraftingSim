@@ -108,6 +108,18 @@ public enum SpecialSkills implements Skill
 		return 1.0;
 	}
 	
+	@Override
+	public int getSkillIndex()
+	{
+		
+		for(int i = 0; i < values().length; i++) {
+			if(this == values()[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public void execute() throws CraftingException {
 		if(this == Byregots_Blessing) {
 			engine.setInnerQuiet(0);

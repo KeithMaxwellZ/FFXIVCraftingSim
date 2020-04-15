@@ -1,11 +1,14 @@
 package application;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import application.components.ConfigManager;
+import application.components.LogManager;
+import application.components.ReplayManager;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
@@ -14,6 +17,7 @@ import application.subPane.EditModePane;
 import engine.CraftingStatus;
 import engine.Engine;
 import engine.EngineStatus;
+import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -59,9 +63,9 @@ import skills.SpecialSkills;
  */
 public class ViewManagerPC extends ViewManager
 {
-	private static final double WIDTH = 750; 			// The width of the scene 
+	private static final double WIDTH = 850; 			// The width of the scene 
 	private static final double HEIGHT = 710;			// The height of the scene 
-	private static final double REC_WIDTH = 680;		// Width of the panes
+	private static final double REC_WIDTH = 800;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
 	private static final double BAR_EDGE = 1.5;			// The width of progress and quality bars
@@ -71,7 +75,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.3-S";	// The version of the program
+	private static final String VERSION = "V1.7.0";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -95,22 +99,26 @@ public class ViewManagerPC extends ViewManager
 	private ArrayList<SkillIcon> skillIcons;	// ArrayList that stores all skillIcon objects
 												// Makes it easier to operate
 	private ConfigManager cm; 					// The config manager that loads/saves the config
+	private LogManager lm;
+	private LogManager.Node node;
 	
 	private CraftingHistoryPane ch;				
 	private AdvancedSettingsPane asp;			
 	private EditModePane emp;	
 	
 	public ViewManagerPC() {
-		engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+		engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
 				rCraftsmanship, rControl, progressDifference, 
 				qualityDifference, seed, CraftingStatus.Mode.Expert);
+		lm = engine.getLogManager();
+		lm.setViewManager(this);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
 		skillIcons = new ArrayList<>();
 		inputTf = new ArrayList<>();
 		
-		cm = new ConfigManager(this, getEngine());
+		cm = new ConfigManager(this, engine);
 		mainPane = new AnchorPane();
 
 		
@@ -128,7 +136,7 @@ public class ViewManagerPC extends ViewManager
 											 // main stage so it's initialized at last
 		tml.setOnFinished(e -> {
 			updateAll();
-			ch.addToQueue(lastSkill, engine.getLastCraftingStatus(), engine.isSkillSuccess());
+			ch.addToQueue(node.getSkill(), node.getCraftingStatus(), node.isSkillSuccess());
 		});
 		
 	}
@@ -198,11 +206,27 @@ public class ViewManagerPC extends ViewManager
 		stage.setOnCloseRequest(e -> {			// Close other related windows
 			closeSubPanes(true);
 		});
-		
+
 		mainScene.setOnKeyPressed(e -> {
+			System.out.println(e.getCode());
 			for(SkillIcon si: skillIcons) {
+				String temp = "";
+				if(e.isShiftDown()) {
+					temp = "s";
+				} else if(e.isAltDown()) {
+					temp = "a";
+				} else if(e.isControlDown()) {
+					temp = "c";
+				} else {
+					temp = "n";
+				}
+				if(e.getCode().toString().length() > 1) {
+					temp += e.getCode().toString().substring(5);
+				} else {
+					temp += e.getCode().toString();
+				}
 				if(si.getKeyCodeCombination() != null) {
-					if(si.getKeyCodeCombination().match(e)) {
+					if(si.match(temp)) {
 						si.fireButton();
 					}
 				}
@@ -234,7 +258,7 @@ public class ViewManagerPC extends ViewManager
 		AnchorPane.setTopAnchor(mainContainer, 10.0);
 		AnchorPane.setLeftAnchor(mainContainer, 30.0);
 		
-		getEngine().setEngineStatus(EngineStatus.Pending);
+		engine.setEngineStatus(EngineStatus.Pending);
 	}
 	
 	/**
@@ -249,11 +273,13 @@ public class ViewManagerPC extends ViewManager
 //		Button confirm = new Button("确认");
 		confirm = new Button("确认");
 		Button logs = new Button("日志"); 
-		Button advanced = new Button("高级");
+		Button advanced = new Button("高级设置");
 		Button finish = new Button("结束制作");
 		Button iconRearr = new Button("编辑图标");
 		Button loadConfig = new Button("加载配置");
 		Button saveConfig = new Button("保存配置");
+		Button saveReplay = new Button("保存录像");
+		Button loadReplat = new Button("读取录像");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
 		
@@ -267,9 +293,9 @@ public class ViewManagerPC extends ViewManager
 		TextField craftTf = new TextField(Integer.toString(craftsmanship));
 		TextField controlTf = new TextField(Integer.toString(control));
 		TextField CPTf = new TextField(Integer.toString(cp));
-		TextField totalProgTf = new TextField(Integer.toString(tProg));
-		TextField totalQltyTf = new TextField(Integer.toString(tQlty));
-		TextField totalDuraTf = new TextField(Integer.toString(dura));
+		TextField totalProgTf = new TextField(Integer.toString(totalProgress));
+		TextField totalQltyTf = new TextField(Integer.toString(totalQuality));
+		TextField totalDuraTf = new TextField(Integer.toString(totalDurability));
 
 		CheckBox GCDCb = new CheckBox("GCD");
 		
@@ -323,9 +349,9 @@ public class ViewManagerPC extends ViewManager
 			craftsmanship = Integer.parseInt(craftTf.getText()); 
 			control = Integer.parseInt(controlTf.getText()); 
 			cp = Integer.parseInt(CPTf.getText());
-			dura = Integer.parseInt(totalDuraTf.getText());
-			tProg = Integer.parseInt(totalProgTf.getText()); 
-			tQlty = Integer.parseInt(totalQltyTf.getText());
+			totalDurability = Integer.parseInt(totalDuraTf.getText());
+			totalProgress = Integer.parseInt(totalProgTf.getText()); 
+			totalQuality = Integer.parseInt(totalQltyTf.getText());
 			ch = new CraftingHistoryPane(this);
 			hasGCD = GCDCb.isSelected();
 			
@@ -337,12 +363,14 @@ public class ViewManagerPC extends ViewManager
 				m = CraftingStatus.Mode.Testing;
 			}
 			
-			engine = new Engine(craftsmanship, control, cp, dura, tProg, tQlty, 
+			engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
 					rCraftsmanship, rControl, progressDifference, 
 					qualityDifference, seed, m);
 			// Creates a new engine to restart everything
+			lm = engine.getLogManager();
+			lm.setViewManager(this);
 			
-			SkillIcon.setVm(getEngine(), tml, this);
+			SkillIcon.setVm(engine, tml, this);
 			updateAll();
 			ch.display();
 			
@@ -359,13 +387,15 @@ public class ViewManagerPC extends ViewManager
 		});
 		// Define the action when export logs button is clicked
 		logs.setOnMouseClicked(e -> {
-			exportLogs();
+			if(ch != null) {
+				ch.display();
+			}
 		});
 		
 
 		// Define the action when finish button is clicked
 		finish.setOnMouseClicked(e -> {		
-			if(getEngine().getEngineStatus() == EngineStatus.Crafting) {
+			if(engine.getEngineStatus() == EngineStatus.Crafting) {
 				postFinishMessage(ExceptionStatus.Craft_Failed);
 			}
 		});
@@ -373,9 +403,9 @@ public class ViewManagerPC extends ViewManager
 		// Define the action when rearrange icon mapping button is clicked
 		iconRearr.setOnMouseClicked(e -> { 
 			if(emp == null) {
-				emp = new EditModePane(this, getEngine());
+				emp = new EditModePane(this, engine);
 			} 
-			emp.setEngine(getEngine());
+			emp.setEngine(engine);
 			emp.display();
 		});
 		
@@ -386,6 +416,52 @@ public class ViewManagerPC extends ViewManager
 		
 		loadConfig.setOnMouseClicked(e -> {
 			cm.importConfig(true);
+		});
+		
+		saveReplay.setOnMouseClicked(e -> {
+			lm.saveReplay();
+		});
+		
+		loadReplat.setOnMouseClicked(e -> {
+			ReplayManager rm = new ReplayManager(this);
+			try {
+				rm.load();
+			
+			
+				CraftingStatus.Mode m = CraftingStatus.Mode.Expert;
+				
+				usedDebug = false;
+				
+				if(emp != null) {
+					emp.close();
+					if(emp.getHotkeyBindingPane() != null) {
+						emp.getHotkeyBindingPane().close();
+					}
+					emp = new EditModePane(this, engine);
+				}
+				ch.destory();
+				setLastSkill(null);
+				
+				ch = new CraftingHistoryPane(this);
+
+				engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
+						rCraftsmanship, rControl, progressDifference, 
+						qualityDifference, seed, m);
+				
+				// Creates a new engine to restart everything
+				lm = engine.getLogManager();
+				lm.setViewManager(this);
+				
+				SkillIcon.setVm(engine, tml, this);
+				updateAll();
+				ch.display();
+				
+				closeSubPanes(false);
+				
+				engine.setEngineStatus(EngineStatus.Replaying);
+			} catch (CraftingException e1) {
+				postInvalidMessage(e1.es);
+			}
 		});
 		
 		int i = 0;
@@ -415,17 +491,22 @@ public class ViewManagerPC extends ViewManager
 		i++;
 		
 		gp.add(confirm, i, j);
-		gp.add(advanced, i, j + 1);
-		gp.add(logs, i, j + 2);
+		gp.add(logs, i, j + 1);
+		i++;
+		
+		gp.add(finish, i, j);
 		i++;
 		
 		i++;
 		i++;
-		gp.add(finish, i, j);
-		gp.add(iconRearr, i, j + 1);
+		gp.add(iconRearr, i, j );
+		gp.add(advanced, i, j + 1);
 		i++;
 		gp.add(loadConfig, i, j);
 		gp.add(saveConfig, i, j + 1);
+		i++;
+		gp.add(loadReplat, i, j);
+		gp.add(saveReplay, i, j + 1);
 		i++;
 		
 //		Button b1 = new Button("Test");
@@ -489,8 +570,8 @@ public class ViewManagerPC extends ViewManager
 		GridPane right = new GridPane();
 		AnchorPane progressBar = createBar(Color.DARKGREEN, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
 		AnchorPane qualityBar = createBar(Color.DARKBLUE, BAR_WIDTH, BAR_HEIGHT, BAR_EDGE);
-		Text progressText = new Text(getEngine().getPresentProgress() + "/" + getEngine().getTotalProgress());
-		Text qualityText = new Text(getEngine().getPresentQuality() + "/" + getEngine().getTotalQuality());
+		Text progressText = new Text(totalProgress + "/" + totalProgress);
+		Text qualityText = new Text(totalQuality + "/" + totalQuality);
 		ArrayList<Text> t = new ArrayList<Text>();
 		
 		GridPane lb = new GridPane();
@@ -499,8 +580,8 @@ public class ViewManagerPC extends ViewManager
 		status.setFill(Color.WHITE);
 		statusDisp = new Circle(10, Color.WHITE);
 		
-		durabilityText = new Text("耐久:  " + getEngine().getPresentDurability() + "/" + getEngine().getTotalDurability());
-		round = new Text("工次:  " + getEngine().getRound());
+		durabilityText = new Text("耐久:  " + totalDurability + "/" + totalDurability);
+		round = new Text("工次:  1");
 		
 		durabilityText.setFont(new Font(20));
 		
@@ -580,7 +661,7 @@ public class ViewManagerPC extends ViewManager
 	private Node initCPDisplay() {
 		HBox container = new HBox();
 		AnchorPane cpBar = createBar(Color.PURPLE, CP_WIDTH, CP_HEIGHT, CP_EDGE);
-		Text cpVal = new Text(getEngine().getPresentCP() + "/" + getEngine().getTotalCP());
+		Text cpVal = new Text(cp + "/" + cp);
 		Text success = new Text("Success!");
 		Text cp = new Text("CP");
 		ArrayList<Text> t = new ArrayList<Text>();
@@ -607,6 +688,8 @@ public class ViewManagerPC extends ViewManager
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
+		
+		success.setFill(Color.rgb(48, 48, 48));
 		
 		GridPane ap = new GridPane();
 		ap.add(container, 0, 0);
@@ -647,8 +730,8 @@ public class ViewManagerPC extends ViewManager
 		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new GridPane(); 
 		
-		Text line1 = new Text("   100%效率下的进展: " + getEngine().getBaseProgEff());
-		Text line2 = new Text("   100%效率下的品质: " + getEngine().getBaseQltyEff());
+		Text line1 = new Text("   100%效率下的进展: " + engine.getBaseProgEff());
+		Text line2 = new Text("   100%效率下的品质: " + engine.getBaseQltyEff());
 		
 		lastSkillAp.setPrefSize(39.0, 39.0);
 		lastSkillAp.setMaxSize(39.0, 39.0);
@@ -763,9 +846,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	private void createSkillList(List<Skill> skl, GridPane gp, int i) {
 		int j = 1;
-		for(Skill s: skl) {
-			getEngine().addToLogs(s.toString() + ": " + s.getAddress());;
-			
+		for(Skill s: skl) {			
 			SkillIcon si = new SkillIcon(s, tml, this);
 			skillIcons.add(si);
 			
@@ -780,7 +861,7 @@ public class ViewManagerPC extends ViewManager
 			gp.add(si, j, i);
 		}
 		
-		SkillIcon.setVm(getEngine(), tml, this);
+		SkillIcon.setVm(engine, tml, this);
 
 		return;
 	}
@@ -844,6 +925,7 @@ public class ViewManagerPC extends ViewManager
 	 * Updates all the displays
 	 */
 	public void updateAll() {
+		node = lm.getPresentNode();
 		updateProgress();
 		updateQuality();
 		updateCP();
@@ -857,34 +939,33 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateProgress() {
-		progText.get(0).setText(getEngine().getPresentProgress() + "/" + getEngine().getTotalProgress());
-		if(getEngine().getPresentProgress()>=getEngine().getTotalProgress()) {
+		progText.get(0).setText(engine.getPresentProgress() + "/" + engine.getTotalProgress());
+		if(engine.getPresentProgress()>=engine.getTotalProgress()) {
 			bars.get(0).setWidth(BAR_WIDTH);
 		} else {
-			bars.get(0).setWidth((double)getEngine().getPresentProgress()/getEngine().getTotalProgress()*BAR_WIDTH);
+			bars.get(0).setWidth((double)engine.getPresentProgress()/engine.getTotalProgress()*BAR_WIDTH);
 		}	}
 	
 	public void updateQuality() {
-		progText.get(1).setText(getEngine().getPresentQuality() + "/" + getEngine().getTotalQuality());
-		if(getEngine().getPresentQuality()>=getEngine().getTotalQuality()) {
+		progText.get(1).setText(engine.getPresentQuality() + "/" + engine.getTotalQuality());
+		if(engine.getPresentQuality()>=engine.getTotalQuality()) {
 			bars.get(1).setWidth(BAR_WIDTH);
 		} else {
-			bars.get(1).setWidth((double)getEngine().getPresentQuality()/getEngine().getTotalQuality()*BAR_WIDTH);
+			bars.get(1).setWidth((double)engine.getPresentQuality()/engine.getTotalQuality()*BAR_WIDTH);
 		}
 	}
 	
 	public void updateCP() {
-		progText.get(3).setText(getEngine().getPresentCP() + "/" + getEngine().getTotalCP());
-		if(getEngine().getPresentCP()>=getEngine().getTotalCP()) {
+		progText.get(3).setText(engine.getPresentCP() + "/" + engine.getTotalCP());
+		if(engine.getPresentCP()>=engine.getTotalCP()) {
 			bars.get(2).setWidth(CP_WIDTH);
 		} else {
-			bars.get(2).setWidth((double)getEngine().getPresentCP()/getEngine().getTotalCP()*CP_WIDTH);
+			bars.get(2).setWidth((double)engine.getPresentCP()/engine.getTotalCP()*CP_WIDTH);
 		}
 	}
 	
 	public void updateDur() {
-		getEngine().addToLogs("Present dur: " + engine.getPresentDurability());
-		durabilityText.setText("耐久:  " + engine.getPresentDurability()+ "/" + getEngine().getTotalDurability());
+		durabilityText.setText("耐久:  " + engine.getPresentDurability()+ "/" + engine.getTotalDurability());
 		round.setText("工次:  " + engine.getRound());;
 		
 		if(engine.getPresentDurability() <= 10) {
@@ -897,15 +978,15 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	public void updateEffDisp() {
-		((Text)efficiencyDisp.getChildren().get(0)).setText("  100%效率下的进展: " + getEngine().getBaseProgEff());
-		((Text)efficiencyDisp.getChildren().get(1)).setText("  100%效率下的品质: " + getEngine().getBaseQltyEff());
+		((Text)efficiencyDisp.getChildren().get(0)).setText("  100%效率下的进展: " + engine.getBaseProgEff());
+		((Text)efficiencyDisp.getChildren().get(1)).setText("  100%效率下的品质: " + engine.getBaseQltyEff());
 
 	}
 	
 	public void updateSuccess() {
 		Text t = progText.get(4);
 		
-		if(getEngine().isSkillSuccess()) {
+		if(engine.isSkillSuccess()) {
 			t.setText("Success!");
 			t.setFill(Color.GREEN);
 		} else {
@@ -929,9 +1010,7 @@ public class ViewManagerPC extends ViewManager
 		buffContainer.getChildren().clear();
 		buffContainer.getChildren().add(buffText);
 		
-		for(ActiveBuff ab: getEngine().getActiveBuffs()) {
-			getEngine().addToLogs("refreshing buff display... " + ab.buff.toString() + " " + ab.getRemaining());
-			
+		for(ActiveBuff ab: engine.getActiveBuffs()) {			
 			AnchorPane ap = new AnchorPane();
 			ImageView iv = null;
 			if(ab.buff == Buff.inner_quiet) {
@@ -968,7 +1047,7 @@ public class ViewManagerPC extends ViewManager
 			SkillIcon si = (SkillIcon)iter.next();
 			if(si.getSkill()!=null) {
 				int i = si.getSkill().getCPCost();
-				i = (getEngine().getCraftingStatus() == CraftingStatus.Pliant ? (i+1)/2 : i);
+				i = (engine.getCraftingStatus() == CraftingStatus.Pliant ? (i+1)/2 : i);
 				if(i!=0) {
 					si.setCostText(Integer.toString(i));
 				} else {
@@ -1002,20 +1081,15 @@ public class ViewManagerPC extends ViewManager
 		GridPane gp = new GridPane();
 		Text DebugMode = new Text(usedDebug ? "使用过Debug" : "");
 		Text GCDMode = new Text("GCD: " + (getHasGCD() ? "开启" : "关闭"));
-		Text runTime = new Text("总用时:  " + Double.toString(getEngine().getRuntime()) + "秒");
-		Text val = new Text("收藏价值:  " + getEngine().getPresentQuality() / 10);
+		Text runTime = new Text("总用时:  " + Double.toString(engine.getRuntime()) + "秒");
+		Text val = new Text("收藏价值:  " + engine.getPresentQuality() / 10);
 		
 		updateAll(); // update before taking summary
 		
-		getEngine().setEngineStatus(EngineStatus.Pending);;
-		getEngine().addToLogs("========= Summary =========");
-		getEngine().addToLogs("Used Debug: " + usedDebug);
-		getEngine().addToLogs("Has GCD: " + hasGCD);
-		getEngine().addToLogs("Status: " + es.toString());
-		getEngine().addToLogs("Total time: " + getEngine().getRuntime());
-		getEngine().addToLogs("Value: " + (getEngine().getPresentQuality() / 10));
-		getEngine().addToLogs("Skill Points: " + getEngine().SPCalc());
-		getEngine().addToLogs("===========================");
+		engine.setEngineStatus(EngineStatus.Pending);;
+		
+		lm.setFinishInfo(usedDebug, hasGCD, engine.getRuntime(), 
+				engine.getPresentQuality() / 10, engine.SPCalc(), engine.getRound());
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
@@ -1029,7 +1103,7 @@ public class ViewManagerPC extends ViewManager
 		gp.add(val, 0, i++);
 		
 		if(es == ExceptionStatus.Craft_Success) {		
-			Text SP = new Text("技巧点数(暂译):  " + getEngine().SPCalc());
+			Text SP = new Text("技巧点数(暂译):  " + engine.SPCalc());
 			gp.add(SP, 0, i++);	
 		}
 		
@@ -1076,8 +1150,9 @@ public class ViewManagerPC extends ViewManager
 		logsOutput.setEditable(false);
 		logsOutput.setWrapText(false);
 		
-		for(String s: getEngine().getLogs()) {
-			System.out.println(s);
+		lm.createLogs();
+		
+		for(String s: lm.exportLogs()) {
 			logsOutput.setText(logsOutput.getText() + "\n" + s);
 		}
 		
@@ -1153,7 +1228,6 @@ public class ViewManagerPC extends ViewManager
 		inputTf.get(1).setText(control);
 		inputTf.get(2).setText(cp);
 	}
-	
 	
 	// == getters and setters ==
 	public Stage getStage() {

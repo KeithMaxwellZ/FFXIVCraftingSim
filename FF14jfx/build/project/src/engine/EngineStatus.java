@@ -2,5 +2,5 @@ package engine;
 
 public enum EngineStatus
 {
-	Pending, Crafting, Editing;
+	Pending, Crafting, Editing, Replaying;
 }

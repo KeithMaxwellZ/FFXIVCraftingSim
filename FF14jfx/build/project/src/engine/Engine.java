@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import application.components.LogManager;
 import application.components.Timer;
 import application.subPane.CraftingHistoryPane;
 import exceptions.CraftingException;
@@ -33,7 +34,7 @@ public class Engine
 	
 	private int coCount;	// Counts the use of Careful_Observation
 	
-	private ArrayList<String> logs; // Stores the logs of the whole crafting process
+//	private ArrayList<String> logs; // Stores the logs of the whole crafting process
 	
 	private CraftingStatus cs; // Stores the current crafting status (see enum CraftingStatus)
 	private CraftingStatus lastCs;
@@ -43,6 +44,7 @@ public class Engine
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
 	private Timer timer;
+	private LogManager lm;
 	
 	protected ArrayList<ActiveBuff> activeBuffs; // Stores the buffs that are active now
 	
@@ -61,7 +63,7 @@ public class Engine
 	
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
-				int totalProgress, int totalQUality, int recCraftsmanship, int recControl,
+				int totalProgress, int totalQuality, int recCraftsmanship, int recControl,
 				double porgressDifference, double qualityDifference,  
 				long seed, CraftingStatus.Mode m) {
 		this.craftsmanship = craftsmanship; 
@@ -69,7 +71,7 @@ public class Engine
 		this.totalCP = totalCP;
 		this.totalDurability = totalDurability;
 		this.totalProgress = totalProgress;
-		this.totalQuality = totalQUality;
+		this.totalQuality = totalQuality;
 		this.recCraftsmanship = recCraftsmanship;
 		this.recControl = recControl;
 		this.progressDifference = porgressDifference;
@@ -77,7 +79,8 @@ public class Engine
 		this.seed = seed;
 		
 		activeBuffs = new ArrayList<>();
-		logs = new ArrayList<>();
+//		logs = new ArrayList<>();
+		lm = new LogManager();
 		
 		presentDurability = totalDurability;
 		presentProgress = 0;
@@ -104,13 +107,7 @@ public class Engine
 		
 		CraftingStatus.setMode(m); // set the crafting mode 
 		
-		addToLogs("Craftsmanship: " + craftsmanship);
-		addToLogs("Control: " + control);
-		addToLogs("CP: " + totalCP);
-		addToLogs("Progress: " + totalProgress);
-		addToLogs("Quality: " + totalQUality);
-		addToLogs("Crafting Status Mode: " + m.toString());
-		addToLogs("=========================");
+		lm.setBaseInfo(craftsmanship, control, totalCP, totalProgress, totalQuality, totalDurability, this.seed, m);
 	}
 	
 	/**
@@ -150,24 +147,8 @@ public class Engine
 			seed = r.nextLong();
 			r.setSeed(seed);
 		}
-		
 		PQSkill.setRandom(r);			// The other two skill class doesn't need random
 		CraftingStatus.setRandom(r);
-	}
-		
-	/**
-	 * The works done before the execution of the skill
-	 * @param sk 
-	 */
-	public void beginning(Skill sk) {
-		skillSuccess = false;
-		progIncreased = false;
-		qltyIncreased = false;
-		addToLogs(" ");
-		addToLogs("===Round " + round + " ===");
-		addToLogs("Crafting Status: " + cs.toString());
-		addToLogs("Skill name: " + (sk).toString());
-		addToLogs("Observed?: " + observed);
 	}
 	
 	/**
@@ -221,7 +202,7 @@ public class Engine
 			}
 		}
 		
-		addToLogs("Success? : " + skillSuccess);
+		lm.setSkillSuccess(skillSuccess);
 		
 		observed = false;
 		finalizeRound(sk);
@@ -235,8 +216,16 @@ public class Engine
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
 		if(sk == BuffSkill.Final_Appraisal) {
 			beginning(sk);
+			
 			skillSuccess = true;
 			presentCP--;
+			
+			lm.setPresentDurability(presentDurability);
+			lm.setDurabilityDecrease(0);
+			lm.setPresentCP(presentCP);
+			lm.setCPDecrease(1);
+			lm.nodeFinish();
+			
 			sk.createBuff();
 //			ch.addToQueue(sk, cs, skillSuccess);
 			return;
@@ -289,9 +278,16 @@ public class Engine
 			coCount++;
 			beginning(sk);
 			skillSuccess = true;
+			
+			lm.setPresentDurability(presentDurability);
+			lm.setDurabilityDecrease(0);
+			lm.setPresentCP(presentCP);
+			lm.setCPDecrease(0);
+			lm.nodeFinish();
+			
 //			ch.addToQueue(sk, cs, true);
 			lastCs = cs;
-			cs = CraftingStatus.getNextStatus();
+			cs = CraftingStatus.getNextStatus();			
 			return;
 		}
 		beginning(sk);
@@ -308,15 +304,31 @@ public class Engine
 	}
 	
 	/**
+	 * The works done before the execution of the skill
+	 * @param sk 
+	 */
+	public void beginning(Skill sk) {
+		skillSuccess = false;
+		progIncreased = false;
+		qltyIncreased = false;
+		
+		lm.init();
+		lm.setRound(round);
+		lm.setCraftingStatus(cs);
+		lm.setSkill(sk);
+		lm.setOberved(observed);
+		lm.setBuffList(activeBuffs);
+	}
+	
+	/**
 	 * Calculate rate, then calculate actual increase and add it to present value
 	 * @param sk
 	 */
 	private void forwardProgress(Skill sk) {
 		double tempProgressRate = sk.getActualProgressRate();
 		double tempQualityRate = sk.getActualQualityRate();
-		
-		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
 		double statusBuff = 0;
+		
 		if(cs == CraftingStatus.HQ) {
 			statusBuff = 1.5;
 		} else if(cs == CraftingStatus.MQ) {
@@ -327,15 +339,21 @@ public class Engine
 			statusBuff = 1.0;
 		}
 		
+		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
 		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * statusBuff * tempQualityRate));
-		addToLogs("Progress Increase: " + tempProgressIncrease + " rate: " + tempProgressRate);
-		addToLogs("Quality Increase: " + tempQualityIncrease + " rate: " + tempQualityRate);
 		
 		progIncreased = tempProgressIncrease > 0;
 		qltyIncreased = tempQualityIncrease > 0;
 		
 		presentProgress += tempProgressIncrease;
 		presentQuality += tempQualityIncrease;
+		
+		lm.setPresentProgressIncrease(tempProgressIncrease);
+		lm.setPresentProgressRate(tempProgressRate);
+		lm.setPresentProgress(presentProgress);
+		lm.setPresentQualityIncrease(tempQualityIncrease);
+		lm.setPresentQualityRate(tempQualityRate);
+		lm.setPresentQuality(presentQuality);
 		
 		// To avoid overflow
 		if(presentProgress > totalProgress) {
@@ -392,11 +410,15 @@ public class Engine
 									  (cs == CraftingStatus.Sturdy ? 2 : 1));
 		int cpDec = (int)Math.round((double)sk.getCPCost() / (cs == CraftingStatus.Pliant ? 2 : 1));
 
-		addToLogs("Duration Cost: " + durDec);
-
 		presentDurability -= durDec;
 		presentCP -= cpDec; 
 		round++;
+	
+		lm.setPresentDurability(presentDurability);
+		lm.setDurabilityDecrease(durDec);
+		lm.setPresentCP(presentCP);
+		lm.setCPDecrease(cpDec);
+		lm.nodeFinish();
 	}
 	
 	/**
@@ -523,9 +545,9 @@ public class Engine
 	/**
 	 * just.... adds to logs
 	 */
-	public void addToLogs(String s) {
-		logs.add(s);
-	}
+//	public void addToLogs(String s) {
+//		logs.add(s);
+//	}
 	
 	/**
 	 * Since the inner quiet is abnormal, so I set it separately, also
@@ -637,9 +659,9 @@ public class Engine
 		return round + 1;
 	}
 	
-	public ArrayList<String> getLogs() {
-		return new ArrayList<String>(logs);
-	}
+//	public ArrayList<String> getLogs() {
+//		return new ArrayList<String>(logs);
+//	}
 	
 	public double getRuntime() {
 		return timer.getTime();
@@ -669,5 +691,9 @@ public class Engine
 	
 	public long getSeed() {
 		return seed;
+	}
+	
+	public LogManager getLogManager() {
+		return lm;
 	}
 }

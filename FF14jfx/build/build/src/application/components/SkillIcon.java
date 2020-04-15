@@ -3,6 +3,7 @@ package application.components;
 import java.util.Locale;
 
 import application.ViewManagerPC;
+import engine.CraftingStatus;
 import engine.Engine;
 import engine.EngineStatus;
 import exceptions.CraftingException;
@@ -18,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination.ModifierValue;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -117,11 +119,15 @@ public class SkillIcon extends AnchorPane
 		
 		b.setPrefHeight(40);
 		b.setPrefWidth(40);
-		
+
 		b.setOpacity(0.0);
 		
 		b.setOnAction(e -> {
-			clicked();
+			if(engine.getEngineStatus() == EngineStatus.Crafting ||
+					engine.getEngineStatus() == EngineStatus.Editing || 
+					engine.getEngineStatus() == EngineStatus.Pending) {
+				clicked();
+			}
 		});
 		
 		this.setOnMouseEntered(e -> {
@@ -140,7 +146,7 @@ public class SkillIcon extends AnchorPane
 		refreshDisplay(getSkill());
 	}
 	
-	private void clicked() {
+	public void clicked() {
 		if(engine.getEngineStatus() == EngineStatus.Editing) {
 			if(getIcon1() == null) {
 				vm.getEditModePane().getHotkeyBindingPane().getStage().requestFocus();
@@ -157,7 +163,8 @@ public class SkillIcon extends AnchorPane
 				setIcon1(null);
 				icon2 = null;
 			}
-		} else if(engine.getEngineStatus() == EngineStatus.Crafting) {
+		} else if(engine.getEngineStatus() == EngineStatus.Crafting ||
+				engine.getEngineStatus() == EngineStatus.Replaying) {
 			if(s != null && vm.getTimer().getTime() >= (vm.getHasGCD() ? 2.00 : 0)) {
 				performSkill(getSkill(), getIv());
 			}
@@ -298,6 +305,17 @@ public class SkillIcon extends AnchorPane
 	public KeyCodeCombination getKeyCodeCombination() {
 		return kcc;
 	}
+	
+	public boolean match(String s) {
+		String sMod = s.substring(0, 1);
+		String sKey = s.substring(1, 2);
+		
+		if(key.equals(sKey) && mod.equals(sMod)) {
+			return true;
+		}
+		
+		return false;
+	}
 
 	public void setCostText(String s) {
 		costText.setText(s);
@@ -382,7 +400,7 @@ public class SkillIcon extends AnchorPane
 	
 	private boolean uniqueCheck(SkillIcon thisSi, String key, String mod) {
 		for(SkillIcon si: vm.getSkillIcons()) {
-			if(si!=thisSi && si.getKeyCodeCombination() != null) {
+			if(si != thisSi && si.kcc != null) {
 				if(si.getKey().equals(key) && si.getMod().equals(mod)) {
 					return false;
 				}
