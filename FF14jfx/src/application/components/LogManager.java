@@ -2,6 +2,7 @@ package application.components;
 
 import java.util.ArrayList;
 
+import application.ViewManagerPC;
 import engine.CraftingStatus;
 import skills.ActiveBuff;
 import skills.Skill;
@@ -11,19 +12,19 @@ public class LogManager
 	// Turn info
 	public class Node {
 		Skill s;
-		boolean skillSuccess;
-		boolean observed;
+		boolean skillSuccess = true;
+		boolean observed = false;
 		CraftingStatus cs;
-		int presentProgress;
-		int presentQuality;
-		int progressIncrease;
-		int qualityIncrease;
-		double progressRate;
-		double qualityRate;
-		int presentDurability;
-		int durabilityDecrease;
-		int presentCP;
-		int CPDecrease;
+		int presentProgress = 0;
+		int presentQuality = 0;
+		int progressIncrease = 0;
+		int qualityIncrease = 0;
+		double progressRate = 0;
+		double qualityRate = 0;
+		int presentDurability = 0;
+		int durabilityDecrease = 0;
+		int presentCP = 0;
+		int CPDecrease = 0;
 		ArrayList<ActiveBuff> buffList;
 		int round;
 		
@@ -93,11 +94,14 @@ public class LogManager
 	private double runtime;
 	private int value;
 	private int sp;
+	private int totalRound;
 	private long seed;
 	
 	private ArrayList<String> logs;
 	private ArrayList<Node> craftingHistory; 
 	private Node presentNode;
+	
+	private ViewManagerPC vm;
 	
 	public LogManager() {
 		craftingHistory = new ArrayList<>();
@@ -195,12 +199,14 @@ public class LogManager
 		
 	}
 	
-	public void setFinishInfo(boolean usedDebug, boolean hasGCD, double runtime, int value, int sp) {
+	public void setFinishInfo(boolean usedDebug, boolean hasGCD, 
+			double runtime, int value, int sp, int totalRound) {
 		this.usedDebug = usedDebug;
 		this.hasGCD = hasGCD;
 		this.runtime = runtime;
 		this.value = value;
 		this.sp = sp;
+		this.totalRound = totalRound;
 		
 		finished = true;
 		
@@ -213,6 +219,8 @@ public class LogManager
 		logs.add("CP: " + cp);
 		logs.add("Progress: " + totalProgress);
 		logs.add("Quality: " + totalQuality);
+		logs.add("Durability: " + totalDurability);
+		logs.add("Seed: " + seed);
 		logs.add("Crafting Status Mode: " + m.toString());
 		logs.add("============Base Information=============");
 		
@@ -244,13 +252,23 @@ public class LogManager
 			logs.add("Used Debug: " + usedDebug);
 			logs.add("Has GCD: " + hasGCD);
 			logs.add("Total time: " + runtime);
+			logs.add("Total Rounds: " + totalRound);
 			logs.add("Value: " + value);
 			logs.add("Skill Points: " + sp);
 			logs.add("===========================");
 		}
 	}
 	
+	public void saveReplay() {
+		ReplayManager rm = new ReplayManager(vm); 
+		rm.saveReplay(craftsmanship, control, cp, seed, value, sp, totalRound, craftingHistory);
+	}
+	
 	public ArrayList<String> exportLogs() {
 		return logs;
+	}
+	
+	public void setViewManager(ViewManagerPC vm) {
+		this.vm = vm;
 	}
 }

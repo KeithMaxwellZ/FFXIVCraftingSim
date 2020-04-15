@@ -44,6 +44,10 @@ public abstract class ViewManager
 	public boolean getHasGCD() {
 		return hasGCD;
 	}
+	
+	public void setHasGCD(boolean b) {
+		hasGCD = b;
+	}
 
 	public int getrCraftsmanship() {
 		return rCraftsmanship;

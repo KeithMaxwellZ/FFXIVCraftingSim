@@ -167,4 +167,16 @@ public enum PQSkill implements Skill
 	public static void setRandom(Random ra) {
 		r = ra;
 	}
+	
+	@Override
+	public int getSkillIndex()
+	{
+		
+		for(int i = 0; i < values().length; i++) {
+			if(this == values()[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
 }

@@ -1,5 +1,6 @@
 package application;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -7,6 +8,7 @@ import java.util.List;
 
 import application.components.ConfigManager;
 import application.components.LogManager;
+import application.components.ReplayManager;
 import application.components.SkillIcon;
 import application.components.Timer;
 import application.subPane.AdvancedSettingsPane;
@@ -15,6 +17,7 @@ import application.subPane.EditModePane;
 import engine.CraftingStatus;
 import engine.Engine;
 import engine.EngineStatus;
+import exceptions.CraftingException;
 import exceptions.ExceptionStatus;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -60,9 +63,9 @@ import skills.SpecialSkills;
  */
 public class ViewManagerPC extends ViewManager
 {
-	private static final double WIDTH = 750; 			// The width of the scene 
+	private static final double WIDTH = 850; 			// The width of the scene 
 	private static final double HEIGHT = 710;			// The height of the scene 
-	private static final double REC_WIDTH = 680;		// Width of the panes
+	private static final double REC_WIDTH = 800;		// Width of the panes
 	private static final double EDGE_GENERAL = 4.0;		// The general edge width of panes
 	private static final double SKILL_HEIGHT = 270;		// The height of skill pane
 	private static final double BAR_EDGE = 1.5;			// The width of progress and quality bars
@@ -72,7 +75,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.6.3-S";	// The version of the program
+	private static final String VERSION = "V1.7.0";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -108,6 +111,7 @@ public class ViewManagerPC extends ViewManager
 				rCraftsmanship, rControl, progressDifference, 
 				qualityDifference, seed, CraftingStatus.Mode.Expert);
 		lm = engine.getLogManager();
+		lm.setViewManager(this);
 		progText = new ArrayList<>();
 		bars = new ArrayList<>();
 		tm = new Timer();
@@ -202,11 +206,27 @@ public class ViewManagerPC extends ViewManager
 		stage.setOnCloseRequest(e -> {			// Close other related windows
 			closeSubPanes(true);
 		});
-		
+
 		mainScene.setOnKeyPressed(e -> {
+			System.out.println(e.getCode());
 			for(SkillIcon si: skillIcons) {
+				String temp = "";
+				if(e.isShiftDown()) {
+					temp = "s";
+				} else if(e.isAltDown()) {
+					temp = "a";
+				} else if(e.isControlDown()) {
+					temp = "c";
+				} else {
+					temp = "n";
+				}
+				if(e.getCode().toString().length() > 1) {
+					temp += e.getCode().toString().substring(5);
+				} else {
+					temp += e.getCode().toString();
+				}
 				if(si.getKeyCodeCombination() != null) {
-					if(si.getKeyCodeCombination().match(e)) {
+					if(si.match(temp)) {
 						si.fireButton();
 					}
 				}
@@ -253,11 +273,13 @@ public class ViewManagerPC extends ViewManager
 //		Button confirm = new Button("确认");
 		confirm = new Button("确认");
 		Button logs = new Button("日志"); 
-		Button advanced = new Button("高级");
+		Button advanced = new Button("高级设置");
 		Button finish = new Button("结束制作");
 		Button iconRearr = new Button("编辑图标");
 		Button loadConfig = new Button("加载配置");
 		Button saveConfig = new Button("保存配置");
+		Button saveReplay = new Button("保存录像");
+		Button loadReplat = new Button("读取录像");
 		
 		ArrayList<Text> t = new ArrayList<Text>();
 		
@@ -346,6 +368,7 @@ public class ViewManagerPC extends ViewManager
 					qualityDifference, seed, m);
 			// Creates a new engine to restart everything
 			lm = engine.getLogManager();
+			lm.setViewManager(this);
 			
 			SkillIcon.setVm(engine, tml, this);
 			updateAll();
@@ -364,7 +387,9 @@ public class ViewManagerPC extends ViewManager
 		});
 		// Define the action when export logs button is clicked
 		logs.setOnMouseClicked(e -> {
-			exportLogs();
+			if(ch != null) {
+				ch.display();
+			}
 		});
 		
 
@@ -391,6 +416,52 @@ public class ViewManagerPC extends ViewManager
 		
 		loadConfig.setOnMouseClicked(e -> {
 			cm.importConfig(true);
+		});
+		
+		saveReplay.setOnMouseClicked(e -> {
+			lm.saveReplay();
+		});
+		
+		loadReplat.setOnMouseClicked(e -> {
+			ReplayManager rm = new ReplayManager(this);
+			try {
+				rm.load();
+			
+			
+				CraftingStatus.Mode m = CraftingStatus.Mode.Expert;
+				
+				usedDebug = false;
+				
+				if(emp != null) {
+					emp.close();
+					if(emp.getHotkeyBindingPane() != null) {
+						emp.getHotkeyBindingPane().close();
+					}
+					emp = new EditModePane(this, engine);
+				}
+				ch.destory();
+				setLastSkill(null);
+				
+				ch = new CraftingHistoryPane(this);
+
+				engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
+						rCraftsmanship, rControl, progressDifference, 
+						qualityDifference, seed, m);
+				
+				// Creates a new engine to restart everything
+				lm = engine.getLogManager();
+				lm.setViewManager(this);
+				
+				SkillIcon.setVm(engine, tml, this);
+				updateAll();
+				ch.display();
+				
+				closeSubPanes(false);
+				
+				engine.setEngineStatus(EngineStatus.Replaying);
+			} catch (CraftingException e1) {
+				postInvalidMessage(e1.es);
+			}
 		});
 		
 		int i = 0;
@@ -420,17 +491,22 @@ public class ViewManagerPC extends ViewManager
 		i++;
 		
 		gp.add(confirm, i, j);
-		gp.add(advanced, i, j + 1);
-		gp.add(logs, i, j + 2);
+		gp.add(logs, i, j + 1);
+		i++;
+		
+		gp.add(finish, i, j);
 		i++;
 		
 		i++;
 		i++;
-		gp.add(finish, i, j);
-		gp.add(iconRearr, i, j + 1);
+		gp.add(iconRearr, i, j );
+		gp.add(advanced, i, j + 1);
 		i++;
 		gp.add(loadConfig, i, j);
 		gp.add(saveConfig, i, j + 1);
+		i++;
+		gp.add(loadReplat, i, j);
+		gp.add(saveReplay, i, j + 1);
 		i++;
 		
 //		Button b1 = new Button("Test");
@@ -612,6 +688,8 @@ public class ViewManagerPC extends ViewManager
 		for(Text tx: t) {
 			tx.setFill(Color.WHITE);
 		}
+		
+		success.setFill(Color.rgb(48, 48, 48));
 		
 		GridPane ap = new GridPane();
 		ap.add(container, 0, 0);
@@ -1010,7 +1088,8 @@ public class ViewManagerPC extends ViewManager
 		
 		engine.setEngineStatus(EngineStatus.Pending);;
 		
-		lm.setFinishInfo(usedDebug, hasGCD, engine.getRuntime(), engine.getPresentProgress() / 10, engine.SPCalc());
+		lm.setFinishInfo(usedDebug, hasGCD, engine.getRuntime(), 
+				engine.getPresentQuality() / 10, engine.SPCalc(), engine.getRound());
 		
 		al.setTitle(es == ExceptionStatus.Craft_Failed ? "制作失败...." : "制作成功！");
 		al.setHeaderText(es == ExceptionStatus.Craft_Failed ? "啊呀，制作失败了...." : "恭喜，制作成功！");
@@ -1149,7 +1228,6 @@ public class ViewManagerPC extends ViewManager
 		inputTf.get(1).setText(control);
 		inputTf.get(2).setText(cp);
 	}
-	
 	
 	// == getters and setters ==
 	public Stage getStage() {

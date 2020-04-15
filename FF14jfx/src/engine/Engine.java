@@ -107,7 +107,7 @@ public class Engine
 		
 		CraftingStatus.setMode(m); // set the crafting mode 
 		
-		lm.setBaseInfo(craftsmanship, control, totalCP, totalProgress, totalQuality, totalDurability, seed, m);
+		lm.setBaseInfo(craftsmanship, control, totalCP, totalProgress, totalQuality, totalDurability, this.seed, m);
 	}
 	
 	/**
@@ -147,7 +147,6 @@ public class Engine
 			seed = r.nextLong();
 			r.setSeed(seed);
 		}
-		
 		PQSkill.setRandom(r);			// The other two skill class doesn't need random
 		CraftingStatus.setRandom(r);
 	}
@@ -217,8 +216,16 @@ public class Engine
 	private void useBuffSkill(BuffSkill sk) throws CraftingException {
 		if(sk == BuffSkill.Final_Appraisal) {
 			beginning(sk);
+			
 			skillSuccess = true;
 			presentCP--;
+			
+			lm.setPresentDurability(presentDurability);
+			lm.setDurabilityDecrease(0);
+			lm.setPresentCP(presentCP);
+			lm.setCPDecrease(1);
+			lm.nodeFinish();
+			
 			sk.createBuff();
 //			ch.addToQueue(sk, cs, skillSuccess);
 			return;
@@ -271,9 +278,16 @@ public class Engine
 			coCount++;
 			beginning(sk);
 			skillSuccess = true;
+			
+			lm.setPresentDurability(presentDurability);
+			lm.setDurabilityDecrease(0);
+			lm.setPresentCP(presentCP);
+			lm.setCPDecrease(0);
+			lm.nodeFinish();
+			
 //			ch.addToQueue(sk, cs, true);
 			lastCs = cs;
-			cs = CraftingStatus.getNextStatus();
+			cs = CraftingStatus.getNextStatus();			
 			return;
 		}
 		beginning(sk);
