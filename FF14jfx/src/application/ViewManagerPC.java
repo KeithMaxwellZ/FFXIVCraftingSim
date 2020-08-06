@@ -1,7 +1,10 @@
 package application;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +31,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -75,7 +80,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.7.0";	// The version of the program
+	private static final String VERSION = "V1.8.0";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -123,9 +128,7 @@ public class ViewManagerPC extends ViewManager
 		cm = new ConfigManager(this, engine);
 		mainPane = new AnchorPane();
 
-		
-		tm.startTimer();
-				
+		tm.startTimer();		
 		
 		initSkillsList();
 		initMainDisplay();
@@ -136,11 +139,76 @@ public class ViewManagerPC extends ViewManager
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
+				
 		tml.setOnFinished(e -> {
 			updateAll();
 			ch.addToQueue(node.getSkill(), node.getCraftingStatus(), node.isSkillSuccess());
 		});
+	}
+	
+	protected void showAbout() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("");
+		alert.setHeaderText("关于");
+		alert.setResizable(false);
 		
+		VBox content = new VBox();
+		
+		Hyperlink hl = new Hyperlink("  ff.web.sdo.com/talos");
+		hl.setOnMouseClicked(e -> {
+			try
+			{
+				Desktop.getDesktop().browse(new URI("ff.web.sdo.com/talos"));
+			} catch (IOException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		
+		int i = 0;
+		
+		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
+		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
+		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
+		TextField l5 = new TextField("车牌号: mkc14360610");
+		
+		l1.setEditable(false);
+		l2.setEditable(false);
+		l3.setEditable(false);
+		l4.setEditable(false);
+		l5.setEditable(false);
+		
+		l1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l5.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		
+		l1.getStyleClass().add("copyablelabel");
+		l2.getStyleClass().add("copyablelabel");
+		l3.getStyleClass().add("copyablelabel");
+		l4.getStyleClass().add("copyablelabel");
+		l5.getStyleClass().add("copyablelabel");
+		
+		content.getChildren().add(i++, l1);
+		content.getChildren().add(i++, l2);
+		content.getChildren().add(i++, l3);
+		content.getChildren().add(i++, l4);
+		content.getChildren().add(i++, l5);
+		content.getChildren().add(i++, hl);
+
+		alert.getDialogPane().setExpandableContent(content);
+		
+		alert.getDialogPane().setPrefWidth(500.0);
+		
+		alert.getDialogPane().setExpanded(true);
+		alert.showAndWait();
 	}
 	
 	/**
