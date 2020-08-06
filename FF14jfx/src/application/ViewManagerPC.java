@@ -58,7 +58,7 @@ import skills.SpecialSkills;
 
 /**
  * The main scene of the program
- * @author keithMaxwell 延夏 埃尔德里基
+ * @author keithMaxwell 延夏-埃尔德里基
  *
  */
 public class ViewManagerPC extends ViewManager
@@ -83,6 +83,7 @@ public class ViewManagerPC extends ViewManager
 	private Scene mainScene;					// Main scene of the stage
 	private AnchorPane mainPane;				// Main pane of the scene, covers everything
 	private AnchorPane lastSkillAp;				// The anchor pane that displays the last skill used
+	private AnchorPane recSkillAp;				// The anchor pane that recommend the next skill to use
 	private GridPane iconContainer;				// The pane that stores all the skill icons/buttons
 	private VBox mainContainer;					// The container that stores other panes
 	private HBox buffContainer;					// The container that display buffs
@@ -91,6 +92,7 @@ public class ViewManagerPC extends ViewManager
 	private Text durabilityText;				// The text that displays current durability
 	private Text round;							// The text that displays current round
 	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
+	private Text finalizeText;					// The text that notifies the user that present recommend skills are in finalize sequence
 	private Timeline tml = new Timeline();		// The timeline that stores GCD animation
 	private Button confirm;
 	private ArrayList<Text> progText;		// 0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
@@ -727,26 +729,51 @@ public class ViewManagerPC extends ViewManager
 		HBox container = new HBox();
 		Text lastSkillT = new Text("上一个技能:  ");
 		ArrayList<Text> t = new ArrayList<Text>();
+		Rectangle dividerRec = new Rectangle(3, 41);
+
 		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new GridPane(); 
+		recSkillAp = new AnchorPane();
 		
 		Text line1 = new Text("   100%效率下的进展: " + engine.getBaseProgEff());
 		Text line2 = new Text("   100%效率下的品质: " + engine.getBaseQltyEff());
 		
+		Text recSkillText = new Text("推荐技能：");
+		finalizeText = new Text();
+		
+		recSkillText.setFill(Color.WHITE);
+		finalizeText.setFill(Color.YELLOW);
+		
 		lastSkillAp.setPrefSize(39.0, 39.0);
 		lastSkillAp.setMaxSize(39.0, 39.0);
-		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
-		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
-		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
 		
 		efficiencyDisp.add(line1, 0, 0);
 		efficiencyDisp.add(line2, 0, 1);
 		
 		efficiencyDisp.setVgap(8.0);
 		
+		recSkillAp.setPrefSize(39.0, 39.0);
+		recSkillAp.setMaxSize(39.0, 39.0);
+		
+		recSkillAp.setBackground(new Background(new BackgroundImage(
+					new Image(BuffSkill.Muscle_Memory.getAddress(), true), null, null, 
+					BackgroundPosition.CENTER, null)));
+		
+		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
+		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
+		
+		HBox.setMargin(recSkillText, new Insets(0, 10.0, 0, 20.0));
+		HBox.setMargin(recSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		
+		HBox.setMargin(finalizeText, new Insets(0, 10.0, 0, 30.0));
+		
+		dividerRec.setFill(Color.RED);
+
 		container.setMinWidth(REC_WIDTH - 32.0);
 		container.setAlignment(Pos.CENTER_LEFT);
-		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
+		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
+				dividerRec, recSkillText, recSkillAp, finalizeText);
 		
 		t.add(lastSkillT);
 		t.add(line1);
@@ -926,6 +953,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	public void updateAll() {
 		node = lm.getPresentNode();
+		updateRecSkill();
 		updateProgress();
 		updateQuality();
 		updateCP();
@@ -938,13 +966,33 @@ public class ViewManagerPC extends ViewManager
 		updateSkillCP();
 	}
 	
+	public void updateRecSkill() {
+		recSkillAp.setBackground(new Background(new BackgroundImage(
+				new Image(engine.getRecSkill().getAddress(), true), null, null, 
+				BackgroundPosition.CENTER, null)));
+		
+		int i = engine.getFinalizeSequence();
+		if(i != 0) {
+			if(i == 1) {
+				finalizeText.setText("比尔格二连收尾");
+			}
+			else if(i == 1) {
+				finalizeText.setText("比尔格三连收尾");
+			}
+			else if(i == 1) {
+				finalizeText.setText("双下地比尔格收尾");
+			}
+		}
+	}
+	
 	public void updateProgress() {
 		progText.get(0).setText(engine.getPresentProgress() + "/" + engine.getTotalProgress());
 		if(engine.getPresentProgress()>=engine.getTotalProgress()) {
 			bars.get(0).setWidth(BAR_WIDTH);
 		} else {
 			bars.get(0).setWidth((double)engine.getPresentProgress()/engine.getTotalProgress()*BAR_WIDTH);
-		}	}
+		}	
+	}
 	
 	public void updateQuality() {
 		progText.get(1).setText(engine.getPresentQuality() + "/" + engine.getTotalQuality());
