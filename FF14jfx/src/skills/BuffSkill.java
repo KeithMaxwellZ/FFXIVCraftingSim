@@ -22,7 +22,7 @@ public enum BuffSkill implements Skill
 													32, 0 , 0.0, 0.0, 1.0, 3, false, false, Buff.great_strides),
 	Innovation("改革",
 													18, 0 , 0.0, 0.0, 1.0, 4, false, false, Buff.innovation),
-	Veneration("崇敬（暂译）",						
+	Veneration("崇敬",						
 													18, 0 , 0.0, 0.0, 1.0, 4, false, false, Buff.veneration),
 	Name_of_the_Elements("元素之美名", 	
 													30, 0 , 0.0, 0.0, 1.0, 3, true, false, Buff.name_of_the_elements),
