@@ -177,7 +177,7 @@ public class ViewManagerPC extends ViewManager
 		hl.setOnMouseClicked(e -> {
 			try
 			{
-				Desktop.getDesktop().browse(new URI("ff.web.sdo.com/talos"));
+				Desktop.getDesktop().browse(new URI("https://ff.web.sdo.com/talos"));
 			} catch (IOException e1)
 			{
 				// TODO Auto-generated catch block
@@ -192,7 +192,7 @@ public class ViewManagerPC extends ViewManager
 		
 		TextField l0 = new TextField("有新版本了，请点击下面的链接前往nga下载更新");
 		Hyperlink h0 = new Hyperlink("  NGA发布帖");
-		hl.setOnMouseClicked(e -> {
+		h0.setOnMouseClicked(e -> {
 			try
 			{
 				Desktop.getDesktop().browse(new URI("https://bbs.nga.cn/read.php?tid=21082240"));
