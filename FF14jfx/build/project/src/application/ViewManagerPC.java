@@ -1,7 +1,10 @@
 package application;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,6 +31,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -58,7 +63,7 @@ import skills.SpecialSkills;
 
 /**
  * The main scene of the program
- * @author keithMaxwell 延夏 埃尔德里基
+ * @author keithMaxwell 延夏-埃尔德里基
  *
  */
 public class ViewManagerPC extends ViewManager
@@ -75,7 +80,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
 	
-	private static final String VERSION = "V1.7.0";	// The version of the program
+	private static final String VERSION = "V1.8.0";	// The version of the program
 	
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
@@ -83,6 +88,7 @@ public class ViewManagerPC extends ViewManager
 	private Scene mainScene;					// Main scene of the stage
 	private AnchorPane mainPane;				// Main pane of the scene, covers everything
 	private AnchorPane lastSkillAp;				// The anchor pane that displays the last skill used
+	private AnchorPane recSkillAp;				// The anchor pane that recommend the next skill to use
 	private GridPane iconContainer;				// The pane that stores all the skill icons/buttons
 	private VBox mainContainer;					// The container that stores other panes
 	private HBox buffContainer;					// The container that display buffs
@@ -91,6 +97,7 @@ public class ViewManagerPC extends ViewManager
 	private Text durabilityText;				// The text that displays current durability
 	private Text round;							// The text that displays current round
 	private Text skillDescription;				// The text that displays the skill(where the cursor points) description
+	private Text finalizeText;					// The text that notifies the user that present recommend skills are in finalize sequence
 	private Timeline tml = new Timeline();		// The timeline that stores GCD animation
 	private Button confirm;
 	private ArrayList<Text> progText;		// 0=>Progress 1=>Quality 2=>CP 3=>Status 4=>Success
@@ -121,9 +128,7 @@ public class ViewManagerPC extends ViewManager
 		cm = new ConfigManager(this, engine);
 		mainPane = new AnchorPane();
 
-		
-		tm.startTimer();
-				
+		tm.startTimer();		
 		
 		initSkillsList();
 		initMainDisplay();
@@ -134,11 +139,79 @@ public class ViewManagerPC extends ViewManager
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
+				
 		tml.setOnFinished(e -> {
 			updateAll();
 			ch.addToQueue(node.getSkill(), node.getCraftingStatus(), node.isSkillSuccess());
 		});
+	}
+	
+	protected void showAbout() {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("");
+		alert.setHeaderText("关于");
 		
+		VBox content = new VBox();
+		
+		Hyperlink hl = new Hyperlink("  ff.web.sdo.com/talos");
+		hl.setOnMouseClicked(e -> {
+			try
+			{
+				Desktop.getDesktop().browse(new URI("ff.web.sdo.com/talos"));
+			} catch (IOException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		
+		int i = 0;
+		
+		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
+		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
+		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
+		TextField l5 = new TextField("车牌号: mkc14360610");
+		
+		l1.setEditable(false);
+		l2.setEditable(false);
+		l3.setEditable(false);
+		l4.setEditable(false);
+		l5.setEditable(false);
+		
+		l1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		l5.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		
+		l1.getStyleClass().add("copyablelabel");
+		l2.getStyleClass().add("copyablelabel");
+		l3.getStyleClass().add("copyablelabel");
+		l4.getStyleClass().add("copyablelabel");
+		l5.getStyleClass().add("copyablelabel");
+		
+		content.getChildren().add(i++, l1);
+		content.getChildren().add(i++, l2);
+		content.getChildren().add(i++, l3);
+		content.getChildren().add(i++, l4);
+		content.getChildren().add(i++, l5);
+		content.getChildren().add(i++, hl);
+
+		content.setMinWidth(500);
+		
+		alert.getDialogPane().setExpandableContent(content);
+		
+		alert.getDialogPane().setMinWidth(700);
+		alert.setWidth(700);
+		
+		alert.getDialogPane().setExpanded(true);
+		alert.setResizable(false);
+		alert.showAndWait();
 	}
 	
 	/**
@@ -727,26 +800,51 @@ public class ViewManagerPC extends ViewManager
 		HBox container = new HBox();
 		Text lastSkillT = new Text("上一个技能:  ");
 		ArrayList<Text> t = new ArrayList<Text>();
+		Rectangle dividerRec = new Rectangle(3, 41);
+
 		lastSkillAp = new AnchorPane();
 		efficiencyDisp = new GridPane(); 
+		recSkillAp = new AnchorPane();
 		
 		Text line1 = new Text("   100%效率下的进展: " + engine.getBaseProgEff());
 		Text line2 = new Text("   100%效率下的品质: " + engine.getBaseQltyEff());
 		
+		Text recSkillText = new Text("推荐技能：");
+		finalizeText = new Text();
+		
+		recSkillText.setFill(Color.WHITE);
+		finalizeText.setFill(Color.YELLOW);
+		
 		lastSkillAp.setPrefSize(39.0, 39.0);
 		lastSkillAp.setMaxSize(39.0, 39.0);
-		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
-		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
-		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
 		
 		efficiencyDisp.add(line1, 0, 0);
 		efficiencyDisp.add(line2, 0, 1);
 		
 		efficiencyDisp.setVgap(8.0);
 		
+		recSkillAp.setPrefSize(39.0, 39.0);
+		recSkillAp.setMaxSize(39.0, 39.0);
+		
+		recSkillAp.setBackground(new Background(new BackgroundImage(
+					new Image(BuffSkill.Muscle_Memory.getAddress(), true), null, null, 
+					BackgroundPosition.CENTER, null)));
+		
+		HBox.setMargin(lastSkillT, new Insets(0, 10.0, 0, 10.0));
+		HBox.setMargin(lastSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		HBox.setMargin(efficiencyDisp, new Insets(5.0, 30.0, 5.0, 0));
+		
+		HBox.setMargin(recSkillText, new Insets(0, 10.0, 0, 20.0));
+		HBox.setMargin(recSkillAp, new Insets(5.0, 30.0, 5.0, 0));
+		
+		HBox.setMargin(finalizeText, new Insets(0, 10.0, 0, 30.0));
+		
+		dividerRec.setFill(Color.RED);
+
 		container.setMinWidth(REC_WIDTH - 32.0);
 		container.setAlignment(Pos.CENTER_LEFT);
-		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp);
+		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
+				dividerRec, recSkillText, recSkillAp, finalizeText);
 		
 		t.add(lastSkillT);
 		t.add(line1);
@@ -926,6 +1024,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	public void updateAll() {
 		node = lm.getPresentNode();
+		updateRecSkill();
 		updateProgress();
 		updateQuality();
 		updateCP();
@@ -938,13 +1037,33 @@ public class ViewManagerPC extends ViewManager
 		updateSkillCP();
 	}
 	
+	public void updateRecSkill() {
+		recSkillAp.setBackground(new Background(new BackgroundImage(
+				new Image(engine.getRecSkill().getAddress(), true), null, null, 
+				BackgroundPosition.CENTER, null)));
+		
+		int i = engine.getFinalizeSequence();
+		if(i != 0) {
+			if(i == 1) {
+				finalizeText.setText("比尔格二连收尾");
+			}
+			else if(i == 1) {
+				finalizeText.setText("比尔格三连收尾");
+			}
+			else if(i == 1) {
+				finalizeText.setText("双下地比尔格收尾");
+			}
+		}
+	}
+	
 	public void updateProgress() {
 		progText.get(0).setText(engine.getPresentProgress() + "/" + engine.getTotalProgress());
 		if(engine.getPresentProgress()>=engine.getTotalProgress()) {
 			bars.get(0).setWidth(BAR_WIDTH);
 		} else {
 			bars.get(0).setWidth((double)engine.getPresentProgress()/engine.getTotalProgress()*BAR_WIDTH);
-		}	}
+		}	
+	}
 	
 	public void updateQuality() {
 		progText.get(1).setText(engine.getPresentQuality() + "/" + engine.getTotalQuality());

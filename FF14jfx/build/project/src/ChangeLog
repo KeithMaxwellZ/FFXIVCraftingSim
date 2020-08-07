@@ -236,3 +236,16 @@ All notable changes to this project will be documented in this file.
 # Changed
 - Changed the format of logs
 
+# [1.7.0] 2020-04-15
+# Added
+- Added the function of saving replay
+
+# Fixed
+- Fixed the issue that modification key cannot be processed properly
+
+# [1.8.0] 2020-08-07
+# Added
+- Added skill recommendation based on current status
+- Added about page
+
+- Fixed issue with skill name translation

@@ -13,6 +13,7 @@ public class Main extends Application {
 		  
 		stage = vm.getStage();
 		stage.show();
+		vm.showAbout();
 	}
 
 	public static void main(String[] args) {
