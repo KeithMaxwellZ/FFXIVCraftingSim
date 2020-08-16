@@ -1,0 +1,255 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+
+# [Pending] 
+
+# [0.2.0] 2020-03-30
+## Added
+- The display of skill name
+- The present turn display
+
+## Changed
+- improved skill area display
+- changed the margin of the input area
+
+## Fixed
+- The issue that Patient_Touch gains 2 Inner_Quiet level instead of double it
+- Prudent touch costs 10 durability, now costs 5
+
+# [0.2.0] 2020-03-31
+## Added
+- The display of skill efficiency and durability cost
+- Added the logs output
+
+## Fixed
+- Fixed the issue that the buff Great_Strides lasts for 4 turns, now only lasts for 3
+- Fixed the issue that Precise_Touch gains only 1 Inner_Quite, now gains 2
+
+# [0.2.1] 2020-03-31
+## Fixed
+- Fixed the issue that the half of 5 durability will become 2 
+- Fixed the issue that the present durability can exceed total
+
+# [0.3.0] 2020-03-31
+## Added
+- SP display and value at the end of crafting
+
+# [0.3.1] 2020-03-31
+## Fixed
+- Inner_Quiet will become 0 after a failure of Patient_Touch and 1 Inner_Quiet
+- Fixed the issue that half cp will be rounded down
+
+# [0.3.2] 2020-03-31
+## Fixed
+- Fixed the issue that the buff will be used when skill failed
+
+# [0.4.0] 2020-03-31
+## Added
+- Added skill Careful_Observation
+
+# [0.4.1] 2020-03-31
+## Added
+- Added Version Mark in the title
+- Added start confirmation
+
+# [0.5.0] 2020-03-31
+## Added
+- Added timer, records the complete time of crafting
+- Added last skill display
+
+# [0.5.1] 2020-03-31
+## Added
+- Exporting the crafting summary to logs
+
+## Fixed
+- Fixed the issue with last skill display after starting a new craft process
+
+# [0.5.2] 2020-03-31
+## Changed
+- Updated the logs display
+- Updated the skill description display activation area and timing
+
+# [0.5.3] 2020-04-01
+## Changed
+- Updated ui design (hmmmm...)
+
+# [1.0.0] 2020-04-01
+## Changed
+- updated ui design again (hmmmmm......)
+- First public release!!!!
+
+# [1.0.0-S] 2020-04-01 (merged)
+## Added
+- added lvl difference input
+
+## Fixed
+- minor typo and data error
+
+# [1.0.1] 2020-04-01
+## Changed
+- Changed the display color of CraftingStatus Centered back to Yellow
+
+## Fixed
+- fixed the issue where manipulation buff doesn't work properly when the difference
+	between present dura and total dura is 5
+
+# [1.1.0-S] 2020-04-01
+## Added
+- Added gcd mode
+- Added gcd animation
+
+## Fixed
+- Fixed the issue when click on the text the button won't work
+
+# [1.1.1-S] 2020-04-01
+## Added
+- Added advanced settings box
+
+# [1.1.2-S] (merged)
+## Fixed
+- Fixed the issue that inner quiet is rounded down when Patient_Touch fails
+
+# [1.2.0] 2020-04-01
+## Added
+- Added crafting status to logs
+
+## Fixed
+- Fixed the issue that manipulation will take effect on 
+	the turn the skill manipulation is used
+
+# [1.2.1-S] 2020-04-01
+## Changed
+- Updated Inner Quiet Buff icon
+
+# [1.3.0-S] 2020-04-02
+## Added
+- Added crafting history display
+
+# [1.3.1-S] 2020-04-02
+## Fixed
+- Fixed the bug of no scroll bar
+
+## TODO
+- unknown issue of negative dura
+
+# [1.3.2-S] 2020-04-02
+## Changed
+- Changed the background color of history pane
+
+## Fixed
+- Fixed the issue that refresh buff doesn't work properly
+
+# [1.4.0] 2020-04-02
+## Added
+- Added success rate display in the history bar
+
+## Fixed
+- Fixed issue with manipulation buff calculation
+
+# [1.4.1] 2020-04-02
+## Changed
+- Optimized codes a little bit
+- The history window now will close with the main window
+
+# [1.5.0-S] 2020-04-02
+## Added
+- Added skill rearrange function
+- Added skill mapping import and export function
+
+## Changed
+- Changed the default location of crafting history pane and edit mode menu
+
+# [1.5.1-S] 2020-04-02
+## Fixed
+- Fixed success rate display error
+
+# [1.5.2-S] 2020-04-03
+## Changed
+- Changed the GCD animation to sudden appear
+
+# [1.5.3-S] 2020-04-03
+## Added
+- Added random seed function
+
+## Changed
+- Now the effect of decreased of CP will be directly display by the skill costs
+
+# [1.5.4-S] 2020-04-03
+## Fixed
+- Fixed the issue that last skill is not properly on the turn which crafting is finished
+
+# [1.5.5-S] 2020-04-03
+# Added 
+- Added saving and loading config function
+
+# Fixed 
+- Fixed the issue that Careful_Observation won't show in the crafting history
+
+# [1.5.6-S] 2020-04-04
+# Added
+- Added finish notification after successfully import / export config
+- Added debug pane in advanced options
+
+# [1.5.7-S] 2020-04-04
+## Added 
+- Added Normal mode and Testing mode
+
+# [1.5.8-S] 2020-04-04
+## Changed
+- Now all info update is after the GCD animation
+
+# [1.5.9-S] 2020-04-04
+## Fixed 
+- Fixed the bug that when there's no GCD the information won't update
+
+# [1.5.10-S] 2020-04-04
+## Changed
+- Added download source from gitee
+
+## Fixed 
+- Fixed the bug that the edit pane cannot be displayed
+
+# [1.6.0] 2020-04-05
+## Fixed
+- Fixed the issue that multiple setting pane can be open simultaneously
+
+# [1.6.1-S] 2020-04-05
+# Changed
+- Optimized codes to prepare for the support of awt
+- ui upgrade
+
+## Changed
+- Changed interaction logic
+
+# [1.6.2-S] 2020-04-06
+# Added 
+- Added hotkey binding function
+
+# [1.6.3-S] 2020-04-06
+# Changed
+- Changed the size of some fonts
+
+# Fixed
+- Fixed the issue that crafting history is not displayed correctly
+
+# [1.6.4-S] 2020-04-07
+# Changed
+- Changed the format of logs
+
+# [1.7.0] 2020-04-15
+# Added
+- Added the function of saving replay
+
+# Fixed
+- Fixed the issue that modification key cannot be processed properly
+
+# [1.8.0] 2020-08-07
+# Added
+- Added skill recommendation based on current status
+- Added about page
+
+- Fixed issue with skill name translation
+
+# [1.8.1] 2020-08-07
+# Added
+- Added update check
