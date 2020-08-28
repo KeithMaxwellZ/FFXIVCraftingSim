@@ -8,13 +8,21 @@ import engine.Engine;
 public enum PQSkill implements Skill
 {
 	Basic_Synthesis("制作", 				 
-														 0, 10, 1.2, 0, 1),
+														 0, 10, 1.0, 0, 0.9),
+	Standard_Synthesis("中级制作", 				 
+			 											 15, 10, 1.5, 0, 0.9), //
 	Careful_Synthesis("模范制作", 			 
-														 7, 10, 1.5, 0, 1),
+														 0, 10, 0.9, 0, 1),
+	Careful_Synthesis_II("模范制作II", 			 
+			 											 0, 10, 1.2, 0, 1), //
+	Careful_Synthesis_III("模范制作III", 			 
+			 											 7, 10, 1.5, 0, 1), //
 	Rapid_Synthesis("高速制作", 				 
-														 0, 10, 5.0, 0, 0.5),
-	Groundwork("坯料制作", 						
-														18, 20, 3.0, 0, 1.0),
+														 0, 10, 2.5, 0, 0.5),
+	Rapid_Synthesis_II("高速制作II", 				 
+			 											 12, 10, 3.0, 0, 0.6),
+//	Groundwork("坯料制作", 						
+//														18, 20, 3.0, 0, 1.0),
 	Focused_Synthesis("注视制作", 			 
 														 5, 10, 2.0, 0, 0.5),
 	Brand_of_the_Elements("元素之印记", 	 
@@ -23,26 +31,31 @@ public enum PQSkill implements Skill
 														 6, 10, 3.0, 0, 1),
 	
 	Basic_Touch("加工",						 
-														18, 10, 0, 1.00, 1.0),
+														18, 10, 0, 1.00, 0.7),
 	Standard_Touch("中级加工",				 
-														32, 10, 0, 1.25, 1.0),
+														32, 10, 0, 1.25, 0.8),
+	Advanced_Touch("上级加工",				 
+														48, 10, 0, 1.25, 0.9), //
 	Hasty_Touch("仓促",						  
-														 0, 10, 0, 1.00, 0.6),
+														 0, 10, 0, 1.00, 0.5),
+	Hasty_Touch_II("仓促II",						  
+														5, 10, 0, 1.00, 0.6), //
+	
 	Precise_Touch("集中加工",					 
-														18, 10, 0, 1.50, 1.0),
+														18, 10, 0, 1.50, 0.7),
 	Focused_Touch("注视加工",					 
 														18, 10, 0, 1.50, 0.5),
 	Patient_Touch("专心加工",					 
 														 6, 10, 0, 1.00, 0.5),
 	Prudent_Touch("俭约加工",					 
-														25,  5, 0, 1.00, 1.0),
-	Preparatory_Touch("坯料加工",			 
-														40, 20, 0, 2.00, 1.0),
+														21,  5, 0, 1.00, 0.7),
+//	Preparatory_Touch("坯料加工",			 
+//														40, 20, 0, 2.00, 1.0),
 	
-	Delicate_Synthesis("精密制作",		 
-														32, 10, 1.0, 1.0, 1.0);
+//	Delicate_Synthesis("精密制作",		 
+//														32, 10, 1.0, 1.0, 1.0);
 	
-	
+	;
 	String name;
 	String imgAddress;
 	int cpCost;	

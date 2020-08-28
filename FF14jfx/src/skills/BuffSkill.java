@@ -8,8 +8,8 @@ import skills.Buff;
 
 public enum BuffSkill implements Skill
 {
-	Muscle_Memory("坚信", 					 
-													6, 10, 3.0, 0.0, 1.0, 5, true, true, Buff.muscle_memory),
+//	Muscle_Memory("坚信", 					 
+//													6, 10, 3.0, 0.0, 1.0, 5, true, true, Buff.muscle_memory),
 	Reflect("闲静",								
 													24, 10, 0.0, 1.0, 1.0, 3, true, true, Buff.inner_quiet),
 	Inner_Quiet("内静",						
@@ -22,14 +22,21 @@ public enum BuffSkill implements Skill
 													32, 0 , 0.0, 0.0, 1.0, 3, false, false, Buff.great_strides),
 	Innovation("改革",
 													18, 0 , 0.0, 0.0, 1.0, 4, false, false, Buff.innovation),
-	Veneration("崇敬",						
-													18, 0 , 0.0, 0.0, 1.0, 4, false, false, Buff.veneration),
+//	Veneration("崇敬",						
+//													18, 0 , 0.0, 0.0, 1.0, 4, false, false, Buff.veneration),
 	Name_of_the_Elements("元素之美名", 	
 													30, 0 , 0.0, 0.0, 1.0, 3, true, false, Buff.name_of_the_elements),
-	Final_Appraisal("最终确认",				 
-													1, 0 , 0.0, 0.0, 1.0, 5, false, false, Buff.final_appraisal),
+//	Final_Appraisal("最终确认",				 
+//													1, 0 , 0.0, 0.0, 1.0, 5, false, false, Buff.final_appraisal),
 	Manipulation("掌握",					
-													96, 0 , 0.0, 0.0, 1.0, 8, false, false, Buff.manipulation),
+													88, 0 , 0.0, 0.0, 1.0, 3, false, false, Buff.manipulation),
+	Manipulation_II("掌握",					
+													96, 0 , 0.0, 0.0, 1.0, 8, false, false, Buff.manipulation), //
+	Steady_Hand("稳手",								22, 0, 0.0, 0.0, 1.0, 5, false, false, null), //
+	Steady_Hand_II("稳手II",							25, 0, 0.0, 0.0, 1.0, 5, false, false, null), //
+	Ingenuity("新颖",								24, 0, 0.0, 0.0, 1.0, 5, false, false, null), //
+	Ingenuity_II("新颖II",							32, 0, 0.0, 0.0, 1.0, 5, false, false, null), //
+	Comfort_Zone("安逸",								66, 0, 0.0, 0.0, 1.0, 10, false, false, null),
 	;
 	
 	String name;

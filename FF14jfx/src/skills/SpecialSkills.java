@@ -8,10 +8,17 @@ import engine.Engine;
 public enum SpecialSkills implements Skill
 {
 	Byregots_Blessing("比尔格的祝福", 24),
-	Masters_Mend("精修", 88),
+	Byregots_Skill("比尔格的技巧", 18),
+	Byregots_Miracle("比尔格的奇迹", 10),
+	Release("松弛", 0),
+	Masters_Mend("精修", 92),
+	Masters_Mend_II("精修II", 160),
 	Observe("观察", 7),
 	Tricks_of_the_Trade("秘诀", 0),
-	Careful_Observation("设计变更", 0)
+//	Careful_Observation("设计变更", 0),
+	Renovation("革新", 8),
+	Experience_of_Flawless("坚实的心得", 20), //
+	Flawless_Synthesis("坚实制作", 15), //
 	;
 	
 	String name; 
@@ -74,7 +81,7 @@ public enum SpecialSkills implements Skill
 	@Override
 	public boolean isSuccess()
 	{
-		return true;
+		return true; // TODO: needs modification
 	}
 
 	@Override
@@ -144,6 +151,8 @@ public enum SpecialSkills implements Skill
 			t += 20;
 			if(t > engine.getTotalCP()) {t = engine.getTotalCP();}
 			engine.setPresentCP(t);
+		} else if (this == Renovation) {
+			// TODO: Renovation
 		}
 	}
 }
