@@ -9,14 +9,14 @@ import skills.Skill;
 
 public abstract class ViewManager 
 {
-	protected int craftsmanship = 2563;	
-	protected int control = 2620;
-	protected int cp = 635;
-	protected int totalDurability = 60;						// Durability
-	protected int totalProgress = 9181;					// Total progress
-	protected int totalQuality = 64862;					// Total quality
-	protected int rCraftsmanship = 2484;			// Recommended craftsmanship
-	protected int rControl = 2206;				// Recommended control
+	protected int craftsmanship = 2758;	
+	protected int control = 2907;
+	protected int cp = 657;
+	protected int totalDurability = 50;						// Durability
+	protected int totalProgress = 11126;					// Total progress
+	protected int totalQuality = 82400;					// Total quality
+	protected int rCraftsmanship = 2620;			// Recommended craftsmanship
+	protected int rControl = 2540;				// Recommended control
 	protected double progressDifference = 0.8;	// Level difference index of progress
 	protected double qualityDifference = 0.6;		// Level difference index of quality
 	protected long seed = 0;

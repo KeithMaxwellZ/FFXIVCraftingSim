@@ -1,13 +1,26 @@
 package application;
 
 import java.awt.Desktop;
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import application.components.ConfigManager;
 import application.components.LogManager;
@@ -32,7 +45,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -79,9 +91,7 @@ public class ViewManagerPC extends ViewManager
 	private static final double CP_EDGE = 1.5;			// CP bar edge width
 	private static final double CP_WIDTH = 150.0;		// CP bar width
 	private static final double CP_HEIGHT = 15.0;		// CP bar height
-	
-	private static final String VERSION = "V1.8.0";	// The version of the program
-	
+		
 //	private static final Color TEXT_COLOR = Color.BLACK; // The general color of the text
 	
 	private Stage stage;						// Main stage
@@ -111,8 +121,12 @@ public class ViewManagerPC extends ViewManager
 	
 	private CraftingHistoryPane ch;				
 	private AdvancedSettingsPane asp;			
-	private EditModePane emp;	
+	private EditModePane emp;
 	
+	private String version;
+	private boolean finish;
+	private boolean hasUpdate;
+		
 	public ViewManagerPC() {
 		engine = new Engine(craftsmanship, control, cp, totalDurability, totalProgress, totalQuality, 
 				rCraftsmanship, rControl, progressDifference, 
@@ -127,6 +141,10 @@ public class ViewManagerPC extends ViewManager
 		
 		cm = new ConfigManager(this, engine);
 		mainPane = new AnchorPane();
+		
+		version = "";
+		finish = false;
+		hasUpdate = false;
 
 		tm.startTimer();		
 		
@@ -135,7 +153,7 @@ public class ViewManagerPC extends ViewManager
 		initStage();
 		
 		confirm.requestFocus();
-//		cm.importConfig(false);
+		cm.importConfig(false);
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
@@ -147,6 +165,8 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	protected void showAbout() {
+//		checkUpdate();
+		
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("");
 		alert.setHeaderText("关于");
@@ -157,7 +177,7 @@ public class ViewManagerPC extends ViewManager
 		hl.setOnMouseClicked(e -> {
 			try
 			{
-				Desktop.getDesktop().browse(new URI("ff.web.sdo.com/talos"));
+				Desktop.getDesktop().browse(new URI("https://ff.web.sdo.com/talos"));
 			} catch (IOException e1)
 			{
 				// TODO Auto-generated catch block
@@ -169,13 +189,33 @@ public class ViewManagerPC extends ViewManager
 			}
 		});
 		
-		int i = 0;
 		
-		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l0 = new TextField("有新版本了，请点击下面的链接前往nga下载更新");
+		Hyperlink h0 = new Hyperlink("  NGA发布帖");
+		h0.setOnMouseClicked(e -> {
+			try
+			{
+				Desktop.getDesktop().browse(new URI("https://bbs.nga.cn/read.php?tid=21082240"));
+			} catch (IOException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (URISyntaxException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		});
+		
+		TextField l1 = new TextField("最后更新时间：2020-09-09");
 		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
 		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
 		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
 		TextField l5 = new TextField("车牌号: mkc14360610");
+		
+		if(finish) {
+			l4.setText("四个车位满了，谢谢各位！");
+		}
 		
 		l1.setEditable(false);
 		l2.setEditable(false);
@@ -183,24 +223,37 @@ public class ViewManagerPC extends ViewManager
 		l4.setEditable(false);
 		l5.setEditable(false);
 		
+		l0.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l5.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		
+		l0.getStyleClass().add("copyablelabel");
 		l1.getStyleClass().add("copyablelabel");
 		l2.getStyleClass().add("copyablelabel");
 		l3.getStyleClass().add("copyablelabel");
 		l4.getStyleClass().add("copyablelabel");
 		l5.getStyleClass().add("copyablelabel");
 		
+		int i = 0;
+		
+		hasUpdate = false;
+		finish = true;
+		
+		if(hasUpdate) {
+			content.getChildren().add(i++, l0);
+			content.getChildren().add(i++, h0);
+		}
 		content.getChildren().add(i++, l1);
-		content.getChildren().add(i++, l2);
+//		content.getChildren().add(i++, l2);
 		content.getChildren().add(i++, l3);
-		content.getChildren().add(i++, l4);
-		content.getChildren().add(i++, l5);
-		content.getChildren().add(i++, hl);
+//		content.getChildren().add(i++, l4);
+		if(!finish) {
+			content.getChildren().add(i++, l5);
+			content.getChildren().add(i++, hl);
+		}
 
 		content.setMinWidth(500);
 		
@@ -212,6 +265,119 @@ public class ViewManagerPC extends ViewManager
 		alert.getDialogPane().setExpanded(true);
 		alert.setResizable(false);
 		alert.showAndWait();
+	}
+	
+	private void checkUpdate() {
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		
+		try {
+			DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.parse("info.xml");
+            NodeList n = document.getElementsByTagName("Node");
+            
+            NodeList childNodes = n.item(0).getChildNodes();
+                        
+            for (int k = 0; k < childNodes.getLength(); k++) {
+                if (childNodes.item(k).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                    if(childNodes.item(k).getNodeName().equals("version")) {
+                    	version = childNodes.item(k).getFirstChild().getNodeValue();
+                    }
+                    if(childNodes.item(k).getNodeName().equals("finish")) {
+                    	Object o = childNodes.item(k).getFirstChild().getNodeValue();
+                    	finish = (o.equals("false") ? false : true);
+                    }
+                }
+            }
+		}
+		catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } 
+		catch (IOException e) {
+            e.printStackTrace();
+        } 
+		catch (SAXException e)
+		{
+			e.printStackTrace();
+		}
+		finally {
+			
+		}
+		
+		FileOutputStream fileOut = null;
+		HttpURLConnection connection = null;
+		InputStream inputStream = null;
+		
+		try {
+			 URL httpUrl=new URL("http://ffxiv.cf/crafter/update/info.xml");
+			 connection=(HttpURLConnection) httpUrl.openConnection();
+			 connection.setRequestMethod("GET");
+		     connection.setDoInput(true);  
+		     connection.setDoOutput(true);
+		     connection.setUseCaches(false);
+		     connection.connect();
+		     inputStream=connection.getInputStream();
+		     BufferedInputStream bis = new BufferedInputStream(inputStream);
+		     String filePath = "./";
+	         fileOut = new FileOutputStream(filePath+"cache");
+	         BufferedOutputStream bos = new BufferedOutputStream(fileOut);
+	         
+	         byte[] buf = new byte[4096];
+	         int length = bis.read(buf);
+	         while(length != -1)
+	         {
+	        	 bos.write(buf, 0, length);
+	        	 length = bis.read(buf);
+	         }
+	         bos.close();
+	         bis.close();
+	         connection.disconnect();
+	         
+	         try {
+	 			DocumentBuilder db = dbf.newDocumentBuilder();
+	             Document document = db.parse("cache");
+	             NodeList n = document.getElementsByTagName("Node");
+	             
+	             NodeList childNodes = n.item(0).getChildNodes();
+	                         
+	             for (int k = 0; k < childNodes.getLength(); k++) {
+	                 if (childNodes.item(k).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+	                     if(childNodes.item(k).getNodeName().equals("version")) {
+	                     	String tVersion = childNodes.item(k).getFirstChild().getNodeValue();
+	                     	if(!tVersion.equals(version)) {
+	                     		hasUpdate = true;
+	                     	}
+	                     }
+	                     if(childNodes.item(k).getNodeName().equals("finish")) {
+	                     	Object o = childNodes.item(k).getFirstChild().getNodeValue();
+	                     	finish = (o.equals("false") ? false : true);
+	                     }
+	                 }
+	             }
+	 		}
+	 		catch (ParserConfigurationException e) {
+	             e.printStackTrace();
+	         } 
+	 		catch (IOException e) {
+	             e.printStackTrace();
+	         } 
+	 		catch (SAXException e)
+	 		{
+	 			// TODO Auto-generated catch block
+	 			e.printStackTrace();
+	 		}
+	 		finally {
+	 			
+	 		}
+	         
+		} 
+		catch (Exception e)
+		{
+			 e.printStackTrace();
+		}
+
+		System.out.println(hasUpdate);
+		
+		return;
 	}
 	
 	/**
@@ -273,7 +439,7 @@ public class ViewManagerPC extends ViewManager
 		mainPane.setBackground(new Background(
 				new BackgroundFill(Color.LIGHTGRAY, null, null)));
 
-		stage.setTitle("FFXIV Crafting Simulator " + VERSION);
+		stage.setTitle("FFXIV Crafting Simulator S2 V1.0");
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
@@ -843,8 +1009,10 @@ public class ViewManagerPC extends ViewManager
 
 		container.setMinWidth(REC_WIDTH - 32.0);
 		container.setAlignment(Pos.CENTER_LEFT);
+//		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
+//				dividerRec, recSkillText, recSkillAp, finalizeText);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
-				dividerRec, recSkillText, recSkillAp, finalizeText);
+				dividerRec);
 		
 		t.add(lastSkillT);
 		t.add(line1);
@@ -1024,7 +1192,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	public void updateAll() {
 		node = lm.getPresentNode();
-		updateRecSkill();
+//		updateRecSkill();
 		updateProgress();
 		updateQuality();
 		updateCP();

@@ -249,3 +249,7 @@ All notable changes to this project will be documented in this file.
 - Added about page
 
 - Fixed issue with skill name translation
+
+# [1.8.1] 2020-08-07
+# Added
+- Added update check

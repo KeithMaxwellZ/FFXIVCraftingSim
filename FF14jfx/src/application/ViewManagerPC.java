@@ -153,7 +153,7 @@ public class ViewManagerPC extends ViewManager
 		initStage();
 		
 		confirm.requestFocus();
-//		cm.importConfig(false);
+		cm.importConfig(false);
 		
 		ch = new CraftingHistoryPane(this);  // the CraftingHistoryPane need the size of the 
 											 // main stage so it's initialized at last
@@ -165,7 +165,7 @@ public class ViewManagerPC extends ViewManager
 	}
 	
 	protected void showAbout() {
-		checkUpdate();
+//		checkUpdate();
 		
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("");
@@ -207,7 +207,7 @@ public class ViewManagerPC extends ViewManager
 			}
 		});
 		
-		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l1 = new TextField("最后更新时间：2020-09-09");
 		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
 		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
 		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
@@ -239,14 +239,17 @@ public class ViewManagerPC extends ViewManager
 		
 		int i = 0;
 		
+		hasUpdate = false;
+		finish = true;
+		
 		if(hasUpdate) {
 			content.getChildren().add(i++, l0);
 			content.getChildren().add(i++, h0);
 		}
 		content.getChildren().add(i++, l1);
-		content.getChildren().add(i++, l2);
+//		content.getChildren().add(i++, l2);
 		content.getChildren().add(i++, l3);
-		content.getChildren().add(i++, l4);
+//		content.getChildren().add(i++, l4);
 		if(!finish) {
 			content.getChildren().add(i++, l5);
 			content.getChildren().add(i++, hl);
@@ -436,7 +439,7 @@ public class ViewManagerPC extends ViewManager
 		mainPane.setBackground(new Background(
 				new BackgroundFill(Color.LIGHTGRAY, null, null)));
 
-		stage.setTitle("FFXIV Crafting Simulator " + version);
+		stage.setTitle("FFXIV Crafting Simulator S2 V1.0");
 		stage.setScene(mainScene);
 		stage.setResizable(false);
 		stage.setOnCloseRequest(e -> {			// Close other related windows
@@ -1006,8 +1009,10 @@ public class ViewManagerPC extends ViewManager
 
 		container.setMinWidth(REC_WIDTH - 32.0);
 		container.setAlignment(Pos.CENTER_LEFT);
+//		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
+//				dividerRec, recSkillText, recSkillAp, finalizeText);
 		container.getChildren().addAll(lastSkillT, lastSkillAp, efficiencyDisp, 
-				dividerRec, recSkillText, recSkillAp, finalizeText);
+				dividerRec);
 		
 		t.add(lastSkillT);
 		t.add(line1);
@@ -1187,7 +1192,7 @@ public class ViewManagerPC extends ViewManager
 	 */
 	public void updateAll() {
 		node = lm.getPresentNode();
-		updateRecSkill();
+//		updateRecSkill();
 		updateProgress();
 		updateQuality();
 		updateCP();
