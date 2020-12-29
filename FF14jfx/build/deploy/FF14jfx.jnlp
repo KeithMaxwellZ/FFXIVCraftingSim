@@ -8,15 +8,15 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="FF14jfx.jar" size="197981" download="eager" />
-    <jar href="libs\javafx-swt.jar" size="36675" download="eager" />
-    <jar href="libs\javafx.base.jar" size="744505" download="eager" />
-    <jar href="libs\javafx.controls.jar" size="2508818" download="eager" />
-    <jar href="libs\javafx.fxml.jar" size="125617" download="eager" />
-    <jar href="libs\javafx.graphics.jar" size="4289319" download="eager" />
-    <jar href="libs\javafx.media.jar" size="264239" download="eager" />
-    <jar href="libs\javafx.swing.jar" size="87867" download="eager" />
-    <jar href="libs\javafx.web.jar" size="704708" download="eager" />
+    <jar href="FF14jfx.jar" size="198437" download="eager" />
+    <jar href="libs\javafx-swt.jar" size="36811" download="eager" />
+    <jar href="libs\javafx.base.jar" size="749889" download="eager" />
+    <jar href="libs\javafx.controls.jar" size="2511137" download="eager" />
+    <jar href="libs\javafx.fxml.jar" size="127395" download="eager" />
+    <jar href="libs\javafx.graphics.jar" size="4295861" download="eager" />
+    <jar href="libs\javafx.media.jar" size="270594" download="eager" />
+    <jar href="libs\javafx.swing.jar" size="119848" download="eager" />
+    <jar href="libs\javafx.web.jar" size="714741" download="eager" />
     <jar href="libs\jl1.0.1.jar" size="105363" download="eager" />
   </resources>
   <jfx:javafx-desc  width="0" height="0" main-class="application.Main"  name="FF14 Crafting Simulator" />

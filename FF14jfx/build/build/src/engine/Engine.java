@@ -19,8 +19,7 @@ import skills.SpecialSkills;
 
 public class Engine
 {	
-	// Finalize Sequence
-	private static ArrayList<ArrayList<Skill>> FS;
+
 	
 	// Same as those appeared in ViewManager
 	private double progressDifference = 0.8;
@@ -40,15 +39,13 @@ public class Engine
 	
 //	private ArrayList<String> logs; // Stores the logs of the whole crafting process
 	
-	private CraftingStatus cs; // Stores the current crafting status (see enum CraftingStatus)
+	CraftingStatus cs; // Stores the current crafting status (see enum CraftingStatus)
 	private CraftingStatus lastCs;
 	
 	private boolean progIncreased;	// Record if the progress and quality has increased or not
 	private boolean qltyIncreased;	// These two are for updating the buff
 	
-	private int finalizeSequence;
-	
-	private Iterator<Skill> FSIterator;
+//	private AI ai;
 	
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
@@ -70,42 +67,7 @@ public class Engine
 	protected boolean observed;  // Record if last turn used the skill Observe
 	protected boolean skillSuccess = true; // Record if the skill is success
 	
-	static {
-		FS = new ArrayList<ArrayList<Skill>>();
-		
-		ArrayList<Skill> temp = new ArrayList<Skill>();
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(BuffSkill.Innovation);
-		temp.add(SpecialSkills.Observe);
-		temp.add(PQSkill.Focused_Touch);
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(SpecialSkills.Byregots_Blessing);
-		temp.add(PQSkill.Basic_Synthesis);
-		
-		FS.add(new ArrayList<Skill>(temp));
-		
-		temp = new ArrayList<Skill>();
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(BuffSkill.Innovation);
-		temp.add(PQSkill.Preparatory_Touch);
-		temp.add(PQSkill.Prudent_Touch);
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(SpecialSkills.Byregots_Blessing);
-		temp.add(PQSkill.Basic_Synthesis);
-		
-		FS.add(new ArrayList<Skill>(temp));
-		
-		temp = new ArrayList<Skill>();
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(BuffSkill.Innovation);
-		temp.add(PQSkill.Preparatory_Touch);
-		temp.add(PQSkill.Prudent_Touch);
-		temp.add(BuffSkill.Great_Strides);
-		temp.add(SpecialSkills.Byregots_Blessing);
-		temp.add(PQSkill.Basic_Synthesis);
-		
-		FS.add(new ArrayList<Skill>(temp));
-	}
+
 	
 	public Engine(int craftsmanship, int control, int totalCP, int totalDurability, 
 				int totalProgress, int totalQuality, int recCraftsmanship, int recControl,
@@ -136,7 +98,8 @@ public class Engine
 		es = EngineStatus.Crafting;
 		progIncreased = false;
 		qltyIncreased = false;
-		finalizeSequence = 0;
+		
+//		ai = new AI(this);
 		
 		timer = new Timer();
 		timer.startTimer();
@@ -520,7 +483,7 @@ public class Engine
 		cs = CraftingStatus.getNextStatus();
 	}
 	
-	private boolean buffExist(Buff b) {
+	boolean buffExist(Buff b) {
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff == b) return true;
 		}
@@ -549,21 +512,21 @@ public class Engine
 	
 	/**
 	 * Calculate SP after finishing crafting
-	 * @return
+	 * @return the value of skill points
 	 */
 	public int SPCalc() {
-		final int lv1 = 4500;
-		final int lv2 = 5000;
-		final int lv3 = 6000;
+		final int lv1 = 5800;
+		final int lv2 = 6500;
+		final int lv3 = 7700;
 		
 		if(presentQuality/10 < lv1) {
 			return 0;
 		} else if (presentQuality/10 < lv2) {
 			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
 		} else if (presentQuality/10 < lv3) {
-			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.25);
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.45);
 		} else {
-			return (int)Math.floor(800 + ((double)presentQuality/10 - lv3) * 0.9);
+			return (int)Math.floor(1100 + ((double)presentQuality/10 - lv3) * 0.3);
 		}
 	}
 	
@@ -616,252 +579,10 @@ public class Engine
 	 * Get the recommended skill based on present status
 	 * @return the skill recommended
 	 */
-	public Skill getRecSkill() {
-		
-		if(finalizeSequence == 0) {
-			finalizeCheck();
-		}
-		
-		if(finalizeSequence != 0) {
-			if(FSIterator == null) {
-				FSIterator = FS.get(finalizeSequence).iterator();
-			}
-			
-			if(FSIterator.hasNext()) {
-				return FSIterator.next();
-			}
-			else {
-				return PQSkill.Basic_Synthesis;
-			}
-		}
-		
-		if(round == 0) {
-			return BuffSkill.Muscle_Memory;
-		}
-		else if(round == 1) {
-			return BuffSkill.Veneration;
-		}
-		
-		if(innerQuietLvl == 0 && (cs == CraftingStatus.Normal || 
-								  cs == CraftingStatus.Sturdy ||
-								  cs == CraftingStatus.Centered)) {
-			return BuffSkill.Inner_Quiet;
-		}
-		
-		if(cs == CraftingStatus.Normal) {
-			boolean hasManipulation = buffExist(Buff.manipulation);
-			boolean hasWasteNot = buffExist(Buff.waste_not);
-			
-			if(presentDurability >= 41 && presentDurability <= 60) {
-				return PQSkill.Hasty_Touch;
-			}
-			else if(presentDurability >= 21 && presentDurability <= 40) {
-				if(hasManipulation || hasWasteNot) {
-					return PQSkill.Hasty_Touch;
-				}
-				else {
-					return BuffSkill.Manipulation;
-				}
-			}
-			else if(presentDurability >= 11 && presentDurability <= 20) {
-				if(hasManipulation) {
-					return SpecialSkills.Masters_Mend;
-				}
-				else if(hasWasteNot) {
-					return PQSkill.Hasty_Touch;
-				}
-				else {
-					return BuffSkill.Manipulation;
-				}
-			}
-			else if(presentDurability >= 6 && presentDurability <= 10) {
-				if(hasWasteNot) {
-					return PQSkill.Hasty_Touch;
-				}
-				else {
-					return SpecialSkills.Masters_Mend;
-				}
-			}
-			else {
-				return SpecialSkills.Masters_Mend;
-			}
-		}
-		else if(cs == CraftingStatus.Pliant) {
-			boolean hasManipulation = buffExist(Buff.manipulation);
-			boolean hasWasteNot = buffExist(Buff.waste_not);
-			
-			int manipulationRemaining = 0;
-			if(hasManipulation) {
-				for(ActiveBuff ab: activeBuffs) {
-					if(ab.buff == Buff.manipulation) {
-						manipulationRemaining = ab.getRemaining();
-					}
-				}
-			}
-			
-			if(presentDurability >= 56 && presentDurability <= 60) {
-				if(hasManipulation || hasWasteNot) {
-					return PQSkill.Preparatory_Touch;
-				}
-				else {
-					return BuffSkill.Manipulation;
-				}
-			}
-			else if(presentDurability >= 26 && presentDurability <= 55) {
-				if(hasWasteNot) {
-					if(manipulationRemaining > 1) {
-						return PQSkill.Preparatory_Touch;
-					}
-					else{
-						return BuffSkill.Manipulation;
-					}
-				}
-				else if(hasManipulation) {
-					return BuffSkill.Waste_Not_II;
-				}
-				else {
-					return BuffSkill.Manipulation;
-				}
-			}
-			else if(presentDurability >= 11 && presentDurability <= 25) {
-				if(hasWasteNot) {
-					if(manipulationRemaining > 1) {
-						return PQSkill.Preparatory_Touch;
-					}
-					else{
-						return BuffSkill.Manipulation;
-					}
-				}
-				else if(hasManipulation) {
-					return SpecialSkills.Masters_Mend;
-				}
-				else {
-					return BuffSkill.Manipulation;
-				}
-			}
-			else{
-				return SpecialSkills.Masters_Mend;
-			}
-		}
-		else if(cs == CraftingStatus.Centered) {
-//			boolean hasManipulation = buffExist(Buff.manipulation);
-			boolean hasWasteNot = buffExist(Buff.waste_not);
-						
-			if(presentDurability >= 11 && presentDurability <= 60) {
-				if(innerQuietLvl <= 5) {
-					return PQSkill.Patient_Touch;
-				} else {
-					return PQSkill.Hasty_Touch;
-				}
-			}
-			else if(presentDurability >= 6 && presentDurability <= 10) {
-				if(hasWasteNot) {
-					if(innerQuietLvl <= 5) {
-						return PQSkill.Patient_Touch;
-					} else {
-						return PQSkill.Hasty_Touch;
-					}
-				}
-				else {
-					return SpecialSkills.Masters_Mend;
-				}
-			}
-			else{
-				return SpecialSkills.Masters_Mend;
-			}
-		}
-		else if(cs == CraftingStatus.Sturdy) {
-//			boolean hasManipulation = buffExist(Buff.manipulation);
-			boolean hasWasteNot = buffExist(Buff.waste_not);
-						
-			if(presentDurability >= 56 && presentDurability <= 60) {
-				if(hasWasteNot) {
-					return PQSkill.Preparatory_Touch;
-				} else {
-					return PQSkill.Hasty_Touch;
-				}
-			}
-			else if(presentDurability >= 6 && presentDurability <= 55) {
-				if(hasWasteNot) {
-					if(presentDurability % 5 == 0) {
-						return PQSkill.Preparatory_Touch;
-					} else {
-						return PQSkill.Hasty_Touch;
-					}
-				}
-				else {
-					return PQSkill.Hasty_Touch;
-				}
-			}
-			else if(presentDurability >= 4 && presentDurability <= 5) {
-				if(hasWasteNot) {
-					return PQSkill.Hasty_Touch;
-				}
-				else {
-					return PQSkill.Prudent_Touch;
-				}
-			}
-			else{
-				return SpecialSkills.Masters_Mend;
-			}
-		}
-		else if(cs == CraftingStatus.HQ) {
-			boolean hasManipulation = buffExist(Buff.manipulation);
-			boolean hasWasteNot = buffExist(Buff.waste_not);
-						
-			if(presentDurability >= 56 && presentDurability <= 60) {
-				if(hasManipulation || hasWasteNot) {
-					return PQSkill.Precise_Touch;
-				}
-				else {
-					return SpecialSkills.Tricks_of_the_Trade;
-				}
-			}
-			else if(presentDurability >= 6 && presentDurability <= 55) {
-				if(hasWasteNot) {
-					return PQSkill.Precise_Touch;
-				}
-				else {
-					return SpecialSkills.Tricks_of_the_Trade;
-				}
-			}
+//	public Skill getRecSkill() {
+//		return ai.RecSkill();
+//	}
 
-			else{
-				return SpecialSkills.Tricks_of_the_Trade;
-			}
-		}
-		return null;
-	}
-	
-	private void finalizeCheck()
-	{
-		int qualityRemaining = 60000 - presentProgress;
-		int progressRemaining = totalProgress - presentProgress;
-		if(qualityRemaining <= (double)baseQltyEff * 15.5 && presentCP >= 186 && presentDurability >= 51) {
-			if(progressRemaining > (double)baseProgEff * 1.2 && progressRemaining <= (double)baseProgEff * 1.5 && presentCP >= 193) {
-				finalizeSequence = 3;
-			}
-			else if(progressRemaining <= baseProgEff) {
-				finalizeSequence = 3;
-			}
-		}
-		else if(qualityRemaining <= (double)baseQltyEff * 14.0 && presentCP >= 171 && presentDurability >= 36) {
-			if(progressRemaining > (double)baseProgEff * 1.2 && progressRemaining <= (double)baseProgEff * 1.5 && presentCP >= 178) {
-				finalizeSequence = 2;
-			}
-			else if(progressRemaining <= baseProgEff) {
-				finalizeSequence = 2;
-			}
-		}
-		else if(qualityRemaining <= (double)baseQltyEff * 11.25 && presentCP >= 131 && presentDurability >= 21) {
-			if(progressRemaining > (double)baseProgEff * 1.2 && progressRemaining <= (double)baseProgEff * 1.5 && presentCP >= 138) {
-				finalizeSequence = 1;
-			}
-			else if(progressRemaining <= baseProgEff) {
-				finalizeSequence = 1;
-			}
-		}
-	}
 	
 	// == getters and setters ==
 	public List<ActiveBuff> getActiveBuffs() {
@@ -994,7 +715,7 @@ public class Engine
 		return lm;
 	}
 	
-	public int getFinalizeSequence() {
-		return finalizeSequence;
-	}
+//	public int getFinalizeSequence() {
+//		return ai.finalizeSequence;
+//	}
 }

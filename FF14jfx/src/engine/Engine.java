@@ -45,7 +45,7 @@ public class Engine
 	private boolean progIncreased;	// Record if the progress and quality has increased or not
 	private boolean qltyIncreased;	// These two are for updating the buff
 	
-	private AI ai;
+//	private AI ai;
 	
 	private EngineStatus es;		// Record the engine status (see enum EngineStatus)
 	
@@ -99,7 +99,7 @@ public class Engine
 		progIncreased = false;
 		qltyIncreased = false;
 		
-		ai = new AI(this);
+//		ai = new AI(this);
 		
 		timer = new Timer();
 		timer.startTimer();
@@ -512,21 +512,21 @@ public class Engine
 	
 	/**
 	 * Calculate SP after finishing crafting
-	 * @return
+	 * @return the value of skill points
 	 */
 	public int SPCalc() {
-		final int lv1 = 4500;
-		final int lv2 = 5000;
-		final int lv3 = 6000;
+		final int lv1 = 5800;
+		final int lv2 = 6500;
+		final int lv3 = 7700;
 		
 		if(presentQuality/10 < lv1) {
 			return 0;
 		} else if (presentQuality/10 < lv2) {
 			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
 		} else if (presentQuality/10 < lv3) {
-			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.25);
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.45);
 		} else {
-			return (int)Math.floor(800 + ((double)presentQuality/10 - lv3) * 0.9);
+			return (int)Math.floor(1100 + ((double)presentQuality/10 - lv3) * 0.3);
 		}
 	}
 	
@@ -579,9 +579,9 @@ public class Engine
 	 * Get the recommended skill based on present status
 	 * @return the skill recommended
 	 */
-	public Skill getRecSkill() {
-		return ai.RecSkill();
-	}
+//	public Skill getRecSkill() {
+//		return ai.RecSkill();
+//	}
 
 	
 	// == getters and setters ==
@@ -715,7 +715,7 @@ public class Engine
 		return lm;
 	}
 	
-	public int getFinalizeSequence() {
-		return ai.finalizeSequence;
-	}
+//	public int getFinalizeSequence() {
+//		return ai.finalizeSequence;
+//	}
 }
