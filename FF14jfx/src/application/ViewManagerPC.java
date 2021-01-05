@@ -207,7 +207,7 @@ public class ViewManagerPC extends ViewManager
 			}
 		});
 		
-		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l1 = new TextField("最后更新时间：2020-12-30");
 		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
 		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
 //		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");

@@ -12,7 +12,7 @@ public abstract class ViewManager
 	protected int craftsmanship = 2758;
 	protected int control = 2907;
 	protected int cp = 657;
-	protected int totalDurability = 60;						// Durability
+	protected int totalDurability = 50;						// Durability
 	protected int totalProgress = 11126;					// Total progress
 	protected int totalQuality = 82400;					// Total quality
 	protected int rCraftsmanship = 2620;			// Recommended craftsmanship
