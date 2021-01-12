@@ -7,12 +7,12 @@ import javafx.scene.paint.Color;
 
 public enum CraftingStatus
 {
-	Sturdy(  "顽丈　　", Color.BLUE, java.awt.Color.BLUE),
+	Sturdy(  "顽丈　　", Color.CYAN, java.awt.Color.CYAN),
 	Centered("安定　　", Color.YELLOW, java.awt.Color.YELLOW),
 	Pliant(  "高性能　", Color.GREEN, java.awt.Color.GREEN),
 	HQ(      "高品质　", Color.RED, java.awt.Color.RED),
 	Normal(  "通常　　", Color.WHITE, java.awt.Color.WHITE),
-	PROG(    "高进展　", Color.ORANGE, java.awt.Color.ORANGE),
+	PROG(    "高进展　", Color.BLUE, java.awt.Color.BLUE),
 	BUFF(    "持久　", Color.PURPLE, java.awt.Color.PINK),
 	
 	MQ(		 "最高品质", Color.FUCHSIA, new java.awt.Color(Integer.parseInt("FF00FF", 16))),
@@ -60,12 +60,11 @@ public enum CraftingStatus
 		normalCs = new ArrayList<>();
 		
 		expertCs.add(new Node(Sturdy, 0.18));
-		expertCs.add(new Node(Centered, 0.15));
 		expertCs.add(new Node(Pliant, 0.12));
 		expertCs.add(new Node(HQ, 0.10));
-		expertCs.add(new Node(PROG, 0.10));
-		expertCs.add(new Node(BUFF, 0.10));
-		expertCs.add(new Node(Normal, 0.25));
+		expertCs.add(new Node(PROG, 0.1));
+		expertCs.add(new Node(BUFF, 0.1));
+		expertCs.add(new Node(Normal, 0.4));
 		
 		normalCs.add(new Node(Normal, 0.75));
 		normalCs.add(new Node(HQ, 0.2));

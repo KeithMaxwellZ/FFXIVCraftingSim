@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 
 public enum CraftingStatus
 {
-	Sturdy(  "顽丈　　", Color.BLUE, java.awt.Color.BLUE),
+	Sturdy(  "顽丈　　", Color.LIGHTBLUE, java.awt.Color.LIGHTBLUE),
 	Centered("安定　　", Color.YELLOW, java.awt.Color.YELLOW),
 	Pliant(  "高性能　", Color.GREEN, java.awt.Color.GREEN),
 	HQ(      "高品质　", Color.RED, java.awt.Color.RED),
