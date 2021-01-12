@@ -173,21 +173,21 @@ public class ViewManagerPC extends ViewManager
 		
 		VBox content = new VBox();
 		
-		Hyperlink hl = new Hyperlink("  ff.web.sdo.com/talos");
-		hl.setOnMouseClicked(e -> {
-			try
-			{
-				Desktop.getDesktop().browse(new URI("https://ff.web.sdo.com/talos"));
-			} catch (IOException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (URISyntaxException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		});
+//		Hyperlink hl = new Hyperlink("  ff.web.sdo.com/talos");
+//		hl.setOnMouseClicked(e -> {
+//			try
+//			{
+//				Desktop.getDesktop().browse(new URI("https://ff.web.sdo.com/talos"));
+//			} catch (IOException e1)
+//			{
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			} catch (URISyntaxException e1)
+//			{
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//		});
 		
 		
 		TextField l0 = new TextField("有新版本了，请点击下面的链接前往nga下载更新");
@@ -207,35 +207,35 @@ public class ViewManagerPC extends ViewManager
 			}
 		});
 		
-		TextField l1 = new TextField("最后更新时间：2020-08-26");
+		TextField l1 = new TextField("最后更新时间：2020-12-30");
 		TextField l2 = new TextField("推荐技能功能仅供参考，并且默认坚信起手，建议主要根据自己的习惯与手法来推进");
 		TextField l3 = new TextField("如果有问题欢迎在发布帖下留言或私聊我，我都会看的");
-		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
-		TextField l5 = new TextField("车牌号: mkc14360610");
-		
-		if(finish) {
-			l4.setText("四个车位满了，谢谢各位！");
-		}
+//		TextField l4 = new TextField("觉得这个模拟器有帮助并且想支持我的话，就点击下面的链接上我的魔矿车吧，谢谢！");
+//		TextField l5 = new TextField("车牌号: mkc14360610");
+//
+//		if(finish) {
+//			l4.setText("四个车位满了，谢谢各位！");
+//		}
 		
 		l1.setEditable(false);
 		l2.setEditable(false);
 		l3.setEditable(false);
-		l4.setEditable(false);
-		l5.setEditable(false);
+//		l4.setEditable(false);
+//		l5.setEditable(false);
 		
 		l0.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l1.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l2.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		l3.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		l4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		l5.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//		l4.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//		l5.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		
 		l0.getStyleClass().add("copyablelabel");
 		l1.getStyleClass().add("copyablelabel");
 		l2.getStyleClass().add("copyablelabel");
 		l3.getStyleClass().add("copyablelabel");
-		l4.getStyleClass().add("copyablelabel");
-		l5.getStyleClass().add("copyablelabel");
+//		l4.getStyleClass().add("copyablelabel");
+//		l5.getStyleClass().add("copyablelabel");
 		
 		int i = 0;
 		
@@ -246,11 +246,11 @@ public class ViewManagerPC extends ViewManager
 		content.getChildren().add(i++, l1);
 		content.getChildren().add(i++, l2);
 		content.getChildren().add(i++, l3);
-		content.getChildren().add(i++, l4);
-		if(!finish) {
-			content.getChildren().add(i++, l5);
-			content.getChildren().add(i++, hl);
-		}
+//		content.getChildren().add(i++, l4);
+//		if(!finish) {
+//			content.getChildren().add(i++, l5);
+//			content.getChildren().add(i++, hl);
+//		}
 
 		content.setMinWidth(500);
 		
