@@ -518,16 +518,16 @@ public class Engine
 	public int SPCalc() {
 		final int lv1 = 5800;
 		final int lv2 = 6500;
-		final int lv3 = 7700;
+		final int lv3 = 7400;
 		
 		if(presentQuality/10 < lv1) {
 			return 0;
 		} else if (presentQuality/10 < lv2) {
 			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
 		} else if (presentQuality/10 < lv3) {
-			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.45);
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.3);
 		} else {
-			return (int)Math.floor(1100 + ((double)presentQuality/10 - lv3) * 0.3);
+			return (int)Math.floor(820 + ((double)presentQuality/10 - lv3) * 0.6);
 		}
 	}
 	
