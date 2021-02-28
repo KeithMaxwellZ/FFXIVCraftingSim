@@ -20,7 +20,7 @@ public enum PQSkill implements Skill
 	Brand_of_the_Elements("元素之印记", 	 
 														 6, 10, 1.0, 0, 1),
 	Intensive_Synthesis("集中制作",		 
-														 6, 10, 3.0, 0, 1),
+														 6, 10, 4.0, 0, 1),
 	
 	Basic_Touch("加工",						 
 														18, 10, 0, 1.00, 1.0),
@@ -130,6 +130,13 @@ public enum PQSkill implements Skill
 	@Override
 	public int getCPCost()
 	{
+		if(this == Standard_Touch) {
+			System.out.println("123");
+			System.out.println(engine.isBasicTouch());
+		}
+		if(this == Standard_Touch && engine.isBasicTouch()) {
+			return 18;
+		}
 		return cpCost;
 	}
 

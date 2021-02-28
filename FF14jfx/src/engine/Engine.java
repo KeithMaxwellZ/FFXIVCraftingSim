@@ -65,6 +65,7 @@ public class Engine
 	protected int innerQuietLvl;
 	
 	protected boolean observed;  // Record if last turn used the skill Observe
+	protected boolean basicTouch; // Record if last turn used the Basic Touch
 	protected boolean skillSuccess = true; // Record if the skill is success
 	
 
@@ -95,6 +96,7 @@ public class Engine
 		coCount = 0;
 		presentCP = totalCP;
 		observed = false;
+		basicTouch = false;
 		es = EngineStatus.Crafting;
 		progIncreased = false;
 		qltyIncreased = false;
@@ -212,9 +214,15 @@ public class Engine
 		}
 		
 		lm.setSkillSuccess(skillSuccess);
-		
-		observed = false;
 		finalizeRound(sk);
+
+		observed = false;
+		basicTouch = false;
+
+		if(sk == PQSkill.Basic_Touch) {
+			System.out.println("activated");
+			basicTouch = true;
+		}
 	}
 	
 	/**
@@ -259,6 +267,7 @@ public class Engine
 		}
 		
 		observed = false;
+		basicTouch = false;
 		
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff == sk.getBuff()) {
@@ -296,12 +305,17 @@ public class Engine
 			
 //			ch.addToQueue(sk, cs, true);
 			lastCs = cs;
-			cs = CraftingStatus.getNextStatus();			
+			cs = CraftingStatus.getNextStatus();
+
+			observed = false;
+			basicTouch = false;
+
 			return;
 		}
 		beginning(sk);
 
 		observed = false;
+		basicTouch = false;
 
 		if(sk.isSuccess()) {
 			skillSuccess = true;
@@ -644,6 +658,14 @@ public class Engine
 	
 	public void setObserved(boolean b) {
 		observed = b;
+	}
+
+	public boolean isBasicTouch() {
+		return basicTouch;
+	}
+
+	public void setBasicTouch(boolean b) {
+		basicTouch = b;
 	}
 	
 	public int getBaseProgEff() {
