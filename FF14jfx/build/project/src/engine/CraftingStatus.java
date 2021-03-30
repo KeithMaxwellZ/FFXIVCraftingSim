@@ -12,6 +12,8 @@ public enum CraftingStatus
 	Pliant(  "高性能　", Color.GREEN, java.awt.Color.GREEN),
 	HQ(      "高品质　", Color.RED, java.awt.Color.RED),
 	Normal(  "通常　　", Color.WHITE, java.awt.Color.WHITE),
+	PROG(    "高进展　", Color.ORANGE, java.awt.Color.ORANGE),
+	BUFF(    "持久　", Color.PURPLE, java.awt.Color.PINK),
 	
 	MQ(		 "最高品质", Color.FUCHSIA, new java.awt.Color(Integer.parseInt("FF00FF", 16))),
 	LQ(	 	 "低品质　", Color.BLACK, java.awt.Color.BLACK),
@@ -61,7 +63,9 @@ public enum CraftingStatus
 		expertCs.add(new Node(Centered, 0.15));
 		expertCs.add(new Node(Pliant, 0.12));
 		expertCs.add(new Node(HQ, 0.10));
-		expertCs.add(new Node(Normal, 0.45));
+		expertCs.add(new Node(PROG, 0.10));
+		expertCs.add(new Node(BUFF, 0.10));
+		expertCs.add(new Node(Normal, 0.25));
 		
 		normalCs.add(new Node(Normal, 0.75));
 		normalCs.add(new Node(HQ, 0.2));
@@ -69,7 +73,7 @@ public enum CraftingStatus
 		normalCs.add(new Node(LQ, 0.015));
 	}
 	
-	private CraftingStatus(String name, Color fxColor, java.awt.Color awtColor) {
+	CraftingStatus(String name, Color fxColor, java.awt.Color awtColor) {
 		this.name = name;
 		this.fxColor = fxColor;
 		this.awtColor = awtColor;

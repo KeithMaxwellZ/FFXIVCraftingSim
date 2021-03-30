@@ -65,6 +65,7 @@ public class Engine
 	protected int innerQuietLvl;
 	
 	protected boolean observed;  // Record if last turn used the skill Observe
+	protected boolean basicTouch; // Record if last turn used the Basic Touch
 	protected boolean skillSuccess = true; // Record if the skill is success
 	
 
@@ -95,6 +96,7 @@ public class Engine
 		coCount = 0;
 		presentCP = totalCP;
 		observed = false;
+		basicTouch = false;
 		es = EngineStatus.Crafting;
 		progIncreased = false;
 		qltyIncreased = false;
@@ -127,12 +129,12 @@ public class Engine
 	public void addActiveBuff(Buff b, int last) {
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff==b) {
-				ab.setRemaining(last);
+				ab.setRemaining(last + (lastCs == CraftingStatus.BUFF ? 2 : 0));
 				return;
 			}
 		}
 		
-		activeBuffs.add(new ActiveBuff(b, last));
+		activeBuffs.add(new ActiveBuff(b, last + (lastCs == CraftingStatus.BUFF ? 2 : 0)));
 	}
 	
 	/**
@@ -212,9 +214,15 @@ public class Engine
 		}
 		
 		lm.setSkillSuccess(skillSuccess);
-		
-		observed = false;
 		finalizeRound(sk);
+
+		observed = false;
+		basicTouch = false;
+
+		if(sk == PQSkill.Basic_Touch) {
+			System.out.println("activated");
+			basicTouch = true;
+		}
 	}
 	
 	/**
@@ -259,6 +267,7 @@ public class Engine
 		}
 		
 		observed = false;
+		basicTouch = false;
 		
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff == sk.getBuff()) {
@@ -296,12 +305,17 @@ public class Engine
 			
 //			ch.addToQueue(sk, cs, true);
 			lastCs = cs;
-			cs = CraftingStatus.getNextStatus();			
+			cs = CraftingStatus.getNextStatus();
+
+			observed = false;
+			basicTouch = false;
+
 			return;
 		}
 		beginning(sk);
 
 		observed = false;
+		basicTouch = false;
 
 		if(sk.isSuccess()) {
 			skillSuccess = true;
@@ -336,20 +350,21 @@ public class Engine
 	private void forwardProgress(Skill sk) {
 		double tempProgressRate = sk.getActualProgressRate();
 		double tempQualityRate = sk.getActualQualityRate();
-		double statusBuff = 0;
-		
-		if(cs == CraftingStatus.HQ) {
-			statusBuff = 1.5;
+		double progBuff = 1.0;
+		double qltyBuff = 1.0;
+
+		if(cs == CraftingStatus.PROG) {
+			progBuff = 1.5;
+		} else if(cs == CraftingStatus.HQ) {
+			qltyBuff = 1.5;
 		} else if(cs == CraftingStatus.MQ) {
-			statusBuff = 4.0;
+			qltyBuff = 4.0;
 		} else if(cs == CraftingStatus.LQ) {
-			statusBuff = 0.5;
-		} else {
-			statusBuff = 1.0;
+			qltyBuff = 0.5;
 		}
 		
-		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
-		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * statusBuff * tempQualityRate));
+		int tempProgressIncrease = (int)Math.floor(baseProgEff * progBuff * tempProgressRate);
+		int tempQualityIncrease  = (int)Math.floor(baseQltyEff * qltyBuff * tempQualityRate);
 		
 		progIncreased = tempProgressIncrease > 0;
 		qltyIncreased = tempQualityIncrease > 0;
@@ -517,16 +532,16 @@ public class Engine
 	public int SPCalc() {
 		final int lv1 = 5800;
 		final int lv2 = 6500;
-		final int lv3 = 7700;
+		final int lv3 = 7400;
 		
 		if(presentQuality/10 < lv1) {
 			return 0;
 		} else if (presentQuality/10 < lv2) {
 			return (int)Math.floor(175 + ((double)presentQuality/10 - lv1) * 0.1);
 		} else if (presentQuality/10 < lv3) {
-			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.45);
+			return (int)Math.floor(370 + ((double)presentQuality/10 - lv2) * 0.3);
 		} else {
-			return (int)Math.floor(1100 + ((double)presentQuality/10 - lv3) * 0.3);
+			return (int)Math.floor(820 + ((double)presentQuality/10 - lv3) * 0.6);
 		}
 	}
 	
@@ -643,6 +658,14 @@ public class Engine
 	
 	public void setObserved(boolean b) {
 		observed = b;
+	}
+
+	public boolean isBasicTouch() {
+		return basicTouch;
+	}
+
+	public void setBasicTouch(boolean b) {
+		basicTouch = b;
 	}
 	
 	public int getBaseProgEff() {

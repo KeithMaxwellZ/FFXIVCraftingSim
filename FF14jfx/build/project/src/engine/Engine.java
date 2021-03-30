@@ -127,12 +127,12 @@ public class Engine
 	public void addActiveBuff(Buff b, int last) {
 		for(ActiveBuff ab: activeBuffs) {
 			if(ab.buff==b) {
-				ab.setRemaining(last);
+				ab.setRemaining(last + (lastCs == CraftingStatus.BUFF ? 2 : 0));
 				return;
 			}
 		}
 		
-		activeBuffs.add(new ActiveBuff(b, last));
+		activeBuffs.add(new ActiveBuff(b, last + (lastCs == CraftingStatus.BUFF ? 2 : 0)));
 	}
 	
 	/**
@@ -336,20 +336,21 @@ public class Engine
 	private void forwardProgress(Skill sk) {
 		double tempProgressRate = sk.getActualProgressRate();
 		double tempQualityRate = sk.getActualQualityRate();
-		double statusBuff = 0;
-		
-		if(cs == CraftingStatus.HQ) {
-			statusBuff = 1.5;
+		double progBuff = 1.0;
+		double qltyBuff = 1.0;
+
+		if(cs == CraftingStatus.PROG) {
+			progBuff = 1.5;
+		} else if(cs == CraftingStatus.HQ) {
+			qltyBuff = 1.5;
 		} else if(cs == CraftingStatus.MQ) {
-			statusBuff = 4.0;
+			qltyBuff = 4.0;
 		} else if(cs == CraftingStatus.LQ) {
-			statusBuff = 0.5;
-		} else {
-			statusBuff = 1.0;
+			qltyBuff = 0.5;
 		}
 		
-		int tempProgressIncrease = (int)Math.floor(baseProgEff * tempProgressRate);
-		int tempQualityIncrease  = (int)Math.floor(Math.floor(baseQltyEff * statusBuff * tempQualityRate));
+		int tempProgressIncrease = (int)Math.floor(baseProgEff * progBuff * tempProgressRate);
+		int tempQualityIncrease  = (int)Math.floor(baseQltyEff * qltyBuff * tempQualityRate);
 		
 		progIncreased = tempProgressIncrease > 0;
 		qltyIncreased = tempQualityIncrease > 0;
